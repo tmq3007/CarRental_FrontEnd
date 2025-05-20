@@ -12,7 +12,7 @@ export default function Home() {
   if (error) return <p>Error loading posts.</p>;
 
   return (
-      <div className="p-8">
+      <div  >
         <h1 className="text-2xl font-bold mb-4">Posts</h1>
           <h2>{data2.title}</h2>
         <ul className="space-y-2">
