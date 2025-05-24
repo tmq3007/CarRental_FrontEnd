@@ -1,7 +1,6 @@
-// app/layout.tsx
 import "@/app/globals.css"
 import { Inter } from "next/font/google"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ReduxProvider } from "@/components/redux-provider" // <-- Import Provider
 

@@ -1,10 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { Car, DollarSign, Shield, UserCheck, FileCheck, CreditCard } from "lucide-react"
 import {useGetCarsQuery} from "@/lib/services/carApi";
 import {Button} from "@/components/ui/button";
-
+import { DollarSign, MapPin, Shield, Headphones, User } from "lucide-react"
 export default function Home() {
   // This will fetch cars but won't break if the API isn't ready
   const { data: cars = [], isLoading, error } = useGetCarsQuery(undefined, {
@@ -15,178 +14,224 @@ export default function Home() {
   console.log("data", cars)
 
   return (
-      <div className="flex flex-col min-h-screen">
-        <header className="bg-zinc-700 text-white">
-          <div className="container mx-auto flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <Car className="h-6 w-6" />
-              <h1 className="text-xl font-bold">Rent a car today!</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/about" className="text-sm hover:underline">
-                ABOUT US
-              </Link>
-              <div className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5" />
-                <span className="text-sm">Welcome, Bao</span>
+      <main className="min-h-screen">
+        {/* Why us section */}
+        <section className="py-12 px-4 md:px-6 lg:px-8 border-b">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8">Why us?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="border p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <DollarSign className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold mb-3">Save money</h3>
+                <p className="text-sm text-gray-600">
+                  We have no setup or registration fees. No extra charge when you rent a car. So get started for FREE!
+                </p>
+              </div>
+
+              <div className="border p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <MapPin className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold mb-3">Convenient</h3>
+                <p className="text-sm text-gray-600">
+                  We have a large selection of premium cars to suit your needs throughout the country
+                </p>
+              </div>
+
+              <div className="border p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold mb-3">Legal and insurance</h3>
+                <p className="text-sm text-gray-600">
+                  We fully cover all rentals and even provide roadside assistance. Our rating system and extended member
+                  profile checks provide safety.
+                </p>
+              </div>
+
+              <div className="border p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Headphones className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold mb-3">24/7 support</h3>
+                <p className="text-sm text-gray-600">
+                  Our team is ready to support you at every step with our 24/7 hotline and services
+                </p>
               </div>
             </div>
           </div>
-        </header>
+        </section>
 
-        <main className="flex-1">
-          <section className="bg-gray-200 py-8">
-            <div className="container mx-auto px-4">
-              <h2 className="text-xl font-semibold mb-6">Have a car for rent? Don&apos;t miss out of your benefit</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <DollarSign className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">How the insurance works</h3>
+        {/* What people say section */}
+        <section className="py-12 px-4 md:px-6 lg:px-8 border-b">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8">What people say?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-500" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    From the minute you list your car, all the way over till the second you get them back you are covered.
-                    Your private insurance is not affected.
-                  </p>
                 </div>
-
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <Shield className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">It&apos;s completely free</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    We offer both owners and renters free sign ups. It&apos;s only once a vehicle is rented out that a
-                    share is deducted to cover admin and insurance.
-                  </p>
+                <div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
                 </div>
+              </div>
 
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <UserCheck className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">You decide the price</h3>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-500" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    When you list a car you decide the price. We can help with recommendations as to price, but ultimately
-                    you decide!
-                  </p>
                 </div>
-
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <Car className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">Handing over your vehicle</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    You arrange the time and location for the exchange of your vehicle with the renter. Both parties will
-                    need to agree and sign the vehicle rental sheet before and after key handover.
-                  </p>
+                <div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
                 </div>
+              </div>
 
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <FileCheck className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">You are in charge</h3>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-500" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    All renters are pre-screened by us to ensure safety and get your approval. If you do not feel
-                    comfortable with someone you are able to decline a booking.
-                  </p>
                 </div>
+                <div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                </div>
+              </div>
 
-                <div className="bg-white p-6 rounded-md shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-gray-200 p-2 rounded">
-                      <CreditCard className="h-5 w-5 text-gray-700" />
-                    </div>
-                    <h3 className="font-medium">Set payment</h3>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-500" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    We pay you once a month and you can always view how much your car has earned under your user profile.
-                  </p>
+                </div>
+                <div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section className="py-10">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold">Make money on your car right away</h2>
+        {/* Where to find us section */}
+        <section className="py-12 px-4 md:px-6 lg:px-8 border-b">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8">Where to find us?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Hanoi</h3>
+                  <p className="text-sm">50+ cars</p>
+                </div>
               </div>
-              <div className="flex justify-center">
-                <button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-medium">
-                  List Your Car Today
-                </button>
+
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Ho Chi Minh city</h3>
+                  <p className="text-sm">100+ cars</p>
+                </div>
+              </div>
+
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Da Nang - Hoi An</h3>
+                  <p className="text-sm">30+ cars</p>
+                </div>
+              </div>
+
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Nha Trang</h3>
+                  <p className="text-sm">25+ cars</p>
+                </div>
+              </div>
+
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Da Lat</h3>
+                  <p className="text-sm">20+ cars</p>
+                </div>
+              </div>
+
+              <div className="relative bg-gray-300 aspect-[4/3] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative text-white text-center">
+                  <h3 className="text-xl font-bold">Quang Ninh</h3>
+                  <p className="text-sm">15+ cars</p>
+                </div>
               </div>
             </div>
-          </section>
-        </main>
+          </div>
+        </section>
 
-        <footer className="bg-gray-200 py-8">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-700">RENT CARS</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/search" className="text-sm text-gray-600 hover:text-gray-900">
-                      Search Cars and Rates
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+        {/* Footer */}
+        <footer className="py-8 px-4 md:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-bold text-sm uppercase tracking-wider mb-4">Rent Cars</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Search Cars and Rates
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-700">CUSTOMER ACCESS</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/booking" className="text-sm text-gray-600 hover:text-gray-900">
-                      Manage My Booking
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/wallet" className="text-sm text-gray-600 hover:text-gray-900">
-                      My Wallet
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/car" className="text-sm text-gray-600 hover:text-gray-900">
-                      My Car
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
-                      Log In
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="font-bold text-sm uppercase tracking-wider mb-4">Customer Access</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Manage My Booking
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    My Wallet
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    My Car
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Log In
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-700">JOIN US</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/signup" className="text-sm text-gray-600 hover:text-gray-900">
-                      New User Sign Up
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="font-bold text-sm uppercase tracking-wider mb-4">Join Us</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    New User Sign Up
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
         </footer>
-      </div>
+      </main>
   )
 }
