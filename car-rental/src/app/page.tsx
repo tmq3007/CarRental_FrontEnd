@@ -1,18 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import {useGetCarsQuery} from "@/lib/services/carApi";
+import {useGetCarsQuery} from "@/lib/services/car-api";
 import {Button} from "@/components/ui/button";
 import { DollarSign, MapPin, Shield, Headphones, User } from "lucide-react"
+import {useGetUserByIdQuery} from "@/lib/services/user-api";
 export default function Home() {
   // This will fetch cars but won't break if the API isn't ready
-  const { data: cars = [], isLoading, error } = useGetCarsQuery(undefined, {
-
-  })
-
-
-  console.log("data", cars)
-
+   const {data, isLoading, error} = useGetUserByIdQuery ("3E90353C-1C5D-469E-A572-0579A1C0468D")
+ console.log("data", data)
   return (
       <main className="min-h-screen">
         {/* Why us section */}
