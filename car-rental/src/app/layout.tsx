@@ -4,7 +4,9 @@ import type { ReactNode } from "react"
 import { ThemeProvider } from "@/components/provider/theme-provider"
 import { ReduxProvider } from "@/components/provider/redux-provider"
 import Header from "@/components/layouts/header";
-import Footer from "@/components/layouts/footer"; // <-- Import Provider
+import Footer from "@/components/layouts/footer";
+import ScrollToTopButton from "@/components/common/scroll-button";
+import ChatToggleButton from "@/components/chat-bot/chatbox"; // <-- Import Provider
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,7 +23,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                 <Header/>
                 {children}
-                <Footer/>
+                <Footer />
+                <ScrollToTopButton />
+                <ChatToggleButton />
+
             </ThemeProvider>
         </ReduxProvider>
         </body>

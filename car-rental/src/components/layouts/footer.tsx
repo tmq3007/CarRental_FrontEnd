@@ -4,15 +4,15 @@ import Link from "next/link"
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-200 py-8 px-4 mt-auto">
+        <footer className="bg-gradient-to-br from-green-200 to-green-300 py-8 px-4 mt-auto">
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Rent Cars Section */}
                     <div>
-                        <h3 className="font-semibold text-gray-800 mb-4 text-sm uppercase tracking-wide">RENT CARS</h3>
+                        <h3 className="font-semibold  mb-4 text-sm uppercase tracking-wide">RENT CARS</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="/search" className="text-gray-600 hover:text-green-600 text-sm transition-colors">
+                                <Link href="/search" className=" hover:text-green-600 text-sm transition-colors">
                                     Search Cars and Rates
                                 </Link>
                             </li>

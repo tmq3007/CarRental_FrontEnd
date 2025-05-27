@@ -1,16 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit"
-import { carApi } from "./services/car-api"
-import {userApi} from "@/lib/services/user-api";
+ import {userApi} from "@/lib/services/user-api";
+import {  deepSeekApi} from "@/lib/services/chatbot-api";
+import {userApi2} from "@/lib/services/user-test";
 
 
 // Create the store
 export const store = configureStore({
     reducer: {
-        [carApi.reducerPath]: carApi.reducer,
-        [userApi.reducerPath]: userApi.reducer
+         [userApi.reducerPath]: userApi.reducer,
+        [deepSeekApi.reducerPath]: deepSeekApi.reducer,
+        [userApi2.reducerPath]: userApi2.reducer
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(carApi.middleware, userApi.middleware),
+        getDefaultMiddleware().concat(  userApi.middleware,deepSeekApi.middleware,userApi2.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "3E90353C-1C5D-469E-A572-0579A1C0468D",
+    "name": "Nguyen Van A",
+    "email": "nguyenvana@example.com",
+    "age": 30,
+    "address": "123 Le Loi, Ho Chi Minh City",
+    "role": "user"
+  },
+  {
+    "id": "7A213C12-9F34-4A91-B0D8-5A3F89E53C1B",
+    "name": "Tran Thi B",
+    "email": "tranthib@example.com",
+    "age": 25,
+    "address": "456 Nguyen Hue, Ho Chi Minh City",
+    "role": "admin"
+  }
+]

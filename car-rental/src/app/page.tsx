@@ -1,8 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import {useGetCarsQuery} from "@/lib/services/car-api";
-import {Button} from "@/components/ui/button";
 import { DollarSign, MapPin, Shield, Headphones, User } from "lucide-react"
 import {useGetUserByIdQuery} from "@/lib/services/user-api";
 export default function Home() {
