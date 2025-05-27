@@ -1,27 +1,40 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Information from "@/app/user/profile/information";
-import Security from "@/app/user/profile/security";
-import Breadcrumb from "@/components/common/breadcum";
-
+import Information from "@/app/user/profile/information"
+import Security from "@/app/user/profile/security"
+import Breadcrumb from "@/components/common/breadcum"
+import { useGetUserByIdQuery, UserProfile } from "@/lib/services/user-api"
 
 export default function ProfilePage() {
-    const [personalInfo, setPersonalInfo] = useState({
-        fullName: "",
-        phoneNumber: "",
-        nationalId: "",
-        address: "",
-        state: "",
-        city: "",
-        postalCode: "",
-        dateOfBirth: "",
-        email: "",
-        drivingLicense: null as File | null,
-    })
+    const {
+        data: user,
+        isLoading: userLoading,
+        error: userError,
+    } = useGetUserByIdQuery("3E90353C-1C5D-469E-A572-0579A1C0468D")
+    console.log("user", user?.data.dob)
+
+    const [personalInfo, setPersonalInfo] = useState<UserProfile | undefined>()
+
+    useEffect(() => {
+        if (user) {
+            setPersonalInfo({
+                id: user?.data.id,
+                fullName: user?.data.fullName,
+                phoneNumber: user?.data.phoneNumber,
+                nationalId: user?.data.nationalId,
+                drivingLicenseUri: user?.data.drivingLicenseUri,
+                houseNumberStreet: user?.data.houseNumberStreet,
+                ward: user?.data.ward,
+                district: user?.data.district,
+                cityProvince: user?.data.cityProvince,
+                email: user?.data.email,
+                dob: user?.data.dob ? new Date(user?.data.dob).toISOString().split("T")[0] : "",
+            })
+        }
+    }, [user])
 
     const [securityInfo, setSecurityInfo] = useState({
         newPassword: "",
@@ -29,7 +42,7 @@ export default function ProfilePage() {
     })
 
     const handlePersonalInfoChange = (field: string, value: string) => {
-        setPersonalInfo((prev) => ({ ...prev, [field]: value }))
+        setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))
     }
 
     const handleSecurityChange = (field: string, value: string) => {
@@ -39,24 +52,43 @@ export default function ProfilePage() {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (file) {
-            setPersonalInfo((prev) => ({ ...prev, drivingLicense: file }))
+            setPersonalInfo((prev) => (prev ? { ...prev, drivingLicenseUri: file.name } : prev))
         }
     }
 
     const handlePersonalSave = () => {
         console.log("Saving personal information:", personalInfo)
-        // Add save logic here
+        // TODO: add save logic here
     }
 
     const handleSecuritySave = () => {
         console.log("Saving security information:", securityInfo)
-        // Add save logic here
+        // TODO: add save logic here
     }
 
     const handleDiscard = () => {
-        // Reset forms or navigate away
         console.log("Discarding changes")
+        // TODO: reset logic here
+        if (user) {
+            setPersonalInfo({
+                id: user?.data.id,
+                fullName: user?.data.fullName,
+                phoneNumber: user?.data.phoneNumber,
+                nationalId: user?.data.nationalId,
+                drivingLicenseUri: user?.data.drivingLicenseUri,
+                houseNumberStreet: user?.data.houseNumberStreet,
+                ward: user?.data.ward,
+                district: user?.data.district,
+                cityProvince: user?.data.cityProvince,
+                email: user?.data.email,
+                dob: user?.data.dob ? new Date(user?.data.dob).toISOString().split("T")[0] : "",
+            })
+            setSecurityInfo({ newPassword: "", confirmPassword: "" })
+        }
     }
+
+    if (userLoading) return <div>Loading user data...</div>
+    if (userError) return <div>Error loading user data.</div>
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
@@ -81,7 +113,7 @@ export default function ProfilePage() {
 
                             <TabsContent value="information">
                                 <Information
-                                    personalInfo={personalInfo}
+                                    personalInfo={personalInfo!}
                                     onPersonalInfoChange={handlePersonalInfoChange}
                                     onFileUpload={handleFileUpload}
                                     onSave={handlePersonalSave}

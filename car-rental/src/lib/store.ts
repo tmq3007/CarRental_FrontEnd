@@ -3,7 +3,11 @@ import { configureStore } from "@reduxjs/toolkit"
 import {  deepSeekApi} from "@/lib/services/chatbot-api";
 import {userApi2} from "@/lib/services/user-test";
 
-
+export type ApiResponse<T> = {
+    code: number;
+    message: string;
+    data: T;
+};
 // Create the store
 export const store = configureStore({
     reducer: {

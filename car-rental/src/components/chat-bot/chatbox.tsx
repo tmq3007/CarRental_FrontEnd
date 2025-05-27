@@ -14,8 +14,7 @@ export default function ChatToggleButton() {
 
     return (
         <>
-            {/* Nút mở/đóng chat */}
-            <Button
+             <Button
                 onClick={toggleChat}
                 size="icon"
                 className="fixed bottom-6 right-16 z-50 bg-blue-500 hover:bg-blue-700 rounded-full shadow-lg"
@@ -25,9 +24,8 @@ export default function ChatToggleButton() {
                 <MessageSquare className="w-5 h-5" />
             </Button>
 
-            {/* Hộp chat (nếu mở) */}
-            {isOpen && (
-                <div className="fixed bottom-20 right-16 z-50   max-w-full">
+             {isOpen && (
+                <div className="fixed bottom-20 right-16 z-50   max-w-[400px]">
                     <ChatboxModal />
                 </div>
             )}
