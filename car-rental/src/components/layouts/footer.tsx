@@ -1,102 +1,192 @@
 "use client"
 
+import type React from "react"
+
 import Link from "next/link"
+import { Car, Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 export default function Footer() {
-    return (
-        <footer className="py-8 px-4 mt-auto bg-green-400">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Rent Cars Section */}
-                    <div>
-                        <h3 className="font-semibold  mb-4 text-md uppercase tracking-wide">RENT CARS</h3>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/search" className=" text-gray-600 hover:text-white text-sm transition-colors">
-                                    Search Cars and Rates
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/locations" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Rental Locations
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/deals" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Special Deals
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
+  const [email, setEmail] = useState("")
+  const [isSubscribed, setIsSubscribed] = useState(false)
 
-                    {/* Customer Access Section */}
-                    <div>
-                        <h3 className="font-semibold text-gray-800 mb-4 text-md uppercase tracking-wide">CUSTOMER ACCESS</h3>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/manage-booking" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Manage My Booking
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/wallet" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    My Wallet
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/my-car" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    My Car
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/login" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Log In
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (email) {
+      setIsSubscribed(true)
+      setEmail("")
+      setTimeout(() => setIsSubscribed(false), 3000)
+    }
+  }
 
-                    {/* Join Us Section */}
-                    <div>
-                        <h3 className="font-semibold text-gray-800 mb-4 text-md uppercase tracking-wide">JOIN US</h3>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/signup" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    New User Sign Up
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/partner" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Become a Partner
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/careers" className="text-gray-600 hover:text-white text-sm transition-colors">
-                                    Careers
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+  const footerSections = [
+    {
+      title: "RENT CARS",
+      links: [
+        { name: "Search Cars and Rates", href: "/search", icon: ArrowRight },
+        { name: "Rental Locations", href: "/locations", icon: ArrowRight },
+        { name: "Special Deals", href: "/deals", icon: ArrowRight },
+        { name: "Fleet Overview", href: "/fleet", icon: ArrowRight },
+      ],
+    },
+    {
+      title: "CUSTOMER ACCESS",
+      links: [
+        { name: "Manage My Booking", href: "/manage-booking", icon: ArrowRight },
+        { name: "My Wallet", href: "/wallet", icon: ArrowRight },
+        { name: "My Car", href: "/my-car", icon: ArrowRight },
+        { name: "Log In", href: "/login", icon: ArrowRight },
+      ],
+    },
+    {
+      title: "JOIN US",
+      links: [
+        { name: "New User Sign Up", href: "/signup", icon: ArrowRight },
+        { name: "Become a Partner", href: "/partner", icon: ArrowRight },
+        { name: "Careers", href: "/careers", icon: ArrowRight },
+        { name: "Investor Relations", href: "/investors", icon: ArrowRight },
+      ],
+    },
+  ]
 
-                {/* Bottom section */}
-                <div className="mt-8 pt-6 border-t border-gray-300">
-                    <div className="flex flex-col md:flex-row justify-between items-center text-md text-gray-600">
-                        <p>&copy; 2024 Car Rental Service. All rights reserved.</p>
-                        <div className="flex gap-6 mt-4 md:mt-0">
-                            <Link href="/privacy" className="hover:text-white transition-colors">
-                                Privacy Policy
-                            </Link>
-                            <Link href="/terms" className="hover:text-white transition-colors">
-                                Terms of Service
-                            </Link>
-                            <Link href="/contact" className="hover:text-white transition-colors">
-                                Contact Us
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+  const socialLinks = [
+    { name: "Facebook", icon: Facebook, href: "#", color: "hover:text-blue-500" },
+    { name: "Twitter", icon: Twitter, href: "#", color: "hover:text-blue-400" },
+    { name: "Instagram", icon: Instagram, href: "#", color: "hover:text-pink-500" },
+    { name: "LinkedIn", icon: Linkedin, href: "#", color: "hover:text-blue-600" },
+  ]
+
+  return (
+    <footer className="bg-gradient-to-br from-green-600 via-green-500 to-green-400 text-white">
+      {/* Main Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Company Info */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <Car className="h-10 w-10 text-white group-hover:rotate-12 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">RentCar Pro</h2>
+                <p className="text-green-100 text-sm">Your journey starts here</p>
+              </div>
             </div>
-        </footer>
-    )
+
+            <p className="text-green-100 leading-relaxed">
+              Experience premium car rental services with our extensive fleet of vehicles. From economy cars to luxury
+              SUVs, we have the perfect ride for every journey.
+            </p>
+
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-green-100 hover:text-white transition-colors group">
+                <Phone className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm">24/7 Support: +1 (555) 123-4567</span>
+              </div>
+              <div className="flex items-center gap-3 text-green-100 hover:text-white transition-colors group">
+                <Mail className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm">support@rentcarpro.com</span>
+              </div>
+              <div className="flex items-center gap-3 text-green-100 hover:text-white transition-colors group">
+                <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm">50+ Locations Nationwide</span>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="flex gap-4">
+              {socialLinks.map((social) => (
+                <Link
+                  key={social.name}
+                  href={social.href}
+                  className={`p-2 bg-white/10 rounded-full ${social.color} transition-all duration-300 hover:bg-white/20 hover:scale-110`}
+                  aria-label={social.name}
+                >
+                  <social.icon className="h-5 w-5" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          {footerSections.map((section, index) => (
+            <div key={section.title} className="space-y-4">
+              <h3 className="font-semibold text-lg uppercase tracking-wide border-b border-green-300/30 pb-2">
+                {section.title}
+              </h3>
+              <ul className="space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-green-100 hover:text-white text-sm transition-all duration-200 flex items-center gap-2 group"
+                    >
+                      <link.icon className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">{link.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Newsletter Signup */}
+        <div className="mt-12 pt-8 border-t border-green-300/30">
+          <div className="max-w-md mx-auto text-center lg:text-left lg:mx-0">
+            <h3 className="text-xl font-semibold mb-2">Stay Updated</h3>
+            <p className="text-green-100 text-sm mb-4">Get the latest deals and updates delivered to your inbox.</p>
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 bg-white/10 border-green-300/30 text-white placeholder:text-green-200 focus:border-white focus:bg-white/20"
+                required
+              />
+              <Button
+                type="submit"
+                className="bg-white text-green-600 hover:bg-green-50 transition-all duration-200 hover:scale-105"
+                disabled={isSubscribed}
+              >
+                {isSubscribed ? (
+                  <span className="flex items-center gap-2">✓ Subscribed</span>
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="bg-green-700/50 border-t border-green-300/20">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-green-100 text-sm">&copy; 2024 RentCar Pro. All rights reserved.</p>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <Link href="/privacy" className="text-green-100 hover:text-white transition-colors hover:underline">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-green-100 hover:text-white transition-colors hover:underline">
+                Terms of Service
+              </Link>
+              <Link href="/contact" className="text-green-100 hover:text-white transition-colors hover:underline">
+                Contact Us
+              </Link>
+              <Link href="/sitemap" className="text-green-100 hover:text-white transition-colors hover:underline">
+                Sitemap
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
 }
