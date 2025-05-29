@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Car, User, Eye, EyeOff, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import useAuthRedirect from "@/lib/hook/useAuthRedirect";
+import {LoginVO, useLoginMutation} from "@/lib/services/auth-api";
+import {ApiResponse} from "@/lib/store";
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
@@ -15,6 +18,8 @@ export default function LoginPage() {
     const [emailError, setEmailError] = useState("")
     const [passwordError, setPasswordError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [Login, {isLoading : loginLoading}] = useLoginMutation()
+    const [loginData, setLoginData] = useState<ApiResponse<LoginVO>>()
 
     const validateEmail = (email: string) => {
         if (!email.trim()) {
@@ -66,15 +71,20 @@ export default function LoginPage() {
 
         // Simulate API call
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000))
-            console.log("Login attempt:", { email, password })
-            // Handle successful login here
+            const data = await Login ({ Email: email, Password: password }).unwrap()
+            setLoginData(data)
         } catch (error) {
             console.error("Login failed:", error)
         } finally {
             setIsLoading(false)
         }
     }
+
+    useAuthRedirect(loginData, undefined, {
+        success: () => {
+            setIsLoading(false)
+        }
+    })
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
