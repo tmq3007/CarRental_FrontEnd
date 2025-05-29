@@ -3,8 +3,6 @@ import HeroSearchSection from "@/components/homepage/hero-search";
 
 export default function CustomerHomePage() {
     return (
-        <main>
-            <CustomerHomepageLayout/>
-        </main>
+        <CustomerHomepageLayout />
     );
 }
