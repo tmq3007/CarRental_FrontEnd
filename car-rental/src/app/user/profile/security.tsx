@@ -30,7 +30,19 @@ export default function Security({ securityInfo, onSecurityChange, onSave, onDis
         confirmPassword: ""
     })
     const [isFormValid, setIsFormValid] = useState(false)
+    const [showSaving, setShowSaving] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
+
+    const handleSave = () => {
+        setShowSaving(true);
+        onSave(); // Gọi hàm save từ props
+
+        // Sau 2 giây sẽ tắt trạng thái "Saving..."
+        setTimeout(() => {
+            setShowSaving(false);
+        }, 2000);
+    };
     useEffect(() => {
         const validationResults = validateSecurityInfo(securityInfo)
         setErrors({
@@ -121,11 +133,11 @@ export default function Security({ securityInfo, onSecurityChange, onSave, onDis
                     Discard
                 </Button>
                 <Button
-                    onClick={onSave}
+                    onClick={handleSave}
                     className="bg-blue-600 hover:bg-blue-700"
-                    disabled={!isFormValid}
+                    disabled={!isFormValid }
                 >
-                    Save
+                    {showSaving ? "Saving..." : "Save"}
                 </Button>
             </div>
         </div>

@@ -6,6 +6,7 @@ import Footer from "@/components/layouts/footer";
 import ScrollToTopButton from "@/components/common/scroll-button";
 import ChatToggleButton from "@/components/chat-bot/chatbox";
 import StoreProvider, {Props} from "@/components/provider/StoreProvider"; // <-- Import Provider
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Props) {
                     <div className="pt-24 sm:pt-28 md:pt-32">
                         {children}
                     </div>
+                    <Toaster />
                     <Footer />
                     <ScrollToTopButton />
                     <ChatToggleButton />

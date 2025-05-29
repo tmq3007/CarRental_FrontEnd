@@ -51,10 +51,18 @@ export const userApi = createApi({
                 body: dto,
             }),
         }),
+        changePassword: builder.mutation<ApiResponse<void>, { id: string, dto: ChangePasswordDTO }>({
+            query: ({ id, dto }) => ({
+                url: `User/change-password/${id}`,
+                method: 'POST',
+                body: dto,
+            }),
+        }),
     }),
 })
 
 export const {
     useGetUserByIdQuery,
-    useUpdateUserProfileMutation
+    useUpdateUserProfileMutation,
+    useChangePasswordMutation
 } = userApi

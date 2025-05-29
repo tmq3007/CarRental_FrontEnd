@@ -6,10 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Information from "@/app/user/profile/information"
 import Security from "@/app/user/profile/security"
 import Breadcrumb from "@/components/common/breadcum"
-import { useGetUserByIdQuery, useUpdateUserProfileMutation, UserProfile } from "@/lib/services/user-api"
-import {toast} from "@/hooks/use-toast";
-import InformationSkeleton from "@/components/skeleton/information-skeleton";
+import {
+    useGetUserByIdQuery,
+    useUpdateUserProfileMutation,
+    UserProfile,
+    useChangePasswordMutation
+} from "@/lib/services/user-api"
+import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import này
+import { toast as sonnerToast } from "sonner"
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
+import InformationSkeleton from "@/components/skeleton/information-skeleton";
 
 export default function ProfilePage() {
     const userId = "3E90353C-1C5D-469E-A572-0579A1C0468D" // You might want to get this dynamically
@@ -21,6 +27,7 @@ export default function ProfilePage() {
     } = useGetUserByIdQuery(userId)
 
     const [updateProfile] = useUpdateUserProfileMutation()
+    const [changePassword] = useChangePasswordMutation()
     const [personalInfo, setPersonalInfo] = useState<UserProfile | undefined>()
 
     const extractUserProfileFromData = (userData: any): UserProfile => ({
@@ -87,24 +94,65 @@ export default function ProfilePage() {
             }
 
             await updateProfile({ id: userId, dto: updateData }).unwrap()
-            toast({
+            // Sử dụng cả 2 toast
+            shadToast({
                 title: "Success",
                 description: "Profile updated successfully",
                 variant: "default",
             })
-            refetchUser() // Refresh user data
+            sonnerToast.success("Profile updated successfully")
+            refetchUser()
         } catch (error) {
-            toast({
+            shadToast({
                 title: "Error",
                 description: "Failed to update profile",
                 variant: "destructive",
             })
+            sonnerToast.error("Failed to update profile")
         }
     }
 
-    const handleSecuritySave = () => {
-        console.log("Saving security information:", securityInfo)
-        // TODO: add save logic here
+    const handleSecuritySave = async () => {
+        if (securityInfo.newPassword !== securityInfo.confirmPassword) {
+            shadToast({
+                title: "Error",
+                description: "New password and confirmation don't match",
+                variant: "destructive",
+            })
+            sonnerToast.error("New password and confirmation don't match")
+            return
+        }
+
+        try {
+            await changePassword({
+                id: userId,
+                dto: {
+                    currentPassword: securityInfo.currentPassword,
+                    newPassword: securityInfo.newPassword,
+                    confirmPassword: securityInfo.confirmPassword
+                }
+            }).unwrap()
+
+            shadToast({
+                title: "Success",
+                description: "Password changed successfully",
+                variant: "default",
+            })
+            sonnerToast.success("Password changed successfully")
+
+            setSecurityInfo({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: "",
+            })
+        } catch (error) {
+            shadToast({
+                title: "Error",
+                description: "Failed to change password. Please check your current password.",
+                variant: "destructive",
+            })
+            sonnerToast.error("Failed to change password. Please check your current password.")
+        }
     }
 
     const handleDiscard = () => {
