@@ -18,18 +18,21 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
-        <ReduxProvider>
-            <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
-                <Header/>
-                {children}
-                <Footer />
-                <ScrollToTopButton />
-                <ChatToggleButton />
-
-            </ThemeProvider>
-        </ReduxProvider>
-        </body>
+            <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
+                <ReduxProvider>
+                    <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
+                        <main className="min-h-screen">
+                            <Header />
+                            <div className="pt-24 sm:pt-28 md:pt-32">
+                                {children}
+                            </div>
+                            <Footer />
+                            <ScrollToTopButton />
+                            <ChatToggleButton />
+                        </main>
+                    </ThemeProvider>
+                </ReduxProvider>
+            </body>
         </html>
     )
 }
