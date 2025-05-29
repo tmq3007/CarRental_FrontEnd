@@ -59,11 +59,17 @@ export default function ProfilePage() {
     }
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
+        const file = event.target.files?.[0];
         if (file) {
-            setPersonalInfo((prev) => (prev ? { ...prev, drivingLicenseUri: file.name } : prev))
+            // Tạo URL tạm thời để hiển thị preview
+            const fileUrl = URL.createObjectURL(file);
+
+            // Cập nhật cả tên file và URL preview
+            setPersonalInfo((prev) =>
+                prev ? { ...prev, drivingLicenseUri: file.name, drivingLicensePreview: fileUrl } : prev
+            );
         }
-    }
+    };
 
     const handlePersonalSave = async () => {
         if (!personalInfo) return

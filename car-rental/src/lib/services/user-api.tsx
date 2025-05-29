@@ -13,6 +13,7 @@ export interface UserProfile {
     district: string
     cityProvince: string
     email?: string
+    drivingLicensePreview?: string;
 }
 
 export interface UserUpdateDTO {

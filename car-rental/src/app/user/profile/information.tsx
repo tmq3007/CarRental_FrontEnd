@@ -55,6 +55,9 @@ export default function Information({
     const [errors, setErrors] = useState<ValidationErrors>({})
     const [isFormValid, setIsFormValid] = useState(false)
     const [showSaving, setShowSaving] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+
     const handleSave = () => {
         setShowSaving(true);
         onSave(); // Gọi hàm save từ props
@@ -340,27 +343,50 @@ export default function Information({
                         <Label htmlFor="drivingLicense" className="text-sm font-medium">
                             Driving license:
                         </Label>
-                        <div className="flex gap-2 mt-1">
-                            <Input id="drivingLicense" type="file" onChange={onFileUpload} className="hidden" />
-                            <div className="flex-1">
+                        <div>
+                            <Label htmlFor="drivingLicense" className="text-sm font-medium">
+                                Driving license:
+                            </Label>
+                            <div className="flex gap-2 mt-1">
                                 <Input
-                                    value={personalInfo.drivingLicenseUri || ""}
-                                    onChange={(e) => handleFieldChange("drivingLicenseUri", e.target.value)}
-                                    placeholder="Enter URL or upload file"
-                                    className={errors.drivingLicenseUri ? "border-red-500 focus:border-red-500" : ""}
+                                    id="drivingLicense"
+                                    type="file"
+                                    onChange={onFileUpload}
+                                    className="hidden"
+                                    accept="image/*" // Chỉ chấp nhận file ảnh
                                 />
-                                <ErrorMessage error={errors.drivingLicenseUri} />
+                                <div className="flex-1">
+                                    <Input
+                                        value={personalInfo.drivingLicenseUri || ""}
+                                        onChange={(e) => handleFieldChange("drivingLicenseUri", e.target.value)}
+                                        placeholder="Enter URL or upload file"
+                                        className={errors.drivingLicenseUri ? "border-red-500 focus:border-red-500" : ""}
+                                    />
+                                    <ErrorMessage error={errors.drivingLicenseUri} />
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => document.getElementById("drivingLicense")?.click()}
+                                    className="px-3"
+                                >
+                                    <Upload className="h-4 w-4 mr-1" />
+                                    Upload
+                                </Button>
                             </div>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => document.getElementById("drivingLicense")?.click()}
-                                className="px-3"
-                            >
-                                <Upload className="h-4 w-4 mr-1" />
-                                Upload
-                            </Button>
+
+                            {/* Hiển thị preview hình ảnh */}
+                            {personalInfo.drivingLicensePreview && (
+                                <div className="mt-5">
+
+                                    <img
+                                        src={personalInfo.drivingLicensePreview}
+                                        alt="Driving license preview"
+                                        className="max-w-xs max-h-40 border rounded-md"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
