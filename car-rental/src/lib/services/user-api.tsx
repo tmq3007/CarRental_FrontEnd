@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { ApiResponse } from "@/lib/store";
+import {baseQuery} from "@/lib/services/config/baseQuery";
 
 export interface UserProfile {
     id: string
@@ -26,6 +27,12 @@ export interface UserUpdateDTO {
     ward?: string
     district?: string
     cityProvince?: string
+}
+
+export  interface ChangePasswordDTO {
+    currentPassword: string
+    newPassword: string
+    confirmPassword: string
 }
 
 export const userApi = createApi({

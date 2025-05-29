@@ -44,6 +44,7 @@ export default function ProfilePage() {
     }, [user])
 
     const [securityInfo, setSecurityInfo] = useState({
+        currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     })
@@ -109,7 +110,7 @@ export default function ProfilePage() {
     const handleDiscard = () => {
         if (user) {
             setPersonalInfo(extractUserProfileFromData(user.data))
-            setSecurityInfo({ newPassword: "", confirmPassword: "" })
+            setSecurityInfo({currentPassword: "", newPassword: "", confirmPassword: "" })
         }
     }
 

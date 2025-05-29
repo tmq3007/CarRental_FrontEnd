@@ -118,3 +118,40 @@ export const validateUserProfile = (profile: {
 export const hasValidationErrors = (errors: Record<string, string | undefined>): boolean => {
     return Object.values(errors).some((error) => error !== undefined)
 }
+// Validates current password (required, min 8 chars)
+export const validateCurrentPassword = (value: string): string | undefined => {
+    if (!value.trim()) return "Current password is required"
+    if (value.length < 8) return "Password must be at least 8 characters"
+    return undefined
+}
+
+// Validates new password (strong password requirements)
+export const validateNewPassword = (value: string): string | undefined => {
+    if (!value.trim()) return "New password is required"
+    if (value.length < 8) return "Password must be at least 8 characters"
+    if (!/[A-Z]/.test(value)) return "Must contain at least one uppercase letter"
+    if (!/[a-z]/.test(value)) return "Must contain at least one lowercase letter"
+    if (!/[0-9]/.test(value)) return "Must contain at least one number"
+    if (!/[^A-Za-z0-9]/.test(value)) return "Must contain at least one special character"
+    return undefined
+}
+
+// Validates password confirmation
+export const validateConfirmPassword = (password: string, confirmPassword: string): string | undefined => {
+    if (!confirmPassword.trim()) return "Please confirm your password"
+    if (password !== confirmPassword) return "Passwords do not match"
+    return undefined
+}
+
+// Validates all security fields (password change)
+export const validateSecurityInfo = (securityInfo: {
+    currentPassword: string
+    newPassword: string
+    confirmPassword: string
+}) => {
+    return {
+        currentPassword: validateCurrentPassword(securityInfo.currentPassword),
+        newPassword: validateNewPassword(securityInfo.newPassword),
+        confirmPassword: validateConfirmPassword(securityInfo.newPassword, securityInfo.confirmPassword)
+    }
+}
