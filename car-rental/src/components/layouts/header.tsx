@@ -6,17 +6,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function Header() {
     return (
-        <header className="bg-gradient-to-br from-green-200 to-green-300   px-4 py-3">
+        <header className="bg-green-400 px-4 py-3">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 {/* Left side - Logo and tagline */}
-                <div className="flex items-center gap-3">
-                    <Car className="h-6 w-6" />
-                    <span className="text-lg font-medium">Rent a car today!</span>
+                <div className="flex items-center gap-3 text-white">
+                    <Car className="h-12 w-12" />
+                    <span className="text-3xl font-serif">Rent a car today!</span>
                 </div>
 
                 {/* Center - Navigation */}
                 <nav className="hidden md:flex">
-                    <Button variant="ghost" className="  hover:text-white hover:bg-green-600">
+                    <Button variant="ghost" className=" text-2xl text-white hover:bg-green-500">
                         ABOUT US
                     </Button>
                 </nav>
@@ -27,7 +27,7 @@ export default function Header() {
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="ghost"
-                                className=" hover:text-white hover:bg-green-600 flex items-center gap-2"
+                                className=" text-xl text-white hover:bg-green-500 flex items-center gap-2"
                             >
                                 <User className="h-4 w-4" />
                                 <span>Welcome, An</span>
