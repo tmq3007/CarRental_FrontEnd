@@ -10,6 +10,8 @@ import { useGetUserByIdQuery, useUpdateUserProfileMutation, UserProfile } from "
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import {toast} from "@/hooks/use-toast";
+import InformationSkeleton from "@/components/skeleton/information-skeleton";
+import SecuritySkeleton from "@/components/skeleton/security-skeleton";
 
 export default function ProfilePage() {
     const userId = "3E90353C-1C5D-469E-A572-0579A1C0468D" // You might want to get this dynamically
@@ -107,11 +109,11 @@ export default function ProfilePage() {
         }
     }
 
-    if (userLoading) return <div>Loading user data...</div>
     if (userError) return <div>Error loading user data.</div>
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
+
             <div className="max-w-5xl mx-auto">
                 <Breadcrumb items={[{ label: "Home", path: "/" }, { label: "Profile" }]} />
 
@@ -127,25 +129,32 @@ export default function ProfilePage() {
                             </TabsList>
 
                             <TabsContent value="information">
-                                {personalInfo && (
-                                    <Information
-                                        personalInfo={personalInfo}
-                                        onPersonalInfoChange={handlePersonalInfoChange}
-                                        onFileUpload={handleFileUpload}
-                                        onSave={handlePersonalSave}
-                                        onDiscard={handleDiscard}
-                                        userId={userId}
-                                    />
+                                {userLoading ? (
+                                    <InformationSkeleton />
+                                ) : (
+                                    personalInfo && (
+                                        <Information
+                                            personalInfo={personalInfo}
+                                            onPersonalInfoChange={handlePersonalInfoChange}
+                                            onFileUpload={handleFileUpload}
+                                            onSave={handlePersonalSave}
+                                            onDiscard={handleDiscard}
+                                            userId={userId}
+                                        />
+                                    )
                                 )}
                             </TabsContent>
 
+
                             <TabsContent value="security">
-                                <Security
+                                {userLoading ? (
+                                    <SecuritySkeleton />
+                                ) : (<Security
                                     securityInfo={securityInfo}
                                     onSecurityChange={handleSecurityChange}
                                     onSave={handleSecuritySave}
                                     onDiscard={handleDiscard}
-                                />
+                                />)}
                             </TabsContent>
                         </Tabs>
                     </CardContent>

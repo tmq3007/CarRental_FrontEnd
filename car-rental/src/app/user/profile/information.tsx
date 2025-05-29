@@ -41,7 +41,7 @@ interface InformationProps {
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
     onSave: () => void
     onDiscard: () => void
-    userId: string
+    userId: string,
 }
 
 export default function Information({
@@ -50,12 +50,20 @@ export default function Information({
                                         onFileUpload,
                                         onSave,
                                         onDiscard,
-                                        userId
+                                        userId,
                                     }: InformationProps) {
     const [errors, setErrors] = useState<ValidationErrors>({})
     const [isFormValid, setIsFormValid] = useState(false)
-    const [updateProfile, { isLoading }] = useUpdateUserProfileMutation()
+    const [showSaving, setShowSaving] = useState(false);
+    const handleSave = () => {
+        setShowSaving(true);
+        onSave(); // Gọi hàm save từ props
 
+        // Sau 2 giây sẽ tắt trạng thái "Saving..."
+        setTimeout(() => {
+            setShowSaving(false);
+        }, 2000);
+    };
     // Fetch Provinces
     const { data: provinces = [] } = useGetProvincesQuery()
 
@@ -147,6 +155,26 @@ export default function Information({
     }, [personalInfo])
 
     console.log("Errors:", errors)
+
+    // Hàm này chuyển đổi date từ các định dạng khác nhau sang YYYY-MM-DD
+    const formatDateForInput = (dateString: string | undefined): string => {
+        if (!dateString) return "";
+
+        // Nếu date đã đúng định dạng YYYY-MM-DD thì trả về luôn
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+            return dateString;
+        }
+
+        // Xử lý các định dạng date khác
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "";
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    };
     const ErrorMessage = ({ error }: { error?: string }) => {
         if (!error) return null
         return (
@@ -286,8 +314,8 @@ export default function Information({
                             <Input
                                 id="dateOfBirth"
                                 type="date"
-                                value={personalInfo.dob || ""}
-                                onChange={(e) => handleFieldChange("dateOfBirth", e.target.value)}
+                                value={formatDateForInput(personalInfo.dob)}
+                                onChange={(e) => handleFieldChange("dob", e.target.value)}
                                 className={`pr-10 ${errors.dob ? "border-red-500 focus:border-red-500" : ""}`}
                             />
                         </div>
@@ -353,11 +381,11 @@ export default function Information({
                     Discard
                 </Button>
                 <Button
-                    onClick={onSave}
+                    onClick={handleSave}
                     className="bg-blue-600 hover:bg-blue-700"
-                    disabled={!isFormValid || isLoading}
+                    disabled={!isFormValid }
                 >
-                    {isLoading ? "Saving..." : "Save"}
+                    {showSaving ? "Saving..." : "Save"}
                 </Button>
             </div>
         </div>
