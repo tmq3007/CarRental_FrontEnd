@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import {ApiResponse} from "@/lib/store";
+import { ApiResponse } from "@/lib/store";
 
 export interface UserProfile {
     id: string
@@ -12,8 +12,22 @@ export interface UserProfile {
     ward: string
     district: string
     cityProvince: string
-    email: string
+    email?: string
+    drivingLicensePreview?: string;
 }
+
+export interface UserUpdateDTO {
+    fullName?: string
+    dob?: string
+    phoneNumber?: string
+    nationalId?: string
+    drivingLicenseUri?: string
+    houseNumberStreet?: string
+    ward?: string
+    district?: string
+    cityProvince?: string
+}
+
 export const userApi = createApi({
     reducerPath: "userApi",
     baseQuery: fetchBaseQuery({
@@ -23,7 +37,17 @@ export const userApi = createApi({
         getUserById: builder.query<ApiResponse<UserProfile>, string>({
             query: (id) => `User/profile/${id}`,
         }),
+        updateUserProfile: builder.mutation<ApiResponse<UserProfile>, { id: string, dto: UserUpdateDTO }>({
+            query: ({ id, dto }) => ({
+                url: `User/profile/${id}`,
+                method: 'PUT',
+                body: dto,
+            }),
+        }),
     }),
 })
 
-export const { useGetUserByIdQuery } = userApi
+export const {
+    useGetUserByIdQuery,
+    useUpdateUserProfileMutation
+} = userApi

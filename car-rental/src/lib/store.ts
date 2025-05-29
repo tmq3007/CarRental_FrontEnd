@@ -6,6 +6,7 @@ import {userApi2} from "@/lib/services/user-test";
 import {authApi} from "@/lib/services/auth-api";
 import userReducer from "@/lib/slice/userSlice";
 import storage from "@/lib/ssr-safe-storage";
+import {addressApi} from "@/lib/services/local-api/address-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -18,7 +19,7 @@ const baseReducer =  combineReducers({
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
     [userApi2.reducerPath]: userApi2.reducer,
     [authApi.reducerPath]: authApi.reducer,
-
+    [addressApi.reducerPath]: addressApi.reducer,
     user: userReducer,
 })
 
@@ -41,7 +42,7 @@ export const store = () => {
                     ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, 'some/non-serializable-action'],
                     ignoredPaths: ['some.non.serializable.path'],
                 },
-            }).concat(userApi.middleware, deepSeekApi.middleware, userApi2.middleware, authApi.middleware),
+            }).concat(userApi.middleware, deepSeekApi.middleware, userApi2.middleware, authApi.middleware, addressApi.middleware),
     })
 }
 

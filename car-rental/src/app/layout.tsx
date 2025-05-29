@@ -20,12 +20,15 @@ export default function RootLayout({ children }: Props) {
         <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
         <StoreProvider>
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
-                <Header/>
-                {children}
-                <Footer />
-                <ScrollToTopButton />
-                <ChatToggleButton />
-
+                <main className="min-h-screen">
+                    <Header />
+                    <div className="pt-24 sm:pt-28 md:pt-32">
+                        {children}
+                    </div>
+                    <Footer />
+                    <ScrollToTopButton />
+                    <ChatToggleButton />
+                </main>
             </ThemeProvider>
         </StoreProvider>
         </body>
