@@ -7,6 +7,8 @@ import Information from "@/app/user/profile/information"
 import Security from "@/app/user/profile/security"
 import Breadcrumb from "@/components/common/breadcum"
 import { useGetUserByIdQuery, UserProfile } from "@/lib/services/user-api"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 
 export default function ProfilePage() {
     const {
@@ -18,23 +20,26 @@ export default function ProfilePage() {
 
     const [personalInfo, setPersonalInfo] = useState<UserProfile | undefined>()
 
+    const extractUserProfileFromData = (userData: any): UserProfile => ({
+        id: userData.id,
+        fullName: userData.fullName,
+        phoneNumber: userData.phoneNumber,
+        nationalId: userData.nationalId,
+        drivingLicenseUri: userData.drivingLicenseUri,
+        houseNumberStreet: userData.houseNumberStreet,
+        ward: userData.ward,
+        district: userData.district,
+        cityProvince: userData.cityProvince,
+        email: userData.email,
+        dob: userData.dob ? new Date(userData.dob).toISOString().split("T")[0] : "",
+    });
+
     useEffect(() => {
         if (user) {
-            setPersonalInfo({
-                id: user?.data.id,
-                fullName: user?.data.fullName,
-                phoneNumber: user?.data.phoneNumber,
-                nationalId: user?.data.nationalId,
-                drivingLicenseUri: user?.data.drivingLicenseUri,
-                houseNumberStreet: user?.data.houseNumberStreet,
-                ward: user?.data.ward,
-                district: user?.data.district,
-                cityProvince: user?.data.cityProvince,
-                email: user?.data.email,
-                dob: user?.data.dob ? new Date(user?.data.dob).toISOString().split("T")[0] : "",
-            })
+            setPersonalInfo(extractUserProfileFromData(user.data))
         }
     }, [user])
+
 
     const [securityInfo, setSecurityInfo] = useState({
         newPassword: "",
@@ -68,24 +73,12 @@ export default function ProfilePage() {
 
     const handleDiscard = () => {
         console.log("Discarding changes")
-        // TODO: reset logic here
         if (user) {
-            setPersonalInfo({
-                id: user?.data.id,
-                fullName: user?.data.fullName,
-                phoneNumber: user?.data.phoneNumber,
-                nationalId: user?.data.nationalId,
-                drivingLicenseUri: user?.data.drivingLicenseUri,
-                houseNumberStreet: user?.data.houseNumberStreet,
-                ward: user?.data.ward,
-                district: user?.data.district,
-                cityProvince: user?.data.cityProvince,
-                email: user?.data.email,
-                dob: user?.data.dob ? new Date(user?.data.dob).toISOString().split("T")[0] : "",
-            })
+            setPersonalInfo(extractUserProfileFromData(user.data))
             setSecurityInfo({ newPassword: "", confirmPassword: "" })
         }
     }
+
 
     if (userLoading) return <div>Loading user data...</div>
     if (userError) return <div>Error loading user data.</div>
