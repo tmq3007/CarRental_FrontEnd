@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, AlertCircle } from "lucide-react"
-import type { UserProfile } from "@/lib/services/user-api"
+import {UserProfile, useUpdateUserProfileMutation} from "@/lib/services/user-api"
 import {
     validateFullName,
     validatePhoneNumber,
@@ -41,6 +41,7 @@ interface InformationProps {
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
     onSave: () => void
     onDiscard: () => void
+    userId: string
 }
 
 export default function Information({
@@ -49,86 +50,63 @@ export default function Information({
                                         onFileUpload,
                                         onSave,
                                         onDiscard,
+                                        userId
                                     }: InformationProps) {
     const [errors, setErrors] = useState<ValidationErrors>({})
     const [isFormValid, setIsFormValid] = useState(false)
-    const [initialCodes, setInitialCodes] = useState<{
-        cityProvinceCode?: string
-        districtCode?: string
-        wardCode?: string
-    }>({})
+    const [updateProfile, { isLoading }] = useUpdateUserProfileMutation()
 
     // Fetch Provinces
     const { data: provinces = [] } = useGetProvincesQuery()
 
-    // Map initial string values to codes when personalInfo and provinces are available
-    useEffect(() => {
-        if (!personalInfo || !provinces.length) return
+    // Fetch Districts when cityProvince changes
+    const { data: districts = [] } = useGetDistrictsQuery(
+        provinces.find(p => p.name === personalInfo?.cityProvince)?.code || 0,
+        { skip: !personalInfo?.cityProvince }
+    )
 
-        const province = provinces.find((p) => p.name === personalInfo.cityProvince)
-        const cityProvinceCode = province ? String(province.code) : ""
+    // Fetch Wards when district changes
+    const { data: wards = [] } = useGetWardsQuery(
+        districts.find(d => d.name === personalInfo?.district)?.code || 0,
+        { skip: !personalInfo?.district }
+    )
 
-        setInitialCodes((prev) => ({
-            ...prev,
-            cityProvinceCode,
-        }))
+    // Find current selections by name
+    const currentProvince = provinces.find(p => p.name === personalInfo?.cityProvince)
+    const currentDistrict = districts.find(d => d.name === personalInfo?.district)
+    const currentWard = wards.find(w => w.name === personalInfo?.ward)
 
-        // Update personalInfo with the code
-        if (cityProvinceCode && cityProvinceCode !== personalInfo.cityProvince) {
-            onPersonalInfoChange("cityProvince", cityProvinceCode)
+    // Handlers for address changes
+    const handleProvinceChange = (code: string) => {
+        const selectedProvince = provinces.find(p => p.code.toString() === code)
+        if (selectedProvince) {
+            onPersonalInfoChange("cityProvince", selectedProvince.name)
+            // Reset dependent fields
+            onPersonalInfoChange("district", "")
+            onPersonalInfoChange("ward", "")
         }
-    }, [personalInfo, provinces, onPersonalInfoChange])
+    }
 
-    // Fetch Districts when cityProvince code is available
-    const { data: districts = [] } = useGetDistrictsQuery(Number(initialCodes.cityProvinceCode), {
-        skip: !initialCodes.cityProvinceCode,
-    })
-
-    // Map district name to code
-    useEffect(() => {
-        if (!personalInfo || !districts.length) return
-
-        const district = districts.find((d) => d.name === personalInfo.district)
-        const districtCode = district ? String(district.code) : ""
-
-        setInitialCodes((prev) => ({
-            ...prev,
-            districtCode,
-        }))
-
-        if (districtCode && districtCode !== personalInfo.district) {
-            onPersonalInfoChange("district", districtCode)
+    const handleDistrictChange = (code: string) => {
+        const selectedDistrict = districts.find(d => d.code.toString() === code)
+        if (selectedDistrict) {
+            onPersonalInfoChange("district", selectedDistrict.name)
+            // Reset dependent field
+            onPersonalInfoChange("ward", "")
         }
-    }, [personalInfo, districts, onPersonalInfoChange])
+    }
 
-    // Fetch Wards when district code is available
-    const { data: wards = [] } = useGetWardsQuery(Number(initialCodes.districtCode), {
-        skip: !initialCodes.districtCode,
-    })
-
-    // Map ward name to code
-    useEffect(() => {
-        if (!personalInfo || !wards.length) return
-
-        const ward = wards.find((w) => w.name === personalInfo.ward)
-        const wardCode = ward ? String(ward.code) : ""
-
-        setInitialCodes((prev) => ({
-            ...prev,
-            wardCode,
-        }))
-
-        if (wardCode && wardCode !== personalInfo.ward) {
-            onPersonalInfoChange("ward", wardCode)
+    const handleWardChange = (code: string) => {
+        const selectedWard = wards.find(w => w.code.toString() === code)
+        if (selectedWard) {
+            onPersonalInfoChange("ward", selectedWard.name)
         }
-    }, [personalInfo, wards, onPersonalInfoChange])
+    }
 
-    // Real-time validation handler
+    // General field change handler
     const handleFieldChange = (field: string, value: string) => {
-        // Update the field value
         onPersonalInfoChange(field, value)
 
-        // Validate the field
         let error: string | undefined
         switch (field) {
             case "fullName":
@@ -140,31 +118,12 @@ export default function Information({
             case "nationalId":
                 error = validateNationalId(value)
                 break
-            // case "drivingLicenseUri":
-            //     error = validateDrivingLicenseUri(value)
-            //     break
-            // case "houseNumberStreet":
-            //     error = validateHouseNumberStreet(value)
-            //     break
-            // case "ward":
-            //     error = validateWard(value)
-            //     break
-            // case "district":
-            //     error = validateDistrict(value)
-            //     break
-            // case "cityProvince":
-            //     error = validateCityProvince(value)
-            //     break
             case "dateOfBirth":
                 error = validateDateOfBirth(value)
                 break
         }
 
-        // Update errors state
-        setErrors((prev) => ({
-            ...prev,
-            [field]: error,
-        }))
+        setErrors(prev => ({ ...prev, [field]: error }))
     }
 
     // Check form validity
@@ -175,11 +134,11 @@ export default function Information({
             fullName: personalInfo.fullName,
             phoneNumber: personalInfo.phoneNumber,
             nationalId: personalInfo.nationalId,
-            drivingLicenseUri: personalInfo.drivingLicenseUri,
-            houseNumberStreet: personalInfo.houseNumberStreet,
-            ward: personalInfo.ward,
-            district: personalInfo.district,
-            cityProvince: personalInfo.cityProvince,
+            // drivingLicenseUri: personalInfo.drivingLicenseUri,
+            // houseNumberStreet: personalInfo.houseNumberStreet,
+            // ward: personalInfo.ward,
+            // district: personalInfo.district,
+            // cityProvince: personalInfo.cityProvince,
             dob: personalInfo.dob,
         })
 
@@ -187,6 +146,7 @@ export default function Information({
         setIsFormValid(!hasValidationErrors(newErrors))
     }, [personalInfo])
 
+    console.log("Errors:", errors)
     const ErrorMessage = ({ error }: { error?: string }) => {
         if (!error) return null
         return (
@@ -239,47 +199,49 @@ export default function Information({
                                 <Input
                                     id="houseNumberStreet"
                                     value={personalInfo.houseNumberStreet || ""}
-                                    onChange={(e) => handleFieldChange("houseNumberStreet", e.target.value)}
-                                    className={errors.houseNumberStreet ? "border-red-500 focus:border-red-500" : ""}
-                                    placeholder="Enter house number and street"
+                                    onChange={(e) => onPersonalInfoChange("houseNumberStreet", e.target.value)}
+                                    placeholder="House number and street (optional)"
                                 />
-                                <ErrorMessage error={errors.houseNumberStreet} />
+                                {/*<ErrorMessage error={errors.houseNumberStreet} />*/}
                             </div>
 
                             <div>
+                                <Label className="text-sm font-medium">City/Province:</Label>
                                 <Select
-                                    onValueChange={(value) => handleFieldChange("ward", value)}
-                                    value={initialCodes.wardCode || personalInfo.ward || ""}
+                                    onValueChange={handleProvinceChange}
+                                    value={currentProvince?.code.toString() || ""}
                                 >
-                                    <SelectTrigger className={errors.ward ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select Ward" />
+                                    <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>
+                                        <SelectValue placeholder="Select City/Province">
+                                            {personalInfo.cityProvince || "Select City/Province"}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {wards.map((ward) => (
-                                            <SelectItem key={ward.code} value={String(ward.code)}>
-                                                {ward.name}
+                                        {provinces.map((province) => (
+                                            <SelectItem key={province.code} value={province.code.toString()}>
+                                                {province.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <ErrorMessage error={errors.ward} />
+                                <ErrorMessage error={errors.cityProvince} />
                             </div>
 
                             <div>
+                                <Label className="text-sm font-medium">District:</Label>
                                 <Select
-                                    onValueChange={(value) => {
-                                        handleFieldChange("district", value)
-                                        handleFieldChange("ward", "")
-                                        setInitialCodes((prev) => ({ ...prev, wardCode: "" }))
-                                    }}
-                                    value={initialCodes.districtCode || personalInfo.district || ""}
+                                    onValueChange={handleDistrictChange}
+                                    value={currentDistrict?.code.toString() || ""}
+                                    disabled={!personalInfo.cityProvince}
                                 >
                                     <SelectTrigger className={errors.district ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select District" />
+                                        <SelectValue placeholder="Select District">
+                                            {personalInfo.district || "Select District"}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {districts.map((district) => (
-                                            <SelectItem key={district.code} value={String(district.code)}>
+                                            <SelectItem key={district.code} value={district.code.toString()}>
                                                 {district.name}
                                             </SelectItem>
                                         ))}
@@ -289,31 +251,26 @@ export default function Information({
                             </div>
 
                             <div>
+                                <Label className="text-sm font-medium">Ward:</Label>
                                 <Select
-                                    value={initialCodes.cityProvinceCode || personalInfo.cityProvince || ""}
-                                    onValueChange={(value) => {
-                                        handleFieldChange("cityProvince", value)
-                                        handleFieldChange("district", "")
-                                        handleFieldChange("ward", "")
-                                        setInitialCodes((prev) => ({
-                                            ...prev,
-                                            districtCode: "",
-                                            wardCode: "",
-                                        }))
-                                    }}
+                                    onValueChange={handleWardChange}
+                                    value={currentWard?.code.toString() || ""}
+                                    disabled={!personalInfo.district}
                                 >
-                                    <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select Province" />
+                                    <SelectTrigger className={errors.ward ? "border-red-500" : ""}>
+                                        <SelectValue placeholder="Select Ward">
+                                            {personalInfo.ward || "Select Ward"}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {provinces.map((province) => (
-                                            <SelectItem key={province.code} value={String(province.code)}>
-                                                {province.name}
+                                        {wards.map((ward) => (
+                                            <SelectItem key={ward.code} value={ward.code.toString()}>
+                                                {ward.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <ErrorMessage error={errors.cityProvince} />
+                                <ErrorMessage error={errors.ward} />
                             </div>
                         </div>
                     </div>
@@ -390,12 +347,17 @@ export default function Information({
                     </div>
                 </div>
             )}
+
             <div className="flex justify-end gap-3 pt-6 border-t">
                 <Button variant="outline" onClick={onDiscard}>
                     Discard
                 </Button>
-                <Button onClick={onSave} className="bg-blue-600 hover:bg-blue-700" disabled={!isFormValid}>
-                    Save
+                <Button
+                    onClick={onSave}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={!isFormValid || isLoading}
+                >
+                    {isLoading ? "Saving..." : "Save"}
                 </Button>
             </div>
         </div>

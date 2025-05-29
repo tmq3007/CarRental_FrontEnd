@@ -19,7 +19,7 @@ const baseReducer =  combineReducers({
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
     [userApi2.reducerPath]: userApi2.reducer,
     [authApi.reducerPath]: authApi.reducer,
-    [addressApi.reducerPath]: addressApi.reducer
+    [addressApi.reducerPath]: addressApi.reducer,
     user: userReducer,
 })
 
