@@ -8,7 +8,7 @@ import {CustomFetchBaseQueryError} from "@/lib/services/config/baseQuery";
 import {updateUser} from "@/lib/slice/userSlice";
 
 interface JwtPayload {
-    sub: string;
+    email: string;
     id: string;
     role: string;
     exp: number;
@@ -19,8 +19,6 @@ const useAuthRedirect = (
     data: any,
     error: FetchBaseQueryError | SerializedError | undefined,
     messageApi: any,
-    redirectUrl: string,
-    isCustomerLogin: boolean,  // param to check type of login form
     onSuccess?: () => void  // Callback to close modal when login successfully
 ) => {
     const router = useRouter();
@@ -30,27 +28,33 @@ const useAuthRedirect = (
         if (data?.data && !processed.current) {
             processed.current = true;
 
-            const accessToken = data.data.accessToken;
+            const accessToken = data.data.token;
+            console.log("=============================================================================");
+            console.log("Access Token:", accessToken);
 
             try {
                 const decoded = jwtDecode<JwtPayload>(accessToken);
+                console.log("Decoded Token:", decoded);
+                const userRole = decoded.role;
                 dispatch(updateUser({
-                    username: decoded.sub,
+                    email: decoded.email,
                     id: decoded.id,
                     role: decoded.role,
                 }));
 
+                // messageApi.success('Login successful.', 1).then(() => {
+                //     if(userRole === 'admin') {
+                //         router.push('/admin/dashboard');
+                //     } else if(userRole === 'customer') {
+                //         router.push('/');
+                //     }
+                // });
+
             } catch (e) {
-                messageApi.error("Failed to decode token.", 1);
+                // messageApi.error("Failed to decode token.", 1);
+                console.log("Failed to decode token:", e);
             }
 
-            messageApi.success('Login successful.', 1).then(() => {
-                if (isCustomerLogin && onSuccess) {
-                    onSuccess();
-                } else if (!isCustomerLogin) {
-                    router.push(redirectUrl); // Redirect admin
-                }
-            });
         }
 
         if (error && 'data' in error) {
@@ -65,7 +69,7 @@ const useAuthRedirect = (
                 messageApi.error('Something went wrong. Try again later!', 1);
             }
         }
-    }, [data, error, redirectUrl, isCustomerLogin, messageApi, router, onSuccess, dispatch]);
+    }, [data, error, messageApi, router, onSuccess, dispatch]);
 };
 
 export default useAuthRedirect;
