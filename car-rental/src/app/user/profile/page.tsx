@@ -7,8 +7,6 @@ import Information from "@/app/user/profile/information"
 import Security from "@/app/user/profile/security"
 import Breadcrumb from "@/components/common/breadcum"
 import { useGetUserByIdQuery, useUpdateUserProfileMutation, UserProfile } from "@/lib/services/user-api"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import {toast} from "@/hooks/use-toast";
 import InformationSkeleton from "@/components/skeleton/information-skeleton";
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
