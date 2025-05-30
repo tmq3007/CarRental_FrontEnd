@@ -4,6 +4,7 @@ import { Car, ChevronDown, User, Phone, MapPin, Clock, Menu, X } from "lucide-re
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEffect, useState, useRef, useCallback } from "react"
+import Link from "next/link";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -174,7 +175,9 @@ export default function Header() {
                     handleDropdownItemClick("My Profile")
                   }}
                 >
-                  My Profile
+                  <Link href="/user/profile"  >
+                    My Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
@@ -183,7 +186,7 @@ export default function Header() {
                     handleDropdownItemClick("My Bookings")
                   }}
                 >
-                  My Bookings
+                  <Link href="/user/profile"  > My Bookings </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
@@ -192,7 +195,7 @@ export default function Header() {
                     handleDropdownItemClick("My Wallet")
                   }}
                 >
-                  My Wallet
+                  <Link href="/user/profile"  >My Wallet</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
@@ -201,7 +204,7 @@ export default function Header() {
                     handleDropdownItemClick("Settings")
                   }}
                 >
-                  Settings
+                  <Link href="/user/profile"  >Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
@@ -210,7 +213,7 @@ export default function Header() {
                     handleDropdownItemClick("Log Out")
                   }}
                 >
-                  Log Out
+                  <Link href="/user/profile"  > Log Out</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -16,6 +16,8 @@ import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import nà
 import { toast as sonnerToast } from "sonner"
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
 import InformationSkeleton from "@/components/skeleton/information-skeleton";
+import NotFound from "@/components/common/not-found";
+import NoResult from "@/components/common/no-result";
 
 export default function ProfilePage() {
     const userId = "3E90353C-1C5D-469E-A572-0579A1C0468D" // You might want to get this dynamically
@@ -162,7 +164,9 @@ export default function ProfilePage() {
         }
     }
 
-    if (userError) return <div>Error loading user data.</div>
+    if (userError) {
+        return <NoResult />
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
