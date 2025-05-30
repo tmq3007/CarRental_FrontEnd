@@ -16,7 +16,7 @@ import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import nà
 import { toast as sonnerToast } from "sonner"
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
 import InformationSkeleton from "@/components/skeleton/information-skeleton";
-import NotFound from "@/components/common/not-found";
+import NotFound from "@/app/not-found";
 import NoResult from "@/components/common/no-result";
 
 export default function ProfilePage() {
