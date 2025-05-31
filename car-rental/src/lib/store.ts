@@ -1,11 +1,12 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit"
-import {persistReducer} from 'redux-persist';
+import {FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE} from 'redux-persist';
  import {userApi} from "@/lib/services/user-api";
 import {deepSeekApi} from "@/lib/services/chatbot-api";
 import {userApi2} from "@/lib/services/user-test";
 import {authApi} from "@/lib/services/auth-api";
 import userReducer from "@/lib/slice/userSlice";
 import storage from "@/lib/ssr-safe-storage";
+import {addressApi} from "@/lib/services/local-api/address-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -18,6 +19,7 @@ const baseReducer =  combineReducers({
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
     [userApi2.reducerPath]: userApi2.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [addressApi.reducerPath]: addressApi.reducer,
 
     user: userReducer,
 })
@@ -32,11 +34,19 @@ export const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, baseReducer);
 
 // Create the store
-export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(userApi.middleware,deepSeekApi.middleware,userApi2.middleware,authApi.middleware),
-})
+export const store = () => {
+    return configureStore({
+        reducer: persistedReducer,
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: {
+                    ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, 'some/non-serializable-action'],
+                    ignoredPaths: ['some.non.serializable.path'],
+                },
+            }).concat(userApi.middleware, deepSeekApi.middleware, userApi2.middleware, authApi.middleware, addressApi.middleware),
+    })
+}
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type AppStore = ReturnType<typeof store>;
+export type RootState = ReturnType<AppStore['getState']>;
+export type AppDispatch = AppStore['dispatch'];
