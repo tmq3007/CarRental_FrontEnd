@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                         <main className="min-h-screen">
                             <Header />
-                            <div className="pt-24 sm:pt-28 md:pt-32">
+                            <div className="pt-20 sm:pt-24 md:pt-28">
                                 {children}
                             </div>
                             <Footer />

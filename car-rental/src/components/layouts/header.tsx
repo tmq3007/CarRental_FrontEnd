@@ -59,7 +59,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 pt-0 right-0 z-50 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${
         isScrolled ? "py-2" : "py-4"
       }`}
     >
