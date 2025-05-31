@@ -19,9 +19,10 @@ import {
     validateCityProvince,
     validateDateOfBirth,
     validateUserProfile,
-    hasValidationErrors,
+    hasValidationErrors, validateEmail,
 } from "@/lib/validation/user-profile-validation"
 import { useGetDistrictsQuery, useGetProvincesQuery, useGetWardsQuery } from "@/lib/services/local-api/address-api"
+
 
 interface ValidationErrors {
     fullName?: string
@@ -33,6 +34,7 @@ interface ValidationErrors {
     district?: string
     cityProvince?: string
     dob?: string
+    email?: string
 }
 
 interface InformationProps {
@@ -56,8 +58,7 @@ export default function Information({
     const [isFormValid, setIsFormValid] = useState(false)
     const [showSaving, setShowSaving] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-
+    　
     const handleSave = () => {
         setShowSaving(true);
         onSave(); // Gọi hàm save từ props
@@ -132,6 +133,9 @@ export default function Information({
             case "dateOfBirth":
                 error = validateDateOfBirth(value)
                 break
+            case "email":
+                error = validateEmail(value)
+                break
         }
 
         setErrors(prev => ({ ...prev, [field]: error }))
@@ -151,14 +155,14 @@ export default function Information({
             // district: personalInfo.district,
             // cityProvince: personalInfo.cityProvince,
             dob: personalInfo.dob,
+            email: personalInfo.email
         })
 
         setErrors(newErrors)
         setIsFormValid(!hasValidationErrors(newErrors))
     }, [personalInfo])
 
-    console.log("Errors:", errors)
-
+　
     // Hàm này chuyển đổi date từ các định dạng khác nhau sang YYYY-MM-DD
     const formatDateForInput = (dateString: string | undefined): string => {
         if (!dateString) return "";
@@ -194,7 +198,7 @@ export default function Information({
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left Column */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                     <div>
                         <Label htmlFor="fullName" className="text-sm font-medium">
                             Full Name: <span className="text-red-500">*</span>
@@ -308,7 +312,7 @@ export default function Information({
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                     <div>
                         <Label htmlFor="dateOfBirth" className="text-sm font-medium">
                             Date of birth:
@@ -338,55 +342,97 @@ export default function Information({
                         />
                         <ErrorMessage error={errors.nationalId} />
                     </div>
-
                     <div>
-                        <Label htmlFor="drivingLicense" className="text-sm font-medium">
-                            Driving license:
+                        <Label htmlFor="email" className="text-sm font-medium">
+                            Email: <span className="text-red-500">*</span>
                         </Label>
-                        <div>
-
-                            <div className="flex gap-2 mt-1">
+                        <div className="space-y-2 mt-1">
+                            <div>
                                 <Input
-                                    id="drivingLicense"
-                                    type="file"
-                                    onChange={onFileUpload}
-                                    className="hidden"
-                                    accept="image/*" // Chỉ chấp nhận file ảnh
+                                    id="email"
+                                    value={personalInfo.email || ""}
+                                    onChange={(e) => handleFieldChange("email", e.target.value)}
+                                    className={`mt-1 ${errors.email ? "border-red-500 focus:border-red-500" : ""}`}
+                                    placeholder="Enter your email"
                                 />
-                                <div className="flex-1">
-                                    <Input
-                                        value={personalInfo.drivingLicenseUri || ""}
-                                        onChange={(e) => handleFieldChange("drivingLicenseUri", e.target.value)}
-                                        placeholder="Enter URL or upload file"
-                                        className={errors.drivingLicenseUri ? "border-red-500 focus:border-red-500" : ""}
-                                    />
-                                    <ErrorMessage error={errors.drivingLicenseUri} />
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => document.getElementById("drivingLicense")?.click()}
-                                    className="px-3"
-                                >
-                                    <Upload className="h-4 w-4 mr-1" />
-                                    Upload
-                                </Button>
+                                <ErrorMessage error={errors.email} />
                             </div>
 
-                            {/* Hiển thị preview hình ảnh */}
-                            {personalInfo.drivingLicensePreview && (
-                                <div className="mt-5">
+                            <div>
+                                <Label className="text-sm font-medium">City/Province:</Label>
+                                <Select
+                                    onValueChange={handleProvinceChange}
+                                    value={currentProvince?.code.toString() || ""}
+                                >
+                                    <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>
+                                        <SelectValue placeholder="Select City/Province">
+                                            {personalInfo.cityProvince || "Select City/Province"}
+                                        </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {provinces.map((province) => (
+                                            <SelectItem key={province.code} value={province.code.toString()}>
+                                                {province.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <ErrorMessage error={errors.cityProvince} />
+                            </div>
 
-                                    <img
-                                        src={personalInfo.drivingLicensePreview}
-                                        alt="Driving license preview"
-                                        className="max-w-xs max-h-40 border rounded-md"
-                                    />
+                            <div>
+
+                                <Label htmlFor="drivingLicense" className="text-sm   font-medium">
+                                    Driving license:
+                                </Label>
+                                <div >
+
+                                    <div className="flex gap-2  ">
+                                        <Input
+                                            id="drivingLicense"
+                                            type="file"
+                                            onChange={onFileUpload}
+                                            className="hidden"
+                                            accept="image/*" // Chỉ chấp nhận file ảnh
+                                        />
+                                        <div className="flex-1">
+                                            <Input
+                                                value={personalInfo.drivingLicenseUri || ""}
+                                                onChange={(e) => handleFieldChange("drivingLicenseUri", e.target.value)}
+                                                placeholder="Enter URL or upload file"
+                                                className={errors.drivingLicenseUri ? "border-red-500 focus:border-red-500" : ""}
+                                            />
+                                            <ErrorMessage error={errors.drivingLicenseUri} />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => document.getElementById("drivingLicense")?.click()}
+                                            className="px-3"
+                                        >
+                                            <Upload className="h-4 w-4 mr-1" />
+                                            Upload
+                                        </Button>
+                                    </div>
+
+                                    {/* Hiển thị preview hình ảnh */}
+                                    {personalInfo.drivingLicensePreview && (
+                                        <div className="mt-5">
+
+                                            <img
+                                                src={personalInfo.drivingLicensePreview}
+                                                alt="Driving license preview"
+                                                className="max-w-xs max-h-40 border rounded-md"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
+
                         </div>
                     </div>
+
                 </div>
             </div>
 

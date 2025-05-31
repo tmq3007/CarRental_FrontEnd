@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEffect, useState, useRef, useCallback } from "react"
 import Link from "next/link";
+import {useSelector} from "react-redux";
+import {RootState} from "@/lib/store";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const ignoreScrollRef = useRef(false)
+  const user = useSelector((state: RootState) => state.user);
 
   // Debounced scroll handler to prevent rapid state changes
   const handleScroll = useCallback(() => {

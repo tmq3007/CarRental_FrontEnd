@@ -27,6 +27,7 @@ export interface UserUpdateDTO {
     ward?: string
     district?: string
     cityProvince?: string
+    email?: string
 }
 
 export  interface ChangePasswordDTO {
