@@ -139,7 +139,7 @@ export function DateTimePicker({
                   mode="single"
                   selected={value}
                   onSelect={handleDateSelect}
-                  initialFocus
+                  autoFocus
                   className="rounded-lg"
                 />
               </div>
