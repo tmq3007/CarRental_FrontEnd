@@ -28,7 +28,7 @@ export default function HeroSearchSection() {
     console.log("Search data:", searchData)
     // Handle search logic here
   }
-
+ 
   const handleLocationChange = (value: string) => {
     setSearchData((prev) => ({
       ...prev,
@@ -99,11 +99,11 @@ export default function HeroSearchSection() {
                 <MapPin className="w-4 h-4" />
                 Pickup Location
               </Label>
-              <Select onValueChange={handleLocationChange}>
+              <Select onValueChange={handleLocationChange} >
                 <SelectTrigger className="h-12 bg-white hover:bg-green-50">
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent >
                   <SelectItem value="california-city">California City</SelectItem>
                   <SelectItem value="los-angeles">Los Angeles</SelectItem>
                   <SelectItem value="san-francisco">San Francisco</SelectItem>

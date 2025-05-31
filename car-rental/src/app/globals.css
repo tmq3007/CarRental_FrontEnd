@@ -73,5 +73,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    @apply !min-w-full;
   }
+  html {
+  @apply overflow-x-hidden;
+}
 }
