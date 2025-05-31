@@ -344,9 +344,7 @@ export default function Information({
                             Driving license:
                         </Label>
                         <div>
-                            <Label htmlFor="drivingLicense" className="text-sm font-medium">
-                                Driving license:
-                            </Label>
+
                             <div className="flex gap-2 mt-1">
                                 <Input
                                     id="drivingLicense"
