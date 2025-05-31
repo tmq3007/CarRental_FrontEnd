@@ -32,6 +32,18 @@ export const validatePhoneNumber = (value: string): string | undefined => {
     return undefined
 }
 
+export const validateEmail = (value: string): string | undefined => {
+    if (!value.trim()) return "Email is required";
+    if (value.length > 100) return "Email must be less than or equal to 100 characters";
+
+    // Regex kiểm tra định dạng email cơ bản
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+        return "Invalid email format";
+    }
+
+    return undefined;
+};
 
 // Validates national ID (required, max 20 chars)
 export const validateNationalId = (value: string): string | undefined => {
@@ -127,12 +139,12 @@ export const validateCurrentPassword = (value: string): string | undefined => {
 
 // Validates new password (strong password requirements)
 export const validateNewPassword = (value: string): string | undefined => {
-    if (!value.trim()) return "New password is required"
+    if (!value.trim()) return "Password is required"
     if (value.length < 8) return "Password must be at least 8 characters"
-    if (!/[A-Z]/.test(value)) return "Must contain at least one uppercase letter"
-    if (!/[a-z]/.test(value)) return "Must contain at least one lowercase letter"
-    if (!/[0-9]/.test(value)) return "Must contain at least one number"
-    if (!/[^A-Za-z0-9]/.test(value)) return "Must contain at least one special character"
+    if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter"
+    if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter"
+    if (!/[0-9]/.test(value)) return "Password must contain at least one number"
+    if (!/[^A-Za-z0-9]/.test(value)) return "Password must contain at least one special character"
     return undefined
 }
 

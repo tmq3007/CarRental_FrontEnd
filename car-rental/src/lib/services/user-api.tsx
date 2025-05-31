@@ -34,6 +34,14 @@ export  interface ChangePasswordDTO {
     newPassword: string
     confirmPassword: string
 }
+export interface RegisterDTO {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    fullName: string;
+    phoneNumber: string;
+    roleId: number;
+}
 
 export const userApi = createApi({
     reducerPath: "userApi",
@@ -58,11 +66,20 @@ export const userApi = createApi({
                 body: dto,
             }),
         }),
+        register: builder.mutation<ApiResponse<void>, RegisterDTO>({
+            query: (dto) => ({
+                url: `User/register`,
+                method: 'POST',
+                body: dto,
+            }),
+        }),
+
     }),
 })
 
 export const {
     useGetUserByIdQuery,
     useUpdateUserProfileMutation,
-    useChangePasswordMutation
+    useChangePasswordMutation,
+    useRegisterMutation
 } = userApi
