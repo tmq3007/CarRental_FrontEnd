@@ -38,7 +38,7 @@ export default function SignInPage() {
         const fullName = formData.get("name") as string
         const phoneNumber = formData.get("phone") as string
         const email = formData.get("email") as string
-const password = formData.get("password") as string
+        const password = formData.get("password") as string
         // Validate fields before submission
         const fullNameError = validateFullName(fullName)
         if (fullNameError) {
