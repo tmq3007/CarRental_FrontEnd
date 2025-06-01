@@ -27,6 +27,7 @@ export interface UserUpdateDTO {
     ward?: string
     district?: string
     cityProvince?: string
+    email?: string
 }
 
 export  interface ChangePasswordDTO {
@@ -45,9 +46,7 @@ export interface RegisterDTO {
 
 export const userApi = createApi({
     reducerPath: "userApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:5227/api/",
-    }),
+    baseQuery: baseQuery,
     endpoints: (builder) => ({
         getUserById: builder.query<ApiResponse<UserProfile>, string>({
             query: (id) => `User/profile/${id}`,

@@ -18,10 +18,13 @@ import SecuritySkeleton from "@/components/skeleton/security-skeleton";
 import InformationSkeleton from "@/components/skeleton/information-skeleton";
 import NotFound from "@/app/not-found";
 import NoResult from "@/components/common/no-result";
+import {useSelector} from "react-redux";
+import {RootState} from "@/lib/store";
 
 export default function ProfilePage() {
-    const userId = "3E90353C-1C5D-469E-A572-0579A1C0468D" // You might want to get this dynamically
-    const {
+
+    const userId = useSelector((state: RootState) => state.user?.id);
+     const {
         data: user,
         isLoading: userLoading,
         error: userError,
@@ -93,16 +96,17 @@ export default function ProfilePage() {
                 district: personalInfo.district,
                 cityProvince: personalInfo.cityProvince,
                 dob: personalInfo.dob,
+                email: personalInfo.email
             }
 
-            await updateProfile({ id: userId, dto: updateData }).unwrap()
+           const response = await updateProfile({ id: userId, dto: updateData }).unwrap()
             // Sử dụng cả 2 toast
             shadToast({
                 title: "Success",
-                description: "Profile updated successfully",
+                description: response.message,
                 variant: "default",
             })
-            sonnerToast.success("Profile updated successfully")
+            sonnerToast.success(response.message)
             refetchUser()
         } catch (error) {
             shadToast({

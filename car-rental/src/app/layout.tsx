@@ -5,7 +5,7 @@ import Header from "@/components/layouts/header";
 import Footer from "@/components/layouts/footer";
 import ScrollToTopButton from "@/components/common/scroll-button";
 import ChatToggleButton from "@/components/chat-bot/chatbox";
-import StoreProvider, {Props} from "@/components/provider/StoreProvider"; // <-- Import Provider
+import ReduxProvider, {Props} from "@/components/provider/StoreProvider"; // <-- Import Provider
 import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -22,11 +22,11 @@ export default function RootLayout({ children }: Props) {
     return (
         <html lang="en" suppressHydrationWarning>
         <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
-        <StoreProvider>
+        <ReduxProvider>
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                     <main className="min-h-screen">
                         <Header />
-                        <div className="pt-24 sm:pt-28 md:pt-32">
+                        <div className="pt-20 sm:pt-24 md:pt-28">
                             {children}
                         </div>
                         <Toaster />
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: Props) {
                         <ChatToggleButton />
                     </main>
             </ThemeProvider>
-        </StoreProvider>
+        </ReduxProvider>
         </body>
         </html>
     )
