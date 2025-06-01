@@ -60,15 +60,13 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 pt-0 right-0 z-50 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${
-        isScrolled ? "py-2" : "py-4"
-      }`}
+      className={`fixed top-0 left-0 pt-0 right-0 z-50 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${isScrolled ? "py-2" : "py-4"
+        }`}
     >
       {/* Top info bar - only visible when not scrolled */}
       <div
-        className={`bg-green-700 text-white text-sm transition-all duration-300 ease-in-out overflow-hidden ${
-          isScrolled ? "max-h-0 opacity-0" : "max-h-10 opacity-100"
-        }`}
+        className={`bg-green-700 text-white text-sm transition-all duration-300 ease-in-out overflow-hidden ${isScrolled ? "max-h-0 opacity-0" : "max-h-10 opacity-100"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-8">
           <div className="flex items-center gap-2">
@@ -91,34 +89,34 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Left side - Logo and tagline */}
           <div
-            className={`flex items-center gap-3 text-white transition-all duration-300 ease-in-out ${
-              isScrolled ? "scale-90" : "scale-100"
-            }`}
+            className={`flex items-center gap-3 text-white transition-all duration-300 ease-in-out ${isScrolled ? "scale-90" : "scale-100"
+              }`}
           >
-            <div className="relative group">
-              <Car
-                className={`transition-all duration-300 ease-in-out group-hover:rotate-12 ${
-                  isScrolled ? "h-8 w-8" : "h-12 w-12"
-                }`}
-              />
-              <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
-            </div>
-            <div className="flex flex-col">
-              <span
-                className={`font-bold transition-all duration-300 ease-in-out ${
-                  isScrolled ? "text-lg" : "text-2xl lg:text-3xl"
-                }`}
-              >
-                RentCar Pro
-              </span>
-              <span
-                className={`font-light transition-all duration-300 ease-in-out ${
-                  isScrolled ? "text-xs opacity-0 max-h-0" : "text-sm opacity-100 max-h-6"
-                } overflow-hidden`}
-              >
-                Your journey starts here
-              </span>
-            </div>
+            <Link href="/" className="flex items-center gap-2">
+
+              <div className="relative group">
+                <Car
+                  className={`transition-all duration-300 ease-in-out group-hover:rotate-12 ${isScrolled ? "h-8 w-8" : "h-12 w-12"
+                    }`}
+                />
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+              </div>
+              <div className="flex flex-col">
+                <span
+                  className={`font-bold transition-all duration-300 ease-in-out ${isScrolled ? "text-lg" : "text-2xl lg:text-3xl"
+                    }`}
+                >
+                  RentCar Pro
+                </span>
+                <span
+                  className={`font-light transition-all duration-300 ease-in-out ${isScrolled ? "text-xs opacity-0 max-h-0" : "text-sm opacity-100 max-h-6"
+                    } overflow-hidden`}
+                >
+                  Your journey starts here
+                </span>
+              </div>
+            </Link>
+
           </div>
 
           {/* Center - Navigation (Desktop) */}
@@ -127,9 +125,8 @@ export default function Header() {
               <Button
                 key={item.name}
                 variant="ghost"
-                className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out relative group ${
-                  isScrolled ? "text-sm px-3 py-2" : "text-base px-4 py-2"
-                }`}
+                className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out relative group ${isScrolled ? "text-sm px-3 py-2" : "text-base px-4 py-2"
+                  }`}
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={(e) => {
                   e.preventDefault()
@@ -150,9 +147,8 @@ export default function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out flex items-center gap-2 ${
-                    isScrolled ? "text-sm px-2 py-1" : "text-base px-3 py-2"
-                  }`}
+                  className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out flex items-center gap-2 ${isScrolled ? "text-sm px-2 py-1" : "text-base px-3 py-2"
+                    }`}
                 >
                   <div className="relative">
                     <User className={`transition-all duration-300 ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`} />
@@ -231,9 +227,8 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         <div
-          className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-            isMobileMenuOpen ? "max-h-64 opacity-100 mt-4" : "max-h-0 opacity-0"
-          }`}
+          className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? "max-h-64 opacity-100 mt-4" : "max-h-0 opacity-0"
+            }`}
         >
           <nav className="flex flex-col space-y-2 pb-4">
             {navItems.map((item, index) => (
