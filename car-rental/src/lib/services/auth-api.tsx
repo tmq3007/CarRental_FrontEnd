@@ -1,6 +1,7 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQuery} from "@/lib/services/config/baseQuery";
 import {ApiResponse} from "@/lib/store";
+import {ChangePasswordDTO} from "@/lib/services/user-api";
 
 export type LoginDTO = {
     Email: string,
@@ -12,16 +13,7 @@ export type LoginVO = {
 }
 
 export type ForgotPasswordDTO = {
-    email: string;
-}
-
-export type ForgotPasswordVO = {
-    fpToken: string;
-    username: string;
-}
-
-export type ResetPasswordDTO = {
-    password: string;
+    Email: string;
 }
 
 export const authApi = createApi({
@@ -38,25 +30,17 @@ export const authApi = createApi({
             }),
         }),
 
-        loginByParent: build.mutation<ApiResponse<LoginVO>, LoginDTO>({
-            query: (loginDTO) => ({
-                url: '/auth/login/public',
-                method: 'POST',
-                body: loginDTO, // Gửi dữ liệu loginDTO trong body của request
-            }),
-        }),
-
-        forgotPassword: build.mutation<ApiResponse<ForgotPasswordVO>, ForgotPasswordDTO>({
+        forgotPassword: build.mutation<ApiResponse<null>, ForgotPasswordDTO>({
             query: (forgotPasswordDTO) => ({
-                url: '/auth/forgot-password',
+                url: '/Auth/send-email-forgot-password',
                 method: 'POST',
                 body: forgotPasswordDTO, // Gửi dữ liệu forgotPasswordDTO trong body của request
             }),
         }),
 
-        resetPassword: build.mutation<ApiResponse<null>, ResetPasswordDTO>({
+        resetPassword: build.mutation<ApiResponse<null>, ChangePasswordDTO>({
             query: (resetPasswordDTO) => ({
-                url: '/auth/reset-password',
+                url: '/Auth/reset-password',
                 method: 'POST',
                 body: resetPasswordDTO, // Gửi dữ liệu resetPasswordDTO trong body của request
             }),
@@ -74,7 +58,6 @@ export const authApi = createApi({
 
 export const {
     useLoginMutation,
-    useLoginByParentMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
     useLogoutMutation
