@@ -23,6 +23,7 @@ import {RootState} from "@/lib/store";
 
 export default function ProfilePage() {
 
+    // @ts-ignore
     const userId = useSelector((state: RootState) => state.user?.id);
      const {
         data: user,

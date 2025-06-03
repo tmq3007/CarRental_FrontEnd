@@ -6,12 +6,13 @@ import { Star } from "lucide-react"
 
 interface CarInfo {
     name: string
-    ratings: number
-    totalRatings: number
+    rating: number
+    totalRating: number
     numberOfRides: number
     price: string
     location: string
-    status: "Available" | "Unavailable" | "Rented"
+    status: "verified" | "not_verified" | "stopped" | "available"
+
 }
 
 interface CarInfoHeaderProps {
@@ -21,11 +22,15 @@ interface CarInfoHeaderProps {
 
 export function CarInfoHeader({ carInfo, onRentClick }: CarInfoHeaderProps) {
     const getStatusColor = (status: string) => {
-        switch (status) {
-            case "Available":
+        switch (status.toLowerCase()) {
+            case "verified":
                 return "bg-green-100 text-green-800"
-            case "Rented":
+            case "not_verified":
+                return "bg-yellow-100 text-yellow-800"
+            case "stopped":
                 return "bg-red-100 text-red-800"
+            case "available":
+                return "bg-blue-100 text-blue-800"
             default:
                 return "bg-gray-100 text-gray-800"
         }
@@ -35,19 +40,19 @@ export function CarInfoHeader({ carInfo, onRentClick }: CarInfoHeaderProps) {
         <div className="flex justify-between items-start">
             <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{carInfo.name}</h2>
-                <div className="space-y-2">
+                <div className="space-y-8 mt-7">
                     <div className="flex items-center space-x-2">
                         <span className="text-sm text-gray-600">Ratings:</span>
                         <div className="flex space-x-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
                                     key={star}
-                                    className={`w-4 h-4 ${star <= carInfo.ratings ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                    className={`w-4 h-4 ${star <= carInfo.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
                                 />
                             ))}
                         </div>
                         <span className="text-xs text-gray-500">
-              {carInfo.totalRatings > 0 ? `(${carInfo.totalRatings} ratings)` : "(No ratings yet)"}
+              {carInfo.totalRating > 0 ? `(${carInfo.totalRating} ratings)` : "(No ratings yet)"}
             </span>
                     </div>
                     <div className="flex items-center space-x-4 text-sm">

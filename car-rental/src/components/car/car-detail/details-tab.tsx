@@ -18,22 +18,34 @@ interface CarDetails {
 
 interface DetailsTabProps {
     details: CarDetails
-    additionalFunctions?: AdditionalFunction[]
+    additionalFunction?: string  // Changed from additionalFunctions array to optional string
 }
 
-export function DetailsTab({ details, additionalFunctions = [] }: DetailsTabProps) {
+export function DetailsTab({ details, additionalFunction }: DetailsTabProps) {
+    // Default functions with all options unchecked
     const defaultFunctions: AdditionalFunction[] = [
-        { icon: Bluetooth, label: "Bluetooth", checked: true },
+        { icon: Bluetooth, label: "Bluetooth", checked: false },
         { icon: Navigation, label: "GPS", checked: false },
         { icon: Camera, label: "Camera", checked: false },
         { icon: Sun, label: "Sun roof", checked: false },
-        { icon: Shield, label: "Child lock", checked: true },
-        { icon: Baby, label: "Child seat", checked: true },
+        { icon: Shield, label: "Child lock", checked: false },
+        { icon: Baby, label: "Child seat", checked: false },
         { icon: Disc, label: "DVD", checked: false },
         { icon: Usb, label: "USB", checked: false },
     ]
 
-    const functions = additionalFunctions.length > 0 ? additionalFunctions : defaultFunctions
+    // Parse the additionalFunction string and update checked status
+    const parseAdditionalFunctions = () => {
+        if (!additionalFunction) return defaultFunctions;
+
+        const activeFunctions = additionalFunction.split(',').map(f => f.trim());
+        return defaultFunctions.map(func => ({
+            ...func,
+            checked: activeFunctions.includes(func.label)
+        }));
+    }
+
+    const functions = parseAdditionalFunctions();
 
     return (
         <Card>

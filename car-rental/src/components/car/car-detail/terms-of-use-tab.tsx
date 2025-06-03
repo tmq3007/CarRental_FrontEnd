@@ -13,13 +13,12 @@ interface Term {
     label: string
     checked: boolean
 }
-
 interface TermsOfUseTabProps {
     pricing: PricingInfo
-    terms?: Term[]
+    terms?: string // Changed from Term[] to string
 }
 
-export function TermsOfUseTab({ pricing, terms = [] }: TermsOfUseTabProps) {
+export function TermsOfUseTab({ pricing, terms }: TermsOfUseTabProps) {
     const defaultTerms: Term[] = [
         { id: "no-smoking", label: "No smoking", checked: true },
         { id: "no-pet", label: "No pet", checked: true },
@@ -27,7 +26,22 @@ export function TermsOfUseTab({ pricing, terms = [] }: TermsOfUseTabProps) {
         { id: "other", label: "Other", checked: false },
     ]
 
-    const termsToShow = terms.length > 0 ? terms : defaultTerms
+    // Parse the terms string into Term array
+    const parseTerms = (): Term[] => {
+        if (!terms) return defaultTerms;
+
+        // Split the string by newlines or commas
+        const termLines = terms.split('\n').filter(line => line.trim() !== '');
+
+        // Map each line to a Term object
+        return termLines.map((line, index) => ({
+            id: `term-${index}`,
+            label: line.trim(),
+            checked: true // Assuming all terms from API are required/checked
+        }));
+    }
+
+    const termsToShow = terms ? parseTerms() : defaultTerms;
 
     return (
         <Card>

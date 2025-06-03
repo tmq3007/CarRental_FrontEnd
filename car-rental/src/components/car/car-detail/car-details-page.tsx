@@ -8,51 +8,83 @@ import {CarInfoHeader} from "@/components/car/car-detail/car-info-header";
 import {BasicInformationTab} from "@/components/car/car-detail/basic-information-tab";
 import {DetailsTab} from "@/components/car/car-detail/details-tab";
 import {TermsOfUseTab} from "@/components/car/car-detail/terms-of-use-tab";
+import {useGetCarDetailQuery} from "@/lib/services/car-api";
 
-export function CarDetailsPage() {
+export function CarDetailsPage({carId}: {carId: string}) {
 
+    const {data: carDetail, isLoading, error} = useGetCarDetailQuery(carId);
+console.log("carDetail", carDetail)
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading car details</div>;
+    }
+
+    if (!carDetail?.data) {
+        return <div>No car data available</div>;
+    }
+
+
+    const car = carDetail.data;
+
+
+    // Prepare car images array
+    const carImages = [
+        car.carImageFront,
+        car.carImageBack,
+        car.carImageLeft,
+        car.carImageRight
+    ].filter(Boolean) as string[];
+
+    // Prepare car info for header
     const carInfo = {
-        name: "Nissan Navara El 2017",
-        ratings: 0,
-        totalRatings: 0,
-        numberOfRides: 0,
-        price: "900k/day",
-        location: "Cau Giay, Hanoi",
-        status: "Available" as const,
+        name: `${car.brand} ${car.model} ${car.productionYear}`,
+        rating: Number(car.rating), // You might want to get this from API
+        totalRating: Number( car.totalRating ), // You might want to get this from API
+        numberOfRides: car.numberOfRides,
+        price: `${car.basePrice.toLocaleString()} VND/day`,
+        location: `${car.district}, ${car.cityProvince}`,
+        status: car.status as "verified" | "not_verified" | "stopped" | "available",
     }
 
+    // Prepare car specs for basic info tab
     const carSpecs = {
-        licensePlate: "",
-        brandName: "",
-        productionYear: "",
-        transmission: "",
-        color: "",
-        model: "",
-        numberOfSeats: "",
-        fuel: "",
+        licensePlate: car.licensePlate || "N/A",
+        brandName: car.brand || "N/A",
+        productionYear: car.productionYear?.toString() || "N/A",
+        transmission: car.isAutomatic ? "Automatic" : "Manual",
+        color: car.color || "N/A",
+        model: car.model || "N/A",
+        numberOfSeats: car.numberOfSeats?.toString() || "N/A",
+        fuel: car.isGasoline ? "Gasoline" : "Diesel",
     }
 
+    // Prepare documents for basic info tab
     const documents = [
-        { no: 1, name: "Registration paper", note: "Verified" },
-        { no: 2, name: "Certificate of Inspection", note: "Verified" },
-        { no: 3, name: "Insurance", note: "Not available" },
+        { no: 1, name: "Registration paper", note: car.registrationPaperUriIsVerified ? "Verified" : "Not verified" },
+        { no: 2, name: "Certificate of Inspection", note: car.certificateOfInspectionUriIsVerified ? "Verified" : "Not verified" },
+        { no: 3, name: "Insurance", note: car.insuranceUriIsVerified ? "Verified" : "Not available" },
     ]
 
+    // Prepare car details for details tab
     const carDetails = {
-        mileage: "",
-        fuelConsumption: "18 liter/100 km",
-        address: "",
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        mileage: car.mileage ? `${car.mileage.toLocaleString()} km` : "N/A",
+        fuelConsumption: car.fuelConsumption ? `${car.fuelConsumption} liter/100 km` : "N/A",
+        address: `${car.houseNumberStreet}, ${car.ward}, ${car.district}, ${car.cityProvince}`,
+        description: car.description || "No description available",
     }
 
+    // Prepare pricing for terms tab
     const pricing = {
-        basePrice: "900,000",
-        requiredDeposit: "15,000,000",
+        basePrice: car.basePrice.toLocaleString(),
+        requiredDeposit: car.deposit.toLocaleString(),
     }
 
     const handleRentClick = () => {
-        console.log("Rent button clicked")
+        console.log("Rent button clicked");
         // Implement rent functionality
     }
 
@@ -63,11 +95,10 @@ export function CarDetailsPage() {
                     { label: "Cars", path: "/cars" },
                     { label: carInfo.name }]} />
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">Car Details</h1>
-                <Separator className="mb-6" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                        <CarImageCarousel alt={carInfo.name} />
+                        <CarImageCarousel images={carImages} alt={carInfo.name} />
                     </div>
 
                     <div className="space-y-6">
@@ -88,11 +119,11 @@ export function CarDetailsPage() {
                         </TabsContent>
 
                         <TabsContent value="details" className="mt-6">
-                            <DetailsTab details={carDetails} />
+                            <DetailsTab details={carDetails} additionalFunction={car.additionalFunction}/>
                         </TabsContent>
 
                         <TabsContent value="terms" className="mt-6">
-                            <TermsOfUseTab pricing={pricing} />
+                            <TermsOfUseTab pricing={pricing} terms={car.termOfUse} />
                         </TabsContent>
                     </Tabs>
                 </div>
