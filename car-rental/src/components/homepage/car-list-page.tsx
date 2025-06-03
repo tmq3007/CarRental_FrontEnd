@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { type CarFilters, type CarVO_ViewACar, useGetCarsQuery } from "@/lib/services/car-api"
 import CarListSkeleton from "@/components/skeleton/car-list-skeleton"
 import NoResult from "@/components/common/no-result"
+import Breadcrumb from "@/components/common/breadcum";
 
 interface CarListPageProps {
     accountId: string
@@ -157,12 +158,10 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-6xl mx-auto">
-                {/* Breadcrumb */}
-                <div className="mb-4">
-                    <span className="text-blue-600 hover:underline cursor-pointer">Home</span>
-                    <span className="mx-2">{">"}</span>
-                    <span className="text-gray-600">My Cars</span>
-                </div>
+                <Breadcrumb items={[{ label: "Home", path: "/home" },
+                    {label: "My Car", path: "my-car"}
+                ]}/>
+
 
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
