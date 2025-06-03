@@ -6,6 +6,7 @@ import {useDispatch} from "react-redux";
 import {jwtDecode} from "jwt-decode";
 import {CustomFetchBaseQueryError} from "@/lib/services/config/baseQuery";
 import {updateUser} from "@/lib/slice/userSlice";
+import {toast} from "sonner";
 
 interface JwtPayload {
     email: string;
@@ -13,6 +14,7 @@ interface JwtPayload {
     role: string;
     exp: number;
     iat: number;
+    fullname?: string;
 }
 
 const useAuthRedirect = (
@@ -40,14 +42,17 @@ const useAuthRedirect = (
                     email: decoded.email,
                     id: decoded.id,
                     role: decoded.role,
+                    full_name: decoded.fullname || ''
                 }));
 
+                toast.success('Login successful.')
+
                 // messageApi.success('Login successful.', 1).then(() => {
-                //     if(userRole === 'admin') {
-                //         router.push('/admin/dashboard');
-                //     } else if(userRole === 'customer') {
-                //         router.push('/');
-                //     }
+                    if(userRole === 'admin') {
+                        router.push('/admin/dashboard');
+                    } else if(userRole === 'customer') {
+                        router.push('/home');
+                    }
                 // });
 
             } catch (e) {

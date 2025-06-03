@@ -2,8 +2,8 @@
 
 import React, {useRef} from "react";
 import {Provider} from "react-redux";
-import {Persistor} from "redux-persist/es/types";
 import {persistStore} from "redux-persist";
+import {Persistor} from 'redux-persist/es/types';
 import {PersistGate} from "redux-persist/integration/react";
 import {setupListeners} from "@reduxjs/toolkit/query";
 import {AppStore, store} from "@/lib/store";

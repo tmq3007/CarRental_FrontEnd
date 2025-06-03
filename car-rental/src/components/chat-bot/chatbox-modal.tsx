@@ -4,7 +4,9 @@ import type React from "react"
 
 import { Send, MessageCircle, User, Bot, Loader2 } from "lucide-react"
 import { useGetChatCompletionMutation } from "@/lib/services/chatbot-api"
-import { useGetUserByIdQuery } from "@/lib/services/user-test"
+import {useSelector} from "react-redux";
+import {RootState} from "@/lib/store";
+import {useGetUserByIdQuery} from "@/lib/services/user-api";
 
 interface Message {
     question: string
@@ -17,11 +19,13 @@ const ChatboxModal: React.FC = () => {
     const [input, setInput] = useState("")
     const [chatHistory, setChatHistory] = useState<Message[]>([])
     const [getCompletion, { data, isLoading, error }] = useGetChatCompletionMutation()
+    const userId = useSelector((state: RootState) => state.user?.id);
+
     const {
         data: user,
         isLoading: userLoading,
         error: userError,
-    } = useGetUserByIdQuery("3E90353C-1C5D-469E-A572-0579A1C0468D")
+    } = useGetUserByIdQuery(userId)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     // Auto scroll to bottom when new messages arrive
@@ -94,7 +98,7 @@ const ChatboxModal: React.FC = () => {
                         <div>
                             <h2 className="font-semibold text-lg">AI Assistant</h2>
                             <p className="text-blue-100 text-sm">
-                                {userLoading ? "Loading user..." : user ? `Hello, ${user.name || "User"}!` : "Ready to help"}
+                                {userLoading ? "Loading user..." : user ? `Hello, ${user.data.fullName || "User"}!` : "Ready to help"}
                             </p>
                         </div>
                     </div>

@@ -112,6 +112,7 @@ export const validateUserProfile = (profile: {
     district?: string
     cityProvince?: string
     dob?: string
+    email?: string
 }) => {
     return {
         fullName: validateFullName(profile.fullName || ""),
@@ -123,6 +124,7 @@ export const validateUserProfile = (profile: {
         district: validateDistrict(profile.district || ""),
         cityProvince: validateCityProvince(profile.cityProvince || ""),
         dob: validateDateOfBirth(profile.dob || ""),
+        email: validateEmail(profile.email || ""),
     }
 }
 
