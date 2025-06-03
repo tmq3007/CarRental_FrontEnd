@@ -30,7 +30,7 @@ export interface UserUpdateDTO {
     email?: string
 }
 
-export  interface ChangePasswordDTO {
+export interface ChangePasswordDTO {
     currentPassword: string
     newPassword: string
     confirmPassword: string
