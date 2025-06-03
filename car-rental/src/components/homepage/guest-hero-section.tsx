@@ -2,23 +2,10 @@
 
 import type React from "react"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  MapPin,
-  Car,
-  Sparkles,
-  TrendingUp,
-  Users,
-  Star,
-  Clock,
-  Shield,
-  Zap,
-  Award,
-  CheckCircle,
-  ArrowRight,
-  X,
-} from "lucide-react"
+import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import RenterPanel from "@/components/homepage/renter-panel"
+import CarOwnerPanel from "@/components/homepage/car-owner-panel"
 
 interface Particle {
   id: number
@@ -37,7 +24,7 @@ interface TransitionState {
   stage: "idle" | "animating" | "focused" | "navigating"
 }
 
-export default function AnimatedDualPurposeHero() {
+export default function AnimatedDualPurposeHeroPage() {
   const router = useRouter()
   const [particles, setParticles] = useState<Particle[]>([])
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -48,6 +35,7 @@ export default function AnimatedDualPurposeHero() {
   const [earningsCount, setEarningsCount] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [currentRenterTestimonial, setCurrentRenterTestimonial] = useState(0)
 
   // Transition state management
   const [transition, setTransition] = useState<TransitionState>({
@@ -56,12 +44,22 @@ export default function AnimatedDualPurposeHero() {
     stage: "idle",
   })
 
-  const testimonials = useMemo(
+  const ownerTestimonials = useMemo(
     () => [
       { text: "Found my perfect car in minutes!", author: "Sarah M.", rating: 5 },
       { text: "Earning $600+ monthly from my car", author: "Mike R.", rating: 5 },
       { text: "Best car rental experience ever", author: "Emma L.", rating: 5 },
       { text: "Super easy to list and earn money", author: "David K.", rating: 5 },
+    ],
+    [],
+  )
+
+  const renterTestimonials = useMemo(
+    () => [
+      { text: "Amazing selection of cars!", author: "John D.", rating: 5 },
+      { text: "Saved so much money on rentals", author: "Lisa K.", rating: 5 },
+      { text: "Quick and easy booking process", author: "Tom W.", rating: 5 },
+      { text: "Great customer service support", author: "Anna P.", rating: 5 },
     ],
     [],
   )
@@ -150,13 +148,21 @@ export default function AnimatedDualPurposeHero() {
     return () => cancelAnimationFrame(animationFrame)
   }, [])
 
-  // Testimonial rotation
+  // Testimonial rotation for owners
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+      setCurrentTestimonial((prev) => (prev + 1) % ownerTestimonials.length)
     }, 4000)
     return () => clearInterval(interval)
-  }, [testimonials.length])
+  }, [ownerTestimonials.length])
+
+  // Testimonial rotation for renters
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentRenterTestimonial((prev) => (prev + 1) % renterTestimonials.length)
+    }, 3500) // Slightly different timing to avoid sync
+    return () => clearInterval(interval)
+  }, [renterTestimonials.length])
 
   // Mouse tracking
   const handleMouseMove = useCallback(
@@ -198,10 +204,11 @@ export default function AnimatedDualPurposeHero() {
         }))
 
         // Navigate to target page
-        router.push(targetUrl)
+        console.log(`Would navigate to: ${targetUrl}`)
+        // router.push(targetUrl) // Commented out for demo
       }, 1200)
     },
-    [transition.isTransitioning, router],
+    [transition.isTransitioning],
   )
 
   // Reset transition
@@ -241,7 +248,7 @@ export default function AnimatedDualPurposeHero() {
   }
 
   return (
-    <section id="hero-section" className="relative overflow-hidden" onMouseMove={handleMouseMove}>
+    <section id="hero-section" className="relative overflow-hidden pt-8" onMouseMove={handleMouseMove}>
       {/* Background with transition effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900" />
@@ -304,16 +311,31 @@ export default function AnimatedDualPurposeHero() {
         <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-purple-500/15 rounded-full blur-xl animate-float-slow" />
         <div className="absolute bottom-32 right-1/3 w-12 h-12 bg-yellow-400/20 rounded-full blur-lg animate-pulse" />
 
-        {/* Floating testimonial */}
-        <div className="absolute top-1/4 right-10 transform transition-all duration-1000">
+        {/* Floating testimonial for car owners (right side) - Better positioning */}
+        <div className="absolute top-16 right-8 xl:right-16 transform transition-all duration-1000 hidden xl:block max-w-xs">
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 animate-float">
             <div className="flex items-center gap-1 mb-1">
-              {[...Array(testimonials[currentTestimonial]?.rating || 5)].map((_, i) => (
+              {[...Array(ownerTestimonials[currentTestimonial]?.rating || 5)].map((_, i) => (
                 <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
               ))}
             </div>
-            <p className="text-white text-xs mb-1">"{testimonials[currentTestimonial]?.text}"</p>
-            <p className="text-gray-300 text-xs">- {testimonials[currentTestimonial]?.author}</p>
+            <p className="text-white text-xs mb-1 leading-relaxed">"{ownerTestimonials[currentTestimonial]?.text}"</p>
+            <p className="text-gray-300 text-xs">- {ownerTestimonials[currentTestimonial]?.author}</p>
+          </div>
+        </div>
+
+        {/* Floating testimonial for renters (left side) - Better positioning */}
+        <div className="absolute top-20 left-8 xl:left-16 transform transition-all duration-1000 hidden xl:block max-w-xs">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 animate-float-delayed">
+            <div className="flex items-center gap-1 mb-1">
+              {[...Array(renterTestimonials[currentRenterTestimonial]?.rating || 5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
+              ))}
+            </div>
+            <p className="text-white text-xs mb-1 leading-relaxed">
+              "{renterTestimonials[currentRenterTestimonial]?.text}"
+            </p>
+            <p className="text-gray-300 text-xs">- {renterTestimonials[currentRenterTestimonial]?.author}</p>
           </div>
         </div>
       </div>
@@ -328,267 +350,60 @@ export default function AnimatedDualPurposeHero() {
         </button>
       )}
 
-      <div className="container mx-auto relative z-10 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen relative">
-          {/* Animated divider */}
+      <div className="container mx-auto relative z-10 px-4  flex items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative">
+          {/* "OR" divider - Hidden on mobile, shown on desktop */}
           <div
-            className={`hidden lg:block absolute top-0 bottom-0 left-1/2 w-1 transform -translate-x-1/2 transition-opacity duration-700 ${
+            className={`hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-700 z-10 ${
               transition.isTransitioning ? "opacity-0" : "opacity-100"
             }`}
           >
-            <div className="h-full bg-gradient-to-b from-[#358004] via-blue-500 to-purple-600 animate-pulse shadow-2xl shadow-[#358004]/30 rounded-full" />
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#358004]/30 via-blue-500/30 to-purple-600/30 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
+              <span className="text-white font-bold text-lg">OR</span>
+            </div>
+          </div>
+
+          {/* Mobile "OR" divider - Shown between panels on mobile */}
+          <div
+            className={`lg:hidden flex justify-center items-center py-4 transition-opacity duration-700 ${
+              transition.isTransitioning ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#358004]/30 via-blue-500/30 to-purple-600/30 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
+              <span className="text-white font-bold text-sm">OR</span>
+            </div>
           </div>
 
           {/* Left Panel - For Renters */}
-          <div
-            className={`p-6 md:p-12 lg:p-16 flex flex-col justify-center group relative transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              transition.isTransitioning ? "pointer-events-none" : "cursor-pointer"
-            }`}
-            style={getPanelStyles("left")}
-            onMouseEnter={() => !transition.isTransitioning && setLeftHovered(true)}
-            onMouseLeave={() => !transition.isTransitioning && setLeftHovered(false)}
-          >
-            <div
-              className={`transform transition-all duration-700 ${
-                leftHovered && !transition.isTransitioning ? "scale-105 rotate-1" : "scale-100"
-              } ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
-              {/* Stats */}
-              <div
-                className={`flex flex-wrap items-center gap-4 mb-8 transition-all duration-500 ${
-                  transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div className="flex items-center gap-2 bg-[#358004]/20 px-4 py-3 rounded-full backdrop-blur-md border border-[#358004]/30 hover:bg-[#358004]/30 transition-all duration-300">
-                  <Car className="w-5 h-5 text-[#358004]" />
-                  <span className="text-[#358004] font-bold text-xl tabular-nums">{carsCount}+</span>
-                  <span className="text-white text-sm font-medium">Cars</span>
-                </div>
-                <div className="flex items-center gap-2 bg-blue-500/20 px-4 py-3 rounded-full backdrop-blur-md border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-300">
-                  <Users className="w-5 h-5 text-blue-400" />
-                  <span className="text-blue-400 font-bold text-xl tabular-nums">{usersCount.toLocaleString()}+</span>
-                  <span className="text-white text-sm font-medium">Users</span>
-                </div>
-              </div>
-
-              {/* Rating */}
-              <div
-                className={`flex items-center gap-4 mb-6 transition-all duration-500 delay-100 ${
-                  transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div
-                  className={`p-3 bg-gradient-to-r from-[#358004] to-green-600 rounded-full transition-all duration-500 ${
-                    leftHovered && !transition.isTransitioning ? "animate-spin-slow scale-110" : ""
-                  }`}
-                >
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 text-yellow-400 fill-current transition-all duration-300 ${
-                          leftHovered && !transition.isTransitioning ? `animate-bounce delay-${i * 100}` : ""
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-white font-semibold">4.9/5</span>
-                  <span className="text-gray-300 text-sm">(2,847 reviews)</span>
-                </div>
-              </div>
-
-              {/* Heading */}
-              <h1
-                className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight transition-all duration-700 delay-200 ${
-                  leftHovered && !transition.isTransitioning ? "animate-pulse" : ""
-                } ${transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""}`}
-              >
-                <span className="bg-gradient-to-r from-white via-green-200 to-white bg-clip-text text-transparent">
-                  Looking for a vehicle?
-                </span>
-              </h1>
-
-              {/* Description */}
-              <p
-                className={`text-lg text-gray-200 mb-8 leading-relaxed transition-all duration-500 delay-300 ${
-                  leftHovered && !transition.isTransitioning ? "text-white scale-105" : ""
-                } ${transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""}`}
-              >
-                Choose between <span className="text-[#358004] font-bold text-xl animate-pulse">{carsCount}+</span>{" "}
-                verified private cars
-                <br />
-                at <span className="text-green-400 font-semibold">unbeatable prices</span> with
-                <span className="text-blue-400 font-semibold"> instant booking!</span>
-              </p>
-
-              {/* CTA Button */}
-              <div
-                className={`mb-6 transition-all duration-500 delay-400 ${
-                  transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <Button
-                  onClick={() => handlePanelSelect("left", "/search")}
-                  disabled={transition.isTransitioning}
-                  className={`group bg-gradient-to-r from-[#358004] via-green-500 to-[#358004] hover:from-green-600 hover:via-[#358004] hover:to-green-600 text-white px-8 py-6 h-auto flex items-center gap-3 text-lg font-bold rounded-2xl shadow-2xl shadow-[#358004]/50 transition-all duration-500 hover:shadow-[#358004]/70 hover:shadow-3xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    leftHovered && !transition.isTransitioning ? "animate-bounce-subtle" : ""
-                  } bg-[length:200%_100%] animate-gradient-x`}
-                >
-                  <div className="p-2 bg-white/20 rounded-full group-hover:bg-white/30 transition-all duration-300">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  Find Your Perfect Car
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </Button>
-              </div>
-
-              {/* Features */}
-              <div
-                className={`grid grid-cols-2 gap-4 text-sm transition-all duration-500 delay-500 ${
-                  transition.isTransitioning && transition.selectedPanel === "left" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Clock className="w-4 h-4 text-green-400" />
-                  <span>24/7 Support</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Shield className="w-4 h-4 text-blue-400" />
-                  <span>Fully Insured</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span>Instant Booking</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Award className="w-4 h-4 text-purple-400" />
-                  <span>Best Prices</span>
-                </div>
-              </div>
+          <div className="flex justify-center items-center order-1 lg:order-1">
+            <div className="w-full max-w-lg">
+              <RenterPanel
+                isTransitioning={transition.isTransitioning}
+                selectedPanel={transition.selectedPanel}
+                isVisible={isVisible}
+                carsCount={carsCount}
+                usersCount={usersCount}
+                leftHovered={leftHovered}
+                setLeftHovered={setLeftHovered}
+                handlePanelSelect={handlePanelSelect}
+                getPanelStyles={getPanelStyles}
+              />
             </div>
           </div>
 
           {/* Right Panel - For Car Owners */}
-          <div
-            className={`p-6 md:p-12 lg:p-16 flex flex-col justify-center border-t lg:border-t-0 border-gray-600 group relative transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              transition.isTransitioning ? "pointer-events-none" : "cursor-pointer"
-            }`}
-            style={getPanelStyles("right")}
-            onMouseEnter={() => !transition.isTransitioning && setRightHovered(true)}
-            onMouseLeave={() => !transition.isTransitioning && setRightHovered(false)}
-          >
-            <div
-              className={`transform transition-all duration-700 ${
-                rightHovered && !transition.isTransitioning ? "scale-105 rotate-1" : "scale-100"
-              } ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
-              {/* Earnings display */}
-              <div
-                className={`flex flex-wrap items-center gap-4 mb-8 transition-all duration-500 ${
-                  transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div className="bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 px-4 py-3 rounded-full backdrop-blur-md border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-300">
-                  <span className="text-green-400 font-bold text-xl tabular-nums">${earningsCount}+</span>
-                  <span className="text-white text-sm font-medium ml-2">Monthly Avg</span>
-                </div>
-                <div className="flex items-center gap-2 bg-purple-500/20 px-4 py-3 rounded-full backdrop-blur-md border border-purple-500/30">
-                  <TrendingUp className="w-5 h-5 text-purple-400" />
-                  <span className="text-purple-400 font-bold">+25%</span>
-                  <span className="text-white text-sm">Income Boost</span>
-                </div>
-              </div>
-
-              {/* Icon section */}
-              <div
-                className={`flex items-center gap-4 mb-6 transition-all duration-500 delay-100 ${
-                  transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div
-                  className={`p-3 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full transition-all duration-500 ${
-                    rightHovered && !transition.isTransitioning ? "animate-spin-slow scale-110" : ""
-                  } bg-[length:200%_100%] animate-gradient-x`}
-                >
-                  <Car className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
-                  <span className="text-white font-semibold">Top Earner Platform</span>
-                </div>
-              </div>
-
-              {/* Heading */}
-              <h1
-                className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight transition-all duration-700 delay-200 ${
-                  rightHovered && !transition.isTransitioning ? "animate-pulse" : ""
-                } ${transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""}`}
-              >
-                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent animate-gradient-x">
-                  Are you a car owner?
-                </span>
-              </h1>
-
-              {/* Description */}
-              <p
-                className={`text-lg text-gray-200 mb-8 leading-relaxed transition-all duration-500 delay-300 ${
-                  rightHovered && !transition.isTransitioning ? "text-white scale-105" : ""
-                } ${transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""}`}
-              >
-                Transform your car into a{" "}
-                <span className="text-green-400 font-bold animate-pulse">money-making asset</span>
-                <br />
-                and start earning <span className="text-blue-400 font-semibold">passive income</span>
-                <span className="text-purple-400 font-semibold"> today!</span>
-              </p>
-
-              {/* CTA Button */}
-              <div
-                className={`mb-6 transition-all duration-500 delay-400 ${
-                  transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <Button
-                  onClick={() => handlePanelSelect("right", "/list-your-car")}
-                  disabled={transition.isTransitioning}
-                  className={`group bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 hover:from-purple-600 hover:via-blue-500 hover:to-purple-600 text-white px-8 py-6 h-auto flex items-center gap-3 text-lg font-bold rounded-2xl shadow-2xl shadow-blue-500/50 transition-all duration-500 hover:shadow-blue-500/70 hover:shadow-3xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    rightHovered && !transition.isTransitioning ? "animate-bounce-subtle" : ""
-                  } bg-[length:200%_100%] animate-gradient-x`}
-                >
-                  <div className="p-2 bg-white/20 rounded-full group-hover:bg-white/30 transition-all duration-300">
-                    <Car className="w-5 h-5" />
-                  </div>
-                  Start Earning Today
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </Button>
-              </div>
-
-              {/* Features */}
-              <div
-                className={`grid grid-cols-2 gap-4 text-sm transition-all duration-500 delay-500 ${
-                  transition.isTransitioning && transition.selectedPanel === "right" ? "animate-fade-in-up" : ""
-                }`}
-              >
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <TrendingUp className="w-4 h-4 text-green-400" />
-                  <span>Passive Income</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Shield className="w-4 h-4 text-blue-400" />
-                  <span>Full Insurance</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Users className="w-4 h-4 text-purple-400" />
-                  <span>Trusted Platform</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span>Quick Setup</span>
-                </div>
-              </div>
+          <div className="flex justify-center items-center order-3 lg:order-2">
+            <div className="w-full max-w-lg">
+              <CarOwnerPanel
+                isTransitioning={transition.isTransitioning}
+                selectedPanel={transition.selectedPanel}
+                isVisible={isVisible}
+                earningsCount={earningsCount}
+                rightHovered={rightHovered}
+                setRightHovered={setRightHovered}
+                handlePanelSelect={handlePanelSelect}
+                getPanelStyles={getPanelStyles}
+              />
             </div>
           </div>
         </div>
@@ -644,7 +459,17 @@ export default function AnimatedDualPurposeHero() {
         .animate-bounce-subtle { animation: bounce-subtle 2s ease-in-out infinite; }
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+
+        /* Mobile-specific styles */
+        @media (max-width: 1023px) {
+          .grid {
+            grid-template-rows: auto auto auto;
+          }
+        }
       `}</style>
     </section>
   )
 }
+
+// Import missing components
+import { Star } from "lucide-react"
