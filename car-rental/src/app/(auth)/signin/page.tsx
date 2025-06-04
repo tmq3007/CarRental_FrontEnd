@@ -10,37 +10,19 @@ import { useState } from "react"
 import useAuthRedirect from "@/lib/hook/useAuthRedirect";
 import {LoginVO, useLoginMutation} from "@/lib/services/auth-api";
 import {ApiResponse} from "@/lib/store";
+import {toast} from "sonner";
+import { validateEmail, validateNewPassword } from "@/lib/validation/user-profile-validation"
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [emailError, setEmailError] = useState("")
-    const [passwordError, setPasswordError] = useState("")
+    const [emailError, setEmailError] = useState("" as string | undefined)
+    const [passwordError, setPasswordError] = useState("" as string | undefined)
     const [isLoading, setIsLoading] = useState(false)
     const [Login, {isLoading : loginLoading}] = useLoginMutation()
     const [loginData, setLoginData] = useState<ApiResponse<LoginVO>>()
 
-    const validateEmail = (email: string) => {
-        if (!email.trim()) {
-            return "Email is required"
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            return "Please enter a valid email address"
-        }
-        return ""
-    }
-
-    const validatePassword = (password: string) => {
-        if (!password.trim()) {
-            return "Password is required"
-        }
-        if (password.length < 6) {
-            return "Password must be at least 6 characters"
-        }
-        return ""
-    }
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -51,17 +33,17 @@ export default function LoginPage() {
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
         setPassword(value)
-        setPasswordError(validatePassword(value))
+        setPasswordError(validateNewPassword(value))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         const emailValidation = validateEmail(email)
-        const passwordValidation = validatePassword(password)
+        const passwordValidation = validateNewPassword(password)
 
-        setEmailError(emailValidation)
-        setPasswordError(passwordValidation)
+        toast.error(emailValidation)
+        toast.error(passwordValidation)
 
         if (emailValidation || passwordValidation) {
             return
@@ -187,7 +169,7 @@ export default function LoginPage() {
                     <div className="text-center mt-6">
             <span className="text-gray-600 text-sm">
               Don't have an account?{" "}
-                <Link href="/user/signup" className="text-green-600 hover:text-green-700 font-medium">
+                <Link href="/signup" className="text-green-600 hover:text-green-700 font-medium">
                 Sign up here
               </Link>
             </span>
