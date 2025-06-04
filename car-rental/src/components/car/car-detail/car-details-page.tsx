@@ -9,22 +9,24 @@ import {BasicInformationTab} from "@/components/car/car-detail/basic-information
 import {DetailsTab} from "@/components/car/car-detail/details-tab";
 import {TermsOfUseTab} from "@/components/car/car-detail/terms-of-use-tab";
 import {useGetCarDetailQuery} from "@/lib/services/car-api";
+import NoResult from "@/components/common/no-result";
+import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
 
 export function CarDetailsPage({carId}: {carId: string}) {
 
     const {data: carDetail, isLoading, error} = useGetCarDetailQuery(carId);
-console.log("carDetail", carDetail)
+    //console.log("carDetail", carDetail)
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <CarDetailsPageSkeleton />
     }
 
     if (error) {
-        return <div>Error loading car details</div>;
+        return <NoResult/>;
     }
 
     if (!carDetail?.data) {
-        return <div>No car data available</div>;
+        return <NoResult/>;
     }
 
 
