@@ -1,4 +1,3 @@
-"use client"
 
 import { Car, Shield, Clock, MapPin, Users, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
