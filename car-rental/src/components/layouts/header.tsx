@@ -126,33 +126,36 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-4 p-1">
                 <div className="flex items-center justify-between">
                     {/* Left side - Logo and tagline */}
-                    <div
-                        className={`flex items-center gap-3 text-white transition-all duration-300 ease-in-out ${isScrolled ? "scale-90" : "scale-100"
-                            }`}
-                    >
-                        <div className="relative group">
-                            <Car
-                                className={`transition-all duration-300 ease-in-out group-hover:rotate-12 ${isScrolled ? "h-8 w-8" : "h-12 w-12"
-                                    }`}
-                            />
-                            <div
-                                className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+                    <Link href="/"> 
+                        <div
+                            className={`flex items-center gap-3 text-white transition-all duration-300 ease-in-out ${isScrolled ? "scale-90" : "scale-100"
+                                }`}
+                        >
+                            <div className="relative group">
+                                <Car
+                                    className={`transition-all duration-300 ease-in-out group-hover:rotate-12 ${isScrolled ? "h-8 w-8" : "h-12 w-12"
+                                        }`}
+                                />
+                                <div
+                                    className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+                            </div>
+                            <div className="flex flex-col">
+                                <span
+                                    className={`font-bold transition-all duration-300 ease-in-out ${isScrolled ? "text-lg" : "text-2xl lg:text-3xl"
+                                        }`}
+                                >
+                                    RentCar Pro
+                                </span>
+                                <span
+                                    className={`font-light transition-all duration-300 ease-in-out ${isScrolled ? "text-xs opacity-0 max-h-0" : "text-sm opacity-100 max-h-6"
+                                        } overflow-hidden`}
+                                >
+                                    Your journey starts here
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span
-                                className={`font-bold transition-all duration-300 ease-in-out ${isScrolled ? "text-lg" : "text-2xl lg:text-3xl"
-                                    }`}
-                            >
-                                RentCar Pro
-                            </span>
-                            <span
-                                className={`font-light transition-all duration-300 ease-in-out ${isScrolled ? "text-xs opacity-0 max-h-0" : "text-sm opacity-100 max-h-6"
-                                    } overflow-hidden`}
-                            >
-                                Your journey starts here
-                            </span>
-                        </div>
-                    </div>
+                    </Link>
+
 
                     {/* Center - Navigation (Desktop) */}
                     <nav className="hidden lg:flex items-center space-x-1">

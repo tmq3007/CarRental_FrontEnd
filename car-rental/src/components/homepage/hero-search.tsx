@@ -96,104 +96,105 @@ export default function HeroSearchSection() {
         </div>
 
         {/* Search Form */}
-        <div className="max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
-          {/* Form Header */}
-          <div className="text-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Find Your Perfect Ride</h2>
-            <p className="text-white/80 text-sm sm:text-base">Choose your destination and dates to get started</p>
-          </div>
-
-          {/* Main Form Container */}
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-8 shadow-2xl">
-            {/* Custom Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-              {/* Location Field - Takes 2 columns and spans full height */}
-              <div className="lg:col-span-2 lg:row-span-2">
-                <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">Pickup Location</h3>
-                      <p className="text-xs text-gray-500">Where do you want to pick up?</p>
-                    </div>
-                  </div>
-                  <AddressInput onLocationChange={handleLocationChange} />
-                </div>
-              </div>
-
-              {/* Pickup Date Field - Takes 1 column, first row */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <CalendarDays className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">Pickup Time</h3>
-                      <p className="text-xs text-gray-500">When do you need it?</p>
-                    </div>
-                  </div>
-                  <DateTimePicker
-                    value={searchData.pickupDateTime}
-                    onChange={handlePickupDateTimeChange}
-                    label=""
-                    placeholder="Select pickup date & time"
-                  />
-                </div>
-              </div>
-
-              {/* Return Date Field - Takes 1 column, second row */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">Return Time</h3>
-                      <p className="text-xs text-gray-500">When will you return?</p>
-                    </div>
-                  </div>
-                  <DateTimePicker
-                    value={searchData.dropoffDateTime}
-                    onChange={handleDropoffDateTimeChange}
-                    label=""
-                    placeholder="Select return date & time"
-                  />
-                </div>
-              </div>
+        <div className="flex items-center justify-center w-full">
+          <div className="max-w-3xl mb-8 sm:mb-12 md:mb-16" style={{ minWidth: "60%" }}>
+            {/* Form Header */}
+            <div className="text-center mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Find Your Perfect Ride</h2>
+              <p className="text-white/80 text-sm sm:text-base">Choose your destination and dates to get started</p>
             </div>
 
-            {/* Search Button */}
-            <div className="flex justify-center mb-6">
-              <Button
-                onClick={handleSearch}
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 h-14 text-lg font-semibold rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              >
-                <Search className="w-5 h-5" />
-                Search Available Cars
-                <div className="hidden sm:flex items-center gap-1 ml-2 px-2 py-1 bg-white/20 rounded-md">
-                  <span className="text-xs">Enter</span>
+            {/* Main Form Container */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-8 shadow-2xl">
+              {/* Custom Grid Layout */}
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                {/* Location Field - Takes 2 columns and spans full height */}
+                <div className="lg:row-span-2">
+                  <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <MapPin className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-sm">Pickup Location</h3>
+                        <p className="text-xs text-gray-500">Where do you want to pick up?</p>
+                      </div>
+                    </div>
+                    <AddressInput onLocationChange={handleLocationChange} orientation="horizontal" />
+                  </div>
                 </div>
-              </Button>
-            </div>
+                <div className="grid lg:grid-cols-2 gap-4">
+                  <div className="lg:col-span-1">
+                    <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <CalendarDays className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900 text-sm">Pickup Time</h3>
+                          <p className="text-xs text-gray-500">When do you need it?</p>
+                        </div>
+                      </div>
+                      <DateTimePicker
+                        value={searchData.pickupDateTime}
+                        onChange={handlePickupDateTimeChange}
+                        label=""
+                        placeholder="Select pickup date & time"
+                      />
+                    </div>
+                  </div>
+                  <div className="lg:col-span-1">
+                    <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 h-full">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900 text-sm">Return Time</h3>
+                          <p className="text-xs text-gray-500">When will you return?</p>
+                        </div>
+                      </div>
+                      <DateTimePicker
+                        value={searchData.dropoffDateTime}
+                        onChange={handleDropoffDateTimeChange}
+                        label=""
+                        placeholder="Select return date & time"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            {/* Additional Info */}
-            <div className="mt-4 pt-4 border-t border-white/20">
-              <div className="flex flex-wrap items-center justify-center gap-4 text-white/70 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span>Free Cancellation</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <span>No Hidden Fees</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  <span>24/7 Support</span>
+              </div>
+
+              {/* Search Button */}
+              <div className="flex justify-center mb-6">
+                <Button
+                  onClick={handleSearch}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 h-14 text-lg font-semibold rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  <Search className="w-5 h-5" />
+                  Search Available Cars
+                  <div className="hidden sm:flex items-center gap-1 ml-2 px-2 py-1 bg-white/20 rounded-md">
+                    <span className="text-xs">Enter</span>
+                  </div>
+                </Button>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-4 pt-4 border-t border-white/20">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-white/70 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>Free Cancellation</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    <span>No Hidden Fees</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    <span>24/7 Support</span>
+                  </div>
                 </div>
               </div>
             </div>

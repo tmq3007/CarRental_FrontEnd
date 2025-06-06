@@ -6,9 +6,15 @@ import { useState } from "react";
 
 interface AddressInputProps {
     onLocationChange: (location: string) => void;
+    orientation?: 'horizontal' | 'vertical';
+    spacing?: 'sm' | 'md' | 'lg';
 }
 
-const AddressInput = ({ onLocationChange }: AddressInputProps) => {
+const AddressInput = ({ 
+    onLocationChange, 
+    orientation = 'vertical',
+    spacing = 'md'
+}: AddressInputProps) => {
     const [selectedProvinceCode, setSelectedProvinceCode] = useState<number | null>(null);
     const [selectedDistrictCode, setSelectedDistrictCode] = useState<number | null>(null);
     const [selectedWardCode, setSelectedWardCode] = useState<number | null>(null);
@@ -59,16 +65,36 @@ const AddressInput = ({ onLocationChange }: AddressInputProps) => {
         onLocationChange(`${selectedProvinceName}, ${selectedDistrictName}, ${ward?.name || ""}`);
     };
 
+    // Dynamic spacing classes
+    const getSpacingClass = () => {
+        const spacingMap = {
+            sm: orientation === 'horizontal' ? 'gap-2' : 'space-y-2',
+            md: orientation === 'horizontal' ? 'gap-4' : 'space-y-4',
+            lg: orientation === 'horizontal' ? 'gap-6' : 'space-y-6'
+        };
+        return spacingMap[spacing];
+    };
+
+    // Container classes based on orientation
+    const containerClasses = orientation === 'horizontal' 
+        ? `flex flex-col sm:flex-row w-full ${getSpacingClass()}`
+        : `${getSpacingClass()}`;
+
+    // Item classes for horizontal layout
+    const itemClasses = orientation === 'horizontal' 
+        ? 'flex-1 min-w-0' // min-w-0 prevents flex items from overflowing
+        : '';
+
     return (
-        <div className="space-y-4">
+        <div className={containerClasses}>
             {/* Province Selection */}
-            <div className="space-y-2">
+            <div className={`space-y-2 ${itemClasses}`}>
                 <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     Province
                 </Label>
                 <Select onValueChange={handleProvinceChange} disabled={provincesLoading}>
-                    <SelectTrigger className="h-12 bg-white hover:bg-green-50">
+                    <SelectTrigger className="h-12 bg-white hover:bg-green-50 w-full">
                         <SelectValue placeholder={provincesLoading ? "Loading..." : "Select province"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -82,7 +108,7 @@ const AddressInput = ({ onLocationChange }: AddressInputProps) => {
             </div>
 
             {/* District Selection */}
-            <div className="space-y-2">
+            <div className={`space-y-2 ${itemClasses}`}>
                 <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     District
@@ -91,7 +117,7 @@ const AddressInput = ({ onLocationChange }: AddressInputProps) => {
                     onValueChange={handleDistrictChange}
                     disabled={districtsLoading || !selectedProvinceCode}
                 >
-                    <SelectTrigger className="h-12 bg-white hover:bg-green-50">
+                    <SelectTrigger className="h-12 bg-white hover:bg-green-50 w-full">
                         <SelectValue placeholder={districtsLoading ? "Loading..." : "Select district"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -105,7 +131,7 @@ const AddressInput = ({ onLocationChange }: AddressInputProps) => {
             </div>
 
             {/* Ward Selection */}
-            <div className="space-y-2">
+            <div className={`space-y-2 ${itemClasses}`}>
                 <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     Ward
@@ -114,7 +140,7 @@ const AddressInput = ({ onLocationChange }: AddressInputProps) => {
                     onValueChange={handleWardChange}
                     disabled={wardsLoading || !selectedDistrictCode}
                 >
-                    <SelectTrigger className="h-12 bg-white hover:bg-green-50">
+                    <SelectTrigger className="h-12 bg-white hover:bg-green-50 w-full">
                         <SelectValue placeholder={wardsLoading ? "Loading..." : "Select ward"} />
                     </SelectTrigger>
                     <SelectContent>

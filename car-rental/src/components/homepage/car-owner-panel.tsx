@@ -107,7 +107,7 @@ export default function CarOwnerPanel({
           }`}
         >
           <Button
-            onClick={() => handlePanelSelect("right", "/list-your-car")}
+            onClick={() => handlePanelSelect("right", "/home?selectedPanel=car-owner")}
             disabled={isTransitioning}
             className={`group bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 hover:from-purple-600 hover:via-blue-500 hover:to-purple-600 text-white px-8 py-6 h-auto flex items-center gap-3 text-lg font-bold rounded-2xl shadow-2xl shadow-blue-500/50 transition-all duration-500 hover:shadow-blue-500/70 hover:shadow-3xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
               rightHovered && !isTransitioning ? "animate-bounce-subtle" : ""

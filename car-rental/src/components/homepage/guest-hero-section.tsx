@@ -205,7 +205,7 @@ export default function AnimatedDualPurposeHeroPage() {
 
         // Navigate to target page
         console.log(`Would navigate to: ${targetUrl}`)
-        // router.push(targetUrl) // Commented out for demo
+        router.push(targetUrl) // Commented out for demo
       }, 1200)
     },
     [transition.isTransitioning],

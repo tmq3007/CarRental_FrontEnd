@@ -121,7 +121,7 @@ export default function RenterPanel({
           }`}
         >
           <Button
-            onClick={() => handlePanelSelect("left", "/search")}
+            onClick={() => handlePanelSelect("left", "/home?selectedPanel=customer")}
             disabled={isTransitioning}
             className={`group bg-gradient-to-r from-[#358004] via-green-500 to-[#358004] hover:from-green-600 hover:via-[#358004] hover:to-green-600 text-white px-8 py-6 h-auto flex items-center gap-3 text-lg font-bold rounded-2xl shadow-2xl shadow-[#358004]/50 transition-all duration-500 hover:shadow-[#358004]/70 hover:shadow-3xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
               leftHovered && !isTransitioning ? "animate-bounce-subtle" : ""
