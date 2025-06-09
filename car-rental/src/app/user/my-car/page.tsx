@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react"
 import CarListPage from "@/components/homepage/car-list-page"
+import {useSelector} from "react-redux";
+import {RootState} from "@/lib/store";
 
 export default function CarsPage() {
     const [accountId, setAccountId] = useState<string>("")
 
     useEffect(() => {
         //test accountId, replace with actual logic to get accountId
-        const mockAccountId = "3E90353C-1C5D-469E-A572-0579A1C0468D"
+        const mockAccountId = useSelector((state: RootState) => state.user?.id)
         setAccountId(mockAccountId)
     }, [])
 
