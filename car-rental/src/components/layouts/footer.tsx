@@ -1,4 +1,3 @@
-"use client"
 
 import type React from "react"
 
@@ -6,21 +5,7 @@ import Link from "next/link"
 import { Car, Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
-
 export default function Footer() {
-  const [email, setEmail] = useState("")
-  const [isSubscribed, setIsSubscribed] = useState(false)
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) {
-      setIsSubscribed(true)
-      setEmail("")
-      setTimeout(() => setIsSubscribed(false), 3000)
-    }
-  }
-
   const footerSections = [
     {
       title: "RENT CARS",
@@ -133,35 +118,6 @@ export default function Footer() {
               </ul>
             </div>
           ))}
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="mt-12 pt-8 border-t border-green-300/30">
-          <div className="max-w-md mx-auto text-center lg:text-left lg:mx-0">
-            <h3 className="text-xl font-semibold mb-2">Stay Updated</h3>
-            <p className="text-green-100 text-sm mb-4">Get the latest deals and updates delivered to your inbox.</p>
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-white/10 border-green-300/30 text-white placeholder:text-green-200 focus:border-white focus:bg-white/20"
-                required
-              />
-              <Button
-                type="submit"
-                className="bg-white text-green-600 hover:bg-green-50 transition-all duration-200 hover:scale-105"
-                disabled={isSubscribed}
-              >
-                {isSubscribed ? (
-                  <span className="flex items-center gap-2">✓ Subscribed</span>
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </form>
-          </div>
         </div>
       </div>
 
