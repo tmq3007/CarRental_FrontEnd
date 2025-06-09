@@ -6,15 +6,9 @@ import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
 
 export default function CarsPage() {
-    const [accountId, setAccountId] = useState<string>("")
+     const mockAccountId = useSelector((state: RootState) => state.user?.id)
 
-    useEffect(() => {
-        //test accountId, replace with actual logic to get accountId
-        const mockAccountId = useSelector((state: RootState) => state.user?.id)
-        setAccountId(mockAccountId)
-    }, [])
-
-    if (!accountId) {
+    if (!mockAccountId) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
@@ -25,5 +19,5 @@ export default function CarsPage() {
         )
     }
 
-    return <CarListPage accountId={accountId} />
+    return <CarListPage accountId={mockAccountId} />
 }
