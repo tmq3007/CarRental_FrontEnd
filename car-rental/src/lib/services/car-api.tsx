@@ -36,6 +36,45 @@ export interface CarFilters {
     sortDirection?: "asc" | "desc"
 }
 
+export interface CarVO_Detail {
+    id: string;
+    brand?: string;
+    model?: string;
+    color?: string;
+    basePrice: number;
+    deposit: number;
+    numberOfSeats?: number;
+    productionYear?: number;
+    mileage?: number;
+    fuelConsumption?: number;
+    isGasoline?: boolean;
+    isAutomatic?: boolean;
+    termOfUse?: string;
+    additionalFunction?: string;
+    description?: string;
+    licensePlate?: string;
+    houseNumberStreet?: string;
+    ward?: string;
+    district?: string;
+    cityProvince?: string;
+    carImageFront?: string;
+    carImageBack?: string;
+    carImageLeft?: string;
+    carImageRight?: string;
+    insuranceUri?: string;
+    insuranceUriIsVerified?: boolean;
+    registrationPaperUri?: string;
+    registrationPaperUriIsVerified?: boolean;
+    certificateOfInspectionUri?: string;
+    certificateOfInspectionUriIsVerified?: boolean;
+    status: string;
+    accountId: string;
+    numberOfRides: number;
+    rating?: number;
+    totalRating?: number
+}
+
+
 export const carApi = createApi({
     reducerPath: "carApi",
     baseQuery: baseQuery,
@@ -56,12 +95,18 @@ export const carApi = createApi({
             },
         }),
 
+        getCarDetail: build.query<ApiResponse<CarVO_Detail>, string>({
+            query: (carId) => ({
+                url: `/Car/${carId}/detail`,
+                method: 'GET',
+            }),
+        }),
 
     }),
 })
 
 export const {
     useGetCarsQuery,
-
+    useGetCarDetailQuery
 } = carApi
 
