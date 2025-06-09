@@ -38,6 +38,11 @@ export default function ProfilePage() {
     const [changePassword] = useChangePasswordMutation()
     const [personalInfo, setPersonalInfo] = useState<UserProfile | null>(null)
 
+    const [securityInfo, setSecurityInfo] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    })
     const extractUserProfileFromData = (userData: any): UserProfile | null => {
         if (!userData) return null;
 
@@ -66,12 +71,6 @@ export default function ProfilePage() {
     if(personalInfo===null){
         return <LoginPage/>
     }
-
-    const [securityInfo, setSecurityInfo] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-    })
 
     const handlePersonalInfoChange = (field: string, value: string) => {
         setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))
