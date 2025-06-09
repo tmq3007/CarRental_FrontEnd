@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react"
 import Link from "next/link"
-import Breadcrumb from "@/components/common/breadcum";
 
 export default function EditCarDetails() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -46,11 +45,18 @@ export default function EditCarDetails() {
     return (
         <div className="min-h-screen bg-gray-50 p-4">
             <div className="max-w-6xl mx-auto">
-                <Breadcrumb items={[{ label: "Home", path: "/home" },
-                    {label: "My Car", path: "my-car" },
-                    {label: "Edit Car"}
-
-                ]}/>
+                {/* Breadcrumb */}
+                <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+                    <Link href="/" className="text-blue-600 hover:underline transition-colors duration-200">
+                        Home
+                    </Link>
+                    <span>{">"}</span>
+                    <Link href="/my-car" className="text-blue-600 hover:underline transition-colors duration-200">
+                        My car
+                    </Link>
+                    <span>{">"}</span>
+                    <span>Edit details</span>
+                </nav>
 
                 {/* Page Title */}
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">Edit car details</h1>
@@ -197,8 +203,6 @@ export default function EditCarDetails() {
                             </TabsTrigger>
                         </TabsList>
 
-
-                        // Basic Information Tab
                         <TabsContent value="basic" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
                             <Card className="transition-all duration-300 hover:shadow-lg">
                                 <CardContent className="p-6">
@@ -344,8 +348,6 @@ export default function EditCarDetails() {
                             </Card>
                         </TabsContent>
 
-
-                        {/* Details Tab */}
                         <TabsContent value="details" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
                             <Card className="transition-all duration-300 hover:shadow-lg">
                                 <CardContent className="p-6 space-y-6">
@@ -576,7 +578,6 @@ export default function EditCarDetails() {
                             </Card>
                         </TabsContent>
 
-                        {/* Pricing Tab */}
                         <TabsContent value="pricing" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
                             <Card className="transition-all duration-300 hover:shadow-lg">
                                 <CardContent className="p-6 space-y-6">
