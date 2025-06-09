@@ -18,9 +18,10 @@ interface CarInfo {
 interface CarInfoHeaderProps {
     carInfo: CarInfo
     onRentClick?: () => void
+    isCarOwner?: boolean
 }
 
-export function CarInfoHeader({ carInfo, onRentClick }: CarInfoHeaderProps) {
+export function CarInfoHeader({ carInfo, onRentClick, isCarOwner }: CarInfoHeaderProps) {
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
             case "verified":
@@ -80,9 +81,11 @@ export function CarInfoHeader({ carInfo, onRentClick }: CarInfoHeaderProps) {
                     </div>
                 </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={onRentClick}>
-                Rent now
-            </Button>
+            {!isCarOwner && (
+                <Button className="bg-blue-600 hover:bg-blue-700" onClick={onRentClick}>
+                    Rent now
+                </Button>
+            )}
         </div>
     )
 }
