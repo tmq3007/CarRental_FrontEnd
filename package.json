@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "sonner": "^2.0.5"
+  }
+}
