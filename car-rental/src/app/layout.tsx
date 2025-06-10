@@ -26,7 +26,7 @@ export default function RootLayout({ children }: Props) {
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                     <main className="min-h-screen">
                         <Header />
-                        <div className="pt-20 sm:pt-24 md:pt-28">
+                        <div className="pt-28">
                             {children}
                         </div>
                         <Toaster />
