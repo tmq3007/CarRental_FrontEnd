@@ -180,34 +180,7 @@ export function DateTimePicker({
             {/* Bottom Section: Time Controls Spanning Full Width */}
             <div className="py-2.5 px-3">
               <div className="flex flex-col sm:flex-row gap-6">
-                {/* Time Presets */}
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Clock className="h-4 w-4 text-green-600" />
-                    <h3 className="font-medium text-sm text-gray-900">Time Presets</h3>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    {timePresets.map((preset, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="h-auto p-2 flex-col hover:bg-green-50 hover:border-green-200 text-xs"
-                        onClick={() => {
-                          if (value) {
-                            const newDate = new Date(value)
-                            newDate.setHours(preset.hour, 0, 0, 0)
-                            onChange(newDate)
-                          }
-                        }}
-                      >
-                        <div className="font-medium text-gray-900">{preset.label}</div>
-                        <div className="text-gray-500">{preset.time}</div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+                
 
                 {/* Custom Time */}
                 <div className="flex-1 space-y-2">
@@ -243,6 +216,36 @@ export function DateTimePicker({
                     </select>
                   </div>
                 </div>
+                
+                {/* Time Presets */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Clock className="h-4 w-4 text-green-600" />
+                    <h3 className="font-medium text-sm text-gray-900">Time Presets</h3>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {timePresets.map((preset, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        className="h-auto p-2 flex-col hover:bg-green-50 hover:border-green-200 text-xs"
+                        onClick={() => {
+                          if (value) {
+                            const newDate = new Date(value)
+                            newDate.setHours(preset.hour, 0, 0, 0)
+                            onChange(newDate)
+                          }
+                        }}
+                      >
+                        <div className="font-medium text-gray-900">{preset.label}</div>
+                        <div className="text-gray-500">{preset.time}</div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
