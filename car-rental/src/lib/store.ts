@@ -2,7 +2,6 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { userApi } from "@/lib/services/user-api";
 import { deepSeekApi } from "@/lib/services/chatbot-api";
-import { userApi2 } from "@/lib/services/user-test";
 import { authApi } from "@/lib/services/auth-api";
 import userReducer from "@/lib/slice/userSlice";
 import storage from "@/lib/ssr-safe-storage";
@@ -19,7 +18,6 @@ export type ApiResponse<T> = {
 const baseReducer = combineReducers({
     [userApi.reducerPath]: userApi.reducer,
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
-    [userApi2.reducerPath]: userApi2.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
@@ -49,7 +47,6 @@ export const store = () => {
             }).concat(
                 userApi.middleware,
                 deepSeekApi.middleware,
-                userApi2.middleware,
                 authApi.middleware,
                 addressApi.middleware,
                 carApi.middleware,
