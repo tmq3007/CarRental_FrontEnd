@@ -7,6 +7,7 @@ import userReducer from "@/lib/slice/userSlice";
 import storage from "@/lib/ssr-safe-storage";
 import {addressApi} from "@/lib/services/local-api/address-api";
 import {carApi} from "@/lib/services/car-api";
+import {vnpayApi} from "@/lib/services/vnp-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -20,6 +21,7 @@ const baseReducer =  combineReducers({
      [authApi.reducerPath]: authApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
+    [vnpayApi.reducerPath]: vnpayApi.reducer,
     user: userReducer,
 })
 
@@ -43,7 +45,7 @@ export const store = () => {
                     ignoredPaths: ['some.non.serializable.path'],
                 },
             }).concat(userApi.middleware, deepSeekApi.middleware, authApi.middleware, addressApi.middleware
-            , carApi.middleware),
+            , carApi.middleware, vnpayApi.middleware),
     })
 }
 
