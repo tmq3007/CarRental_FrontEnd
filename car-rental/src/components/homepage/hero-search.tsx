@@ -14,8 +14,7 @@ interface SearchFormData {
 }
 
 export default function HeroSearchSection() {
-  const defaultDate = new Date(2025, 4, 29, 10, 0) // May 29, 2025, 10:00 AM
-
+  const defaultDate = new Date();
   const [searchData, setSearchData] = useState<SearchFormData>({
     pickupLocation: "",
     pickupDateTime: defaultDate,

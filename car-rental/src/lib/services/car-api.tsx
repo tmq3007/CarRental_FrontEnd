@@ -3,6 +3,50 @@ import {baseQuery} from "@/lib/services/config/baseQuery";
 import {ApiResponse} from "@/lib/store";
 
 
+// Interface for car data
+export interface SearchCar {
+  id: number
+  brand: string
+  model: string
+  type: string
+  rating: number
+  reviews: number
+  bookedTime: string
+  originalPrice: number
+  discountedPrice: number
+  dailyPrice: number
+  images: string[]
+  specs: {
+    engine: string
+    fuel: string
+    transmission: string
+    efficiency: string
+    capacity: string
+  }
+}
+
+// Define the filter criteria interface
+export interface FilterCriteria {
+  priceRange: [number, number]
+  dailyPriceMax: number
+  carTypes: string[]
+  fuelTypes: string[]
+  transmissionTypes: string[]
+  brands: string[]
+  seats: string[]
+  searchQuery: string
+  location?: {
+    province?: string
+    district?: string
+    ward?: string
+  }
+  pickupTime?: Date | null
+  dropoffTime?: Date | null
+  sortBy: string
+  order: "asc" | "desc"
+}
+
+
 export interface CarVO_ViewACar {
     id: number
     brand: string
@@ -74,6 +118,40 @@ export interface CarVO_Detail {
     totalRating?: number
 }
 
+// Utility to convert FilterCriteria to query parameters
+const toQueryParams = (filters: FilterCriteria): string => {
+  const params = new URLSearchParams()
+
+  // Add priceRange as min and max
+  params.append('priceRangeMin', filters.priceRange[0].toString())
+  params.append('priceRangeMax', filters.priceRange[1].toString())
+
+  // Add dailyPriceMax
+  params.append('dailyPriceMax', filters.dailyPriceMax.toString())
+
+  // Add arrays (carTypes, fuelTypes, etc.) as comma-separated values
+  if (filters.carTypes.length > 0) params.append('carTypes', filters.carTypes.join(','))
+  if (filters.fuelTypes.length > 0) params.append('fuelTypes', filters.fuelTypes.join(','))
+  if (filters.transmissionTypes.length > 0) params.append('transmissionTypes', filters.transmissionTypes.join(','))
+  if (filters.brands.length > 0) params.append('brands', filters.brands.join(','))
+  if (filters.seats.length > 0) params.append('seats', filters.seats.join(','))
+
+  // Add searchQuery
+  if (filters.searchQuery.trim()) params.append('searchQuery', filters.searchQuery)
+
+  // Add location fields if they exist
+  if (filters.location) {
+    if (filters.location.province) params.append('locationProvince', filters.location.province)
+    if (filters.location.district) params.append('locationDistrict', filters.location.district)
+    if (filters.location.ward) params.append('locationWard', filters.location.ward)
+  }
+
+  // Add pickupTime and dropoffTime as ISO strings if they exist
+  if (filters.pickupTime) params.append('pickupTime', filters.pickupTime.toISOString())
+  if (filters.dropoffTime) params.append('dropoffTime', filters.dropoffTime.toISOString())
+
+  return params.toString()
+}
 
 export const carApi = createApi({
     reducerPath: "carApi",
@@ -102,11 +180,19 @@ export const carApi = createApi({
             }),
         }),
 
+        searchCars: build.query<ApiResponse<SearchCar[]>, FilterCriteria>({
+            query: (filters) => ({
+            url: `/Car/search?${toQueryParams(filters)}`,
+            method: 'GET',
+            }),
+        }),
+
     }),
 })
 
 export const {
     useGetCarsQuery,
-    useGetCarDetailQuery
+    useGetCarDetailQuery,
+    useSearchCarsQuery
 } = carApi
 

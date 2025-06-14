@@ -1,8 +1,8 @@
 "use client"
 
 import { Filter } from "lucide-react"
-import CarRentalListCard from "./list-view-card"
-import CarRentalGridCard from "./grid-view-card"
+import CarRentalListCard from "./cards/list-view-card"
+import CarRentalGridCard from "./cards/grid-view-card"
 
 interface CarData {
   id: number
