@@ -8,7 +8,8 @@ interface ResultsHeaderProps {
   viewMode: "list" | "grid"
   setViewMode: (mode: "list" | "grid") => void
   sortBy: string
-  setSortBy: (sort: string) => void
+  order: "asc" | "desc"
+  onSortChange: (sortBy: string, order: "asc" | "desc") => void
 }
 
 export default function ResultsHeader({
@@ -17,8 +18,17 @@ export default function ResultsHeader({
   viewMode,
   setViewMode,
   sortBy,
-  setSortBy,
+  order,
+  onSortChange,
 }: ResultsHeaderProps) {
+  const handleSortChange = (newSortBy: string) => {
+    onSortChange(newSortBy, order)
+  }
+
+  const handleOrderChange = (newOrder: "asc" | "desc") => {
+    onSortChange(sortBy, newOrder)
+  }
+
   return (
     <div className="flex flex-col gap-4 mb-6">
       <div>
@@ -34,13 +44,20 @@ export default function ResultsHeader({
           <span className="text-sm text-gray-600 whitespace-nowrap">Sort By:</span>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors flex-1 sm:flex-none min-w-[140px]"
           >
             <option value="newest">Newest</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
+            <option value="price">Price</option>
             <option value="rating">Highest Rated</option>
+          </select>
+          <select
+            value={order}
+            onChange={(e) => handleOrderChange(e.target.value as "asc" | "desc")}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors flex-1 sm:flex-none min-w-[100px]"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
           </select>
         </div>
 

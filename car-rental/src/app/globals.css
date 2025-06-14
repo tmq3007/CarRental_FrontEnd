@@ -16,8 +16,8 @@
     --primary: 142.1 76.2% 36.3%;
     --primary-foreground: 355.7 100% 97.3%;
 
-    --secondary: 142.1 76.2% 36.3%;
-    --secondary-foreground: 355.7 100% 97.3%;
+     --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -66,7 +66,20 @@
     --chart-5: 340 75% 55%;
   }
 }
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
 @layer base {
   * {
     @apply border-border;

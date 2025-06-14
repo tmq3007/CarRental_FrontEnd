@@ -5,29 +5,11 @@ import type React from "react"
 import { Star, Bookmark, Car, Fuel, Cog, Ruler, Box, ChevronLeft, ChevronRight } from "lucide-react"
 import { Card, CardFooter, CardHeader } from "@/components/ui/card"
 import { useState, useRef } from "react"
+import { CarSearchVO } from "@/lib/services/car-api"
 
-interface CarData {
-  id: number
-  brand: string
-  model: string
-  rating: number
-  reviews: number
-  bookedTime: string
-  originalPrice: number
-  discountedPrice: number
-  dailyPrice: number
-  images: string[]
-  specs: {
-    engine: string
-    fuel: string
-    transmission: string
-    efficiency: string
-    capacity: string
-  }
-}
 
 interface CarRentalGridCardProps {
-  car: CarData
+  car: CarSearchVO
 }
 
 export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
@@ -107,7 +89,7 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
         <div className="flex items-center">
           <Star className="fill-yellow-400 text-yellow-400" size={16} />
           <span className="ml-1 text-sm font-medium">
-            {car.rating} ({car.reviews})
+            {car.rating} ({car.rating})
           </span>
         </div>
         <div className="text-xs text-gray-500">{car.bookedTime}</div>
@@ -143,11 +125,11 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
             </div>
             <div className="border border-r-0 p-2 flex flex-col items-center justify-center text-center">
               <Ruler size={18} className="text-gray-500 mb-1" />
-              <span className="text-xs">{car.specs.efficiency}</span>
+              <span className="text-xs">{car.specs.fuelConsumption}</span>
             </div>
             <div className="border border-r-0 p-2 flex flex-col items-center justify-center text-center">
               <Box size={18} className="text-gray-500 mb-1" />
-              <span className="text-xs">{car.specs.capacity}</span>
+              <span className="text-xs">{car.specs.numberOfSeat}</span>
             </div>
             <div className="border p-2 flex flex-col items-center justify-center text-center text-green-600">
               <span className="text-xs font-medium">View All</span>
@@ -159,9 +141,8 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
         {/* Price Section */}
         <div className="w-1/3 p-3 flex flex-col justify-center items-center border-l">
           <p className="text-xs text-gray-500">Rented for 5 days</p>
-          <p className="text-gray-500 line-through text-sm">${car.originalPrice}</p>
-          <p className="text-green-600 text-2xl font-bold">${car.discountedPrice}</p>
-          <p className="text-xs text-gray-500">${car.dailyPrice} Daily</p>
+          <p className="text-gray-500 line-through text-sm">${car.basePrice * 1.2}</p>
+          <p className="text-green-600 text-2xl font-bold">${car.basePrice}</p>
         </div>
       </div>
 
