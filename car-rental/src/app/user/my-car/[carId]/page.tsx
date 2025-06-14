@@ -1,6 +1,5 @@
 "use client"
 
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Breadcrumb from "@/components/common/breadcum";
 import {CarImageCarousel} from "@/components/car/car-detail/car-image-carousel";
@@ -15,7 +14,7 @@ import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
 export default function MyCarDetailsPage({ params }: { params: { carId: string } }) {
     console.log("params.carId:", params); // Debug log
     const { data: carDetail, isLoading, error } = useGetCarDetailQuery(params.carId);
-    //console.log("carDetail", carDetail)
+    console.log("carDetail", carDetail)
 
     if (isLoading) {
         return <CarDetailsPageSkeleton />

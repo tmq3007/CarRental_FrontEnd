@@ -3,10 +3,12 @@
 import { useState } from "react"
 import ResultsHeader from "./results-header"
 import CarGrid from "./car-grid"
-import { SearchCar } from "@/lib/services/car-api"
+import { CarSearchVO } from "@/lib/services/car-api"
+import { PaginationMetadata } from "@/lib/store"
 
 interface SearchResultComponentProps {
-  cars: SearchCar[]
+  cars: CarSearchVO[]
+  pagination: PaginationMetadata
   location: string
   isLoading?: boolean
   onClearFilters?: () => void
@@ -17,6 +19,7 @@ interface SearchResultComponentProps {
 
 export default function SearchResultComponent({
   cars,
+  pagination,
   location,
   isLoading = false,
   onClearFilters,
@@ -25,7 +28,6 @@ export default function SearchResultComponent({
   onSortChange,
 }: SearchResultComponentProps) {
   const [viewMode, setViewMode] = useState<"list" | "grid">("list")
-
   if (isLoading) {
     return (
       <div className="mx-10 p-4 md:p-6">
@@ -42,7 +44,7 @@ export default function SearchResultComponent({
   }
 
   return (
-    <div className="mx-10 p-4 md:p-6">
+    <div className="mx-10 p-4 md:p-6 z-0">
       <ResultsHeader
         filteredCarsCount={cars.length}
         location={location}

@@ -5,29 +5,11 @@ import type React from "react"
 import { Star, Bookmark, Car, Fuel, Cog, Ruler, Box, ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { useState, useRef } from "react"
+import { CarSearchVO } from "@/lib/services/car-api"
 
-interface CarData {
-  id: number
-  brand: string
-  model: string
-  rating: number
-  reviews: number
-  bookedTime: string
-  originalPrice: number
-  discountedPrice: number
-  dailyPrice: number
-  images: string[]
-  specs: {
-    engine: string
-    fuel: string
-    transmission: string
-    efficiency: string
-    capacity: string
-  }
-}
 
 interface CarRentalListCardProps {
-  car: CarData
+  car: CarSearchVO
 }
 
 export default function CarRentalListCard({ car }: CarRentalListCardProps) {
@@ -105,7 +87,7 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
             <div className="flex items-center">
               <Star className="fill-yellow-400 text-yellow-400" size={16} />
               <span className="ml-1 text-sm font-medium">
-                {car.rating} ({car.reviews})
+                {car.rating} ({car.rating})
               </span>
             </div>
             <div className="text-xs text-gray-500">{car.bookedTime}</div>
@@ -142,11 +124,11 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
             </div>
             <div className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center">
               <Ruler size={20} className="text-gray-500 mb-1 md:mb-2" />
-              <span className="text-xs text-gray-500">{car.specs.efficiency}</span>
+              <span className="text-xs text-gray-500">{car.specs.fuelConsumption}</span>
             </div>
             <div className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center">
               <Box size={20} className="text-gray-500 mb-1 md:mb-2" />
-              <span className="text-xs text-gray-500">{car.specs.capacity}</span>
+              <span className="text-xs text-gray-500">{car.specs.numberOfSeat}</span>
             </div>
             <div className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer hover:bg-green-50">
               <span className="text-xs font-medium">View All</span>
@@ -175,9 +157,8 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
         <div className="w-full lg:w-1/3 p-4 border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col justify-center">
           <div className="text-center lg:text-right mb-6">
             <p className="text-sm text-gray-500 mb-1">Total 5 days</p>
-            <p className="text-gray-500 line-through text-lg">${car.originalPrice}</p>
-            <p className="text-green-600 text-3xl md:text-4xl font-bold mb-1">${car.discountedPrice}</p>
-            <p className="text-sm text-gray-500">$ {car.dailyPrice} / Daily</p>
+            <p className="text-gray-500 line-through text-lg">${car.basePrice * 1.2}</p>
+            <p className="text-green-600 text-3xl md:text-4xl font-bold mb-1">${car.basePrice}</p>
           </div>
 
           <div className="space-y-3">

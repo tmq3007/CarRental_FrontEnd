@@ -1,28 +1,32 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQuery} from "@/lib/services/config/baseQuery";
-import {ApiResponse} from "@/lib/store";
+import {ApiResponse, PaginationMetadata, PaginationResponse} from "@/lib/store";
 
 
 // Interface for car data
-export interface SearchCar {
-  id: number
-  brand: string
-  model: string
-  type: string
-  rating: number
-  reviews: number
-  bookedTime: string
-  originalPrice: number
-  discountedPrice: number
-  dailyPrice: number
-  images: string[]
-  specs: {
-    engine: string
-    fuel: string
-    transmission: string
-    efficiency: string
-    capacity: string
-  }
+export interface CarSearchVO {
+    id: string;
+    brand: string;
+    model: string;
+    type: string;
+    rating: number;
+    bookedTime: string;
+    basePrice: number;
+    images: string[];
+    specs: {
+        engine: string;
+        fuel: string;
+        transmission: string;
+        numberOfSeat: string;
+        productionYear: string;
+        mileage: string;
+        fuelConsumption: string;
+        color: string;
+    };
+    ward: string;
+    district: string;
+    cityProvince: string;
+    status: string;
 }
 
 // Define the filter criteria interface
@@ -65,15 +69,7 @@ export interface CarVO_ViewACar {
     cityProvince?: string
 }
 
-export interface PaginationResponse {
-    data: CarVO_ViewACar[]
-    pageNumber: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-}
+
 
 export interface CarFilters {
     sortBy?: string
@@ -158,7 +154,7 @@ export const carApi = createApi({
     baseQuery: baseQuery,
     endpoints: (build) => ({
 
-        getCars: build.query<ApiResponse<PaginationResponse>, { accountId: string, pageNumber?: number, pageSize?: number, filters?: CarFilters }>({
+        getCars: build.query<ApiResponse<PaginationResponse<CarVO_ViewACar[]>>, { accountId: string, pageNumber?: number, pageSize?: number, filters?: CarFilters }>({
             query: ({ accountId, pageNumber = 1, pageSize = 10, filters = {} }) => {
                 const params = new URLSearchParams({
                     pageNumber: pageNumber.toString(),
@@ -180,7 +176,7 @@ export const carApi = createApi({
             }),
         }),
 
-        searchCars: build.query<ApiResponse<SearchCar[]>, FilterCriteria>({
+        searchCars: build.query<ApiResponse<PaginationResponse<CarSearchVO[]>>, FilterCriteria>({
             query: (filters) => ({
             url: `/Car/search?${toQueryParams(filters)}`,
             method: 'GET',

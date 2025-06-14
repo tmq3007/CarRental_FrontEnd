@@ -58,7 +58,7 @@ export default function FilterPanel({
   if (!isExpanded) return null
 
   return (
-    <div className="sticky top-28 z-40 transition-all duration-300 opacity-100 pointer-events-auto">
+    <div className="sticky top-28 z-50 transition-all duration-300 opacity-100 pointer-events-auto">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/30" onClick={onToggleExpanded} />
 

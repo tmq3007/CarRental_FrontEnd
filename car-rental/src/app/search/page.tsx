@@ -25,7 +25,15 @@ export default function SearchPage() {
 
   // RTK Query hook to fetch cars
   const { data, isLoading, error } = useSearchCarsQuery(currentFilters)
-
+  const cars = data?.data.data || [];
+  const pagination = data?.data.PaginationMetadata || {
+    pageNumber: 1,
+    pageSize: 10,
+    totalRecords: 0,
+    totalPages: 1,
+    hasPreviousPage: false,
+    hasNextPage: false,
+  };
   // Calculate the rental duration in days
   const rentalDays =
     currentFilters.pickupTime && currentFilters.dropoffTime
@@ -90,7 +98,8 @@ export default function SearchPage() {
 
         {/* Search Result Component */}
         <SearchResultComponent
-          cars={data?.data ?? []}
+          cars={cars}
+          pagination={pagination}
           location={getLocationString()}
           isLoading={isLoading}
           onClearFilters={handleClearFilters}

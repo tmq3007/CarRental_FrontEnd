@@ -175,18 +175,6 @@ export default function FilterPillComponent({
       })
     })
 
-    // Sort tag
-    if (immediateFilters.sortBy !== "newest" || immediateFilters.order !== "asc") {
-      tags.push({
-        id: "sort",
-        label: `Sort: ${immediateFilters.sortBy.charAt(0).toUpperCase() + immediateFilters.sortBy.slice(1)} (${
-          immediateFilters.order === "asc" ? "Ascending" : "Descending"
-        })`,
-        type: "sort",
-        value: { sortBy: immediateFilters.sortBy, order: immediateFilters.order },
-      })
-    }
-
     return tags
   }
 
