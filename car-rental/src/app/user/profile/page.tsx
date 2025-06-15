@@ -68,10 +68,6 @@ export default function ProfilePage() {
         }
     }, [user])
 
-    if(personalInfo===null){
-        return <LoginPage/>
-    }
-
     const handlePersonalInfoChange = (field: string, value: string) => {
         setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))
     }

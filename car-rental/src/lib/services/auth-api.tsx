@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
-import {baseQuery} from "@/lib/services/config/baseQuery";
+import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 import {ApiResponse} from "@/lib/store";
 import {ChangePasswordDTO} from "@/lib/services/user-api";
 
@@ -18,7 +18,7 @@ export type ForgotPasswordDTO = {
 
 export const authApi = createApi({
     reducerPath: "authApi",
-    baseQuery: baseQuery,
+    baseQuery: baseQueryWithAuthCheck,
     tagTypes: ['Auth'],
     endpoints: (build) => ({
 

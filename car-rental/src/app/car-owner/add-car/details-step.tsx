@@ -7,11 +7,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, Search, AlertCircle } from "lucide-react"
-import type { CarData } from "@/app/car-owner/add-car/page"
+import {AddCarDTO} from "@/lib/services/car-api";
 
 interface DetailsStepProps {
-    carData: CarData
-    updateCarData: (updates: Partial<CarData>) => void
+    carData: AddCarDTO
+    updateCarData: (updates: Partial<AddCarDTO>) => void
     onNext: () => void
     onPrev: () => void
 }
@@ -19,7 +19,7 @@ interface DetailsStepProps {
 export default function DetailsStep({ carData, updateCarData, onNext, onPrev }: DetailsStepProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const handleAddressChange = (field: keyof CarData["Address"], value: string) => {
+    const handleAddressChange = (field: keyof AddCarDTO["Address"], value: string) => {
         updateCarData({
             Address: {
                 ...carData.Address,
@@ -28,7 +28,7 @@ export default function DetailsStep({ carData, updateCarData, onNext, onPrev }: 
         })
     }
 
-    const handleFunctionChange = (field: keyof CarData["AdditionalFunctions"], checked: boolean) => {
+    const handleFunctionChange = (field: keyof AddCarDTO["AdditionalFunctions"], checked: boolean) => {
         updateCarData({
             AdditionalFunctions: {
                 ...carData.AdditionalFunctions,
@@ -37,7 +37,7 @@ export default function DetailsStep({ carData, updateCarData, onNext, onPrev }: 
         })
     }
 
-    const handleImageUpload = (field: keyof CarData["Images"], file: File | null) => {
+    const handleImageUpload = (field: keyof AddCarDTO["Images"], file: File | null) => {
         updateCarData({
             Images: {
                 ...carData.Images,
@@ -68,7 +68,7 @@ export default function DetailsStep({ carData, updateCarData, onNext, onPrev }: 
                                  file,
                              }: {
         title: string
-        field: keyof CarData["Images"]
+        field: keyof AddCarDTO["Images"]
         file: File | null
     }) => (
         <div className="text-center">
@@ -228,9 +228,9 @@ export default function DetailsStep({ carData, updateCarData, onNext, onPrev }: 
                         <div key={item.key} className="flex items-center space-x-2">
                             <Checkbox
                                 id={item.key}
-                                checked={carData.AdditionalFunctions[item.key as keyof CarData["AdditionalFunctions"]]}
+                                checked={carData.AdditionalFunctions[item.key as keyof AddCarDTO["AdditionalFunctions"]]}
                                 onCheckedChange={(checked) =>
-                                    handleFunctionChange(item.key as keyof CarData["AdditionalFunctions"], checked as boolean)
+                                    handleFunctionChange(item.key as keyof AddCarDTO["AdditionalFunctions"], checked as boolean)
                                 }
                             />
                             <Label htmlFor={item.key} className="text-sm">

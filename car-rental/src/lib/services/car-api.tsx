@@ -1,6 +1,7 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
-import {baseQuery} from "@/lib/services/config/baseQuery";
+import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 import {ApiResponse} from "@/lib/store";
+import {useCarFormData} from "@/lib/hook/useCarFormData";
 
 
 export interface CarVO_ViewACar {
@@ -74,10 +75,66 @@ export interface CarVO_Detail {
     totalRating?: number
 }
 
+export interface AddCarDTO {
+    // Basic Info
+    LicensePlate: string
+    BrandName: string
+    Model: string
+    ProductionYear: string
+    Transmission: string
+    Color: string
+    NumberOfSeats: string
+    Fuel: string
+    Documents: {
+        RegistrationPaper: File | null
+        CertificateOfInspection: File | null
+        Insurance: File | null
+    }
+
+    // Details
+    Mileage: string
+    FuelConsumption: string
+    Address: {
+        Search: string
+        CityProvince: string
+        District: string
+        Ward: string
+        HouseNumber: string
+    }
+    Description: string
+    AdditionalFunctions: {
+        Bluetooth: boolean
+        GPS: boolean
+        Camera: boolean
+        SunRoof: boolean
+        ChildLock: boolean
+        ChildSeat: boolean
+        DVD: boolean
+        USB: boolean
+    }
+    Images: {
+        Front: File | null
+        Back: File | null
+        Left: File | null
+        Right: File | null
+    }
+
+    // Pricing
+    BasePrice: string
+    RequiredDeposit: string
+    TermsOfUse: {
+        NoSmoking: boolean
+        NoFoodInCar: boolean
+        NoPet: boolean
+        Other: boolean
+        OtherText: string
+    }
+}
+
 
 export const carApi = createApi({
     reducerPath: "carApi",
-    baseQuery: baseQuery,
+    baseQuery: baseQueryWithAuthCheck,
     endpoints: (build) => ({
 
         getCars: build.query<ApiResponse<PaginationResponse>, { accountId: string, pageNumber?: number, pageSize?: number, filters?: CarFilters }>({
@@ -102,11 +159,25 @@ export const carApi = createApi({
             }),
         }),
 
+        addCar: build.mutation<ApiResponse<CarVO_Detail>, AddCarDTO>({
+            query: (addCarDTO) => {
+                const { toFormData } = useCarFormData();
+                const formData = toFormData(addCarDTO);
+
+                return {
+                    url: '/Car/add',
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+        }),
+
     }),
 })
 
 export const {
     useGetCarsQuery,
-    useGetCarDetailQuery
+    useGetCarDetailQuery,
+    useAddCarMutation
 } = carApi
 

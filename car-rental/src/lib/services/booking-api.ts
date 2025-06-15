@@ -1,7 +1,7 @@
 // src/lib/services/booking/booking-api.ts
 
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQuery } from "@/lib/services/config/baseQuery";
+import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
 
 export interface BookingVO {
@@ -25,7 +25,7 @@ export interface PaginatedBookingResponse {
 
 export const bookingApi = createApi({
     reducerPath: "bookingApi",
-    baseQuery: baseQuery,
+    baseQuery: baseQueryWithAuthCheck,
     tagTypes: ["Booking"],
     endpoints: (build) => ({
         getBookings: build.query<ApiResponse<PaginatedBookingResponse>, { page: number; pageSize: number }>({

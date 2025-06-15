@@ -2,40 +2,42 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
-import type { CarData } from "@/app/car-owner/add-car/page"
+import {AddCarDTO, useAddCarMutation} from "@/lib/services/car-api";
 
 interface FinishStepProps {
-    carData: CarData
+    carData: AddCarDTO
     onPrev: () => void
 }
 
 export default function FinishStep({ carData, onPrev }: FinishStepProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [addCar, { isLoading, isError, isSuccess }] = useAddCarMutation();
+
 
     // Get available images
     const images = Object.values(carData.Images).filter((img) => img !== null)
     const hasImages = images.length > 0
 
     const handleSubmit = async () => {
-        setIsSubmitting(true)
+        setIsSubmitting(true);
 
         try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000))
+            console.log("Submitting car data:", carData);
 
-            // Here you would normally submit to your API
-            console.log("Submitting car data:", carData)
+            const response = await addCar(carData).unwrap();
 
-            // Show success message or redirect
-            alert("Car submitted successfully!")
+            console.log("Success:", response);
+
+            alert("Car submitted successfully!");
+            // Optionally reset form or redirect
         } catch (error) {
-            console.error("Error submitting car:", error)
-            alert("Error submitting car. Please try again.")
+            console.error("Error submitting car:", error);
+            alert("Error submitting car. Please try again.");
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
-    }
+    };
 
     const nextImage = () => {
         if (hasImages) {

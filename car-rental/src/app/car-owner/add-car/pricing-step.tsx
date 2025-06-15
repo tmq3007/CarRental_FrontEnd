@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle } from "lucide-react"
-import type { CarData } from "@/app/car-owner/add-car/page"
+import {AddCarDTO} from "@/lib/services/car-api";
 
 interface PricingStepProps {
-    carData: CarData
-    updateCarData: (updates: Partial<CarData>) => void
+    carData: AddCarDTO
+    updateCarData: (updates: Partial<AddCarDTO>) => void
     onNext: () => void
     onPrev: () => void
 }
@@ -18,7 +18,7 @@ interface PricingStepProps {
 export default function PricingStep({ carData, updateCarData, onNext, onPrev }: PricingStepProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const handleTermsChange = (field: keyof CarData["TermsOfUse"], value: boolean | string) => {
+    const handleTermsChange = (field: keyof AddCarDTO["TermsOfUse"], value: boolean | string) => {
         updateCarData({
             TermsOfUse: {
                 ...carData.TermsOfUse,

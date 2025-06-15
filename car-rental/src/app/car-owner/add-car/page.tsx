@@ -7,63 +7,8 @@ import DetailsStep from "@/app/car-owner/add-car/details-step"
 import PricingStep from "@/app/car-owner/add-car/pricing-step"
 import FinishStep from "@/app/car-owner/add-car/finish-step"
 import Breadcrumb from "@/components/common/breadcum";
+import {AddCarDTO} from "@/lib/services/car-api";
 
-// Types
-export interface CarData {
-    // Basic Info
-    LicensePlate: string
-    BrandName: string
-    Model: string
-    ProductionYear: string
-    Transmission: string
-    Color: string
-    NumberOfSeats: string
-    Fuel: string
-    Documents: {
-        RegistrationPaper: File | null
-        CertificateOfInspection: File | null
-        Insurance: File | null
-    }
-
-    // Details
-    Mileage: string
-    FuelConsumption: string
-    Address: {
-        Search: string
-        CityProvince: string
-        District: string
-        Ward: string
-        HouseNumber: string
-    }
-    Description: string
-    AdditionalFunctions: {
-        Bluetooth: boolean
-        GPS: boolean
-        Camera: boolean
-        SunRoof: boolean
-        ChildLock: boolean
-        ChildSeat: boolean
-        DVD: boolean
-        USB: boolean
-    }
-    Images: {
-        Front: File | null
-        Back: File | null
-        Left: File | null
-        Right: File | null
-    }
-
-    // Pricing
-    BasePrice: string
-    RequiredDeposit: string
-    TermsOfUse: {
-        NoSmoking: boolean
-        NoFoodInCar: boolean
-        NoPet: boolean
-        Other: boolean
-        OtherText: string
-    }
-}
 
 const steps = [
     { id: 1, title: "Basic", description: "Basic information" },
@@ -74,7 +19,7 @@ const steps = [
 
 export default function AddCarPage() {
     const [currentStep, setCurrentStep] = useState(1)
-    const [carData, setCarData] = useState<CarData>({
+    const [AddCarDTO, setAddCarDTO] = useState<AddCarDTO>({
         // Basic Info
         LicensePlate: "",
         BrandName: "",
@@ -130,8 +75,8 @@ export default function AddCarPage() {
         },
     })
 
-    const updateCarData = (updates: Partial<CarData>) => {
-        setCarData((prev) => ({ ...prev, ...updates }))
+    const updateAddCarDTO = (updates: Partial<AddCarDTO>) => {
+        setAddCarDTO((prev) => ({ ...prev, ...updates }))
     }
 
     const nextStep = () => {
@@ -149,13 +94,13 @@ export default function AddCarPage() {
     const renderStep = () => {
         switch (currentStep) {
             case 1:
-                return <BasicInfoStep carData={carData} updateCarData={updateCarData} onNext={nextStep} />
+                return <BasicInfoStep carData={AddCarDTO} updateCarData={updateAddCarDTO} onNext={nextStep} />
             case 2:
-                return <DetailsStep carData={carData} updateCarData={updateCarData} onNext={nextStep} onPrev={prevStep} />
+                return <DetailsStep carData={AddCarDTO} updateCarData={updateAddCarDTO} onNext={nextStep} onPrev={prevStep} />
             case 3:
-                return <PricingStep carData={carData} updateCarData={updateCarData} onNext={nextStep} onPrev={prevStep} />
+                return <PricingStep carData={AddCarDTO} updateCarData={updateAddCarDTO} onNext={nextStep} onPrev={prevStep} />
             case 4:
-                return <FinishStep carData={carData} onPrev={prevStep} />
+                return <FinishStep carData={AddCarDTO} onPrev={prevStep} />
             default:
                 return null
         }

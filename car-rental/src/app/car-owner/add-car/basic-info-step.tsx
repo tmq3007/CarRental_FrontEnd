@@ -5,18 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, AlertCircle } from "lucide-react"
-import type { CarData } from "@/app/car-owner/add-car/page"
+import {AddCarDTO} from "@/lib/services/car-api";
 
 interface BasicInfoStepProps {
-    carData: CarData
-    updateCarData: (updates: Partial<CarData>) => void
+    carData: AddCarDTO
+    updateCarData: (updates: Partial<AddCarDTO>) => void
     onNext: () => void
 }
 
 export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicInfoStepProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const handleFileUpload = (field: keyof CarData["Documents"], file: File | null) => {
+    const handleFileUpload = (field: keyof AddCarDTO["Documents"], file: File | null) => {
         updateCarData({
             Documents: {
                 ...carData.Documents,
@@ -51,7 +51,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                                 file,
                             }: {
         title: string
-        field: keyof CarData["Documents"]
+        field: keyof AddCarDTO["Documents"]
         file: File | null
     }) => (
         <div className="text-center">
