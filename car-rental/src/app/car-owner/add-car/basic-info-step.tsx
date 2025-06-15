@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, AlertCircle } from "lucide-react"
-import { CarData } from "@/app/car-owner/add-car/page"
+import type { CarData } from "@/app/car-owner/add-car/page"
 
 interface BasicInfoStepProps {
     carData: CarData
@@ -16,10 +16,10 @@ interface BasicInfoStepProps {
 export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicInfoStepProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const handleFileUpload = (field: keyof CarData["documents"], file: File | null) => {
+    const handleFileUpload = (field: keyof CarData["Documents"], file: File | null) => {
         updateCarData({
-            documents: {
-                ...carData.documents,
+            Documents: {
+                ...carData.Documents,
                 [field]: file,
             },
         })
@@ -28,12 +28,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
 
-        if (!carData.licensePlate.trim()) newErrors.licensePlate = "License plate is required"
-        if (!carData.brandName.trim()) newErrors.brandName = "Brand name is required"
-        if (!carData.model.trim()) newErrors.model = "Model is required"
-        if (!carData.productionYear.trim()) newErrors.productionYear = "Production year is required"
-        if (!carData.color.trim()) newErrors.color = "Color is required"
-        if (!carData.numberOfSeats.trim()) newErrors.numberOfSeats = "Number of seats is required"
+        if (!carData.LicensePlate.trim()) newErrors.LicensePlate = "License plate is required"
+        if (!carData.BrandName.trim()) newErrors.BrandName = "Brand name is required"
+        if (!carData.Model.trim()) newErrors.Model = "Model is required"
+        if (!carData.ProductionYear.trim()) newErrors.ProductionYear = "Production year is required"
+        if (!carData.Color.trim()) newErrors.Color = "Color is required"
+        if (!carData.NumberOfSeats.trim()) newErrors.NumberOfSeats = "Number of seats is required"
 
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
@@ -51,7 +51,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                                 file,
                             }: {
         title: string
-        field: keyof CarData["documents"]
+        field: keyof CarData["Documents"]
         file: File | null
     }) => (
         <div className="text-center">
@@ -86,26 +86,26 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* License Plate */}
                 <div className="space-y-2">
-                    <Label htmlFor="licensePlate">License plate: *</Label>
+                    <Label htmlFor="LicensePlate">License plate: *</Label>
                     <Input
-                        id="licensePlate"
-                        value={carData.licensePlate}
-                        onChange={(e) => updateCarData({ licensePlate: e.target.value })}
-                        className={errors.licensePlate ? "border-red-500" : ""}
+                        id="LicensePlate"
+                        value={carData.LicensePlate}
+                        onChange={(e) => updateCarData({ LicensePlate: e.target.value })}
+                        className={errors.LicensePlate ? "border-red-500" : ""}
                     />
-                    {errors.licensePlate && (
+                    {errors.LicensePlate && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.licensePlate}
+                            {errors.LicensePlate}
                         </p>
                     )}
                 </div>
 
                 {/* Color */}
                 <div className="space-y-2">
-                    <Label htmlFor="color">Color: *</Label>
-                    <Select value={carData.color} onValueChange={(value) => updateCarData({ color: value })}>
-                        <SelectTrigger className={errors.color ? "border-red-500" : ""}>
+                    <Label htmlFor="Color">Color: *</Label>
+                    <Select value={carData.Color} onValueChange={(value) => updateCarData({ Color: value })}>
+                        <SelectTrigger className={errors.Color ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select color" />
                         </SelectTrigger>
                         <SelectContent>
@@ -117,19 +117,19 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="gray">Gray</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.color && (
+                    {errors.Color && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.color}
+                            {errors.Color}
                         </p>
                     )}
                 </div>
 
                 {/* Brand Name */}
                 <div className="space-y-2">
-                    <Label htmlFor="brandName">Brand name: *</Label>
-                    <Select value={carData.brandName} onValueChange={(value) => updateCarData({ brandName: value })}>
-                        <SelectTrigger className={errors.brandName ? "border-red-500" : ""}>
+                    <Label htmlFor="BrandName">Brand name: *</Label>
+                    <Select value={carData.BrandName} onValueChange={(value) => updateCarData({ BrandName: value })}>
+                        <SelectTrigger className={errors.BrandName ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select brand" />
                         </SelectTrigger>
                         <SelectContent>
@@ -141,19 +141,19 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="ford">Ford</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.brandName && (
+                    {errors.BrandName && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.brandName}
+                            {errors.BrandName}
                         </p>
                     )}
                 </div>
 
                 {/* Model */}
                 <div className="space-y-2">
-                    <Label htmlFor="model">Model: *</Label>
-                    <Select value={carData.model} onValueChange={(value) => updateCarData({ model: value })}>
-                        <SelectTrigger className={errors.model ? "border-red-500" : ""}>
+                    <Label htmlFor="Model">Model: *</Label>
+                    <Select value={carData.Model} onValueChange={(value) => updateCarData({ Model: value })}>
+                        <SelectTrigger className={errors.Model ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select model" />
                         </SelectTrigger>
                         <SelectContent>
@@ -163,19 +163,19 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="navara">Navara</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.model && (
+                    {errors.Model && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.model}
+                            {errors.Model}
                         </p>
                     )}
                 </div>
 
                 {/* Production Year */}
                 <div className="space-y-2">
-                    <Label htmlFor="productionYear">Production year: *</Label>
-                    <Select value={carData.productionYear} onValueChange={(value) => updateCarData({ productionYear: value })}>
-                        <SelectTrigger className={errors.productionYear ? "border-red-500" : ""}>
+                    <Label htmlFor="ProductionYear">Production year: *</Label>
+                    <Select value={carData.ProductionYear} onValueChange={(value) => updateCarData({ ProductionYear: value })}>
+                        <SelectTrigger className={errors.ProductionYear ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -186,19 +186,19 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             ))}
                         </SelectContent>
                     </Select>
-                    {errors.productionYear && (
+                    {errors.ProductionYear && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.productionYear}
+                            {errors.ProductionYear}
                         </p>
                     )}
                 </div>
 
                 {/* Number of Seats */}
                 <div className="space-y-2">
-                    <Label htmlFor="numberOfSeats">No. of seats: *</Label>
-                    <Select value={carData.numberOfSeats} onValueChange={(value) => updateCarData({ numberOfSeats: value })}>
-                        <SelectTrigger className={errors.numberOfSeats ? "border-red-500" : ""}>
+                    <Label htmlFor="NumberOfSeats">No. of seats: *</Label>
+                    <Select value={carData.NumberOfSeats} onValueChange={(value) => updateCarData({ NumberOfSeats: value })}>
+                        <SelectTrigger className={errors.NumberOfSeats ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select seats" />
                         </SelectTrigger>
                         <SelectContent>
@@ -209,10 +209,10 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="8">8</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.numberOfSeats && (
+                    {errors.NumberOfSeats && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {errors.numberOfSeats}
+                            {errors.NumberOfSeats}
                         </p>
                     )}
                 </div>
@@ -225,8 +225,8 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <input
                                 type="radio"
                                 value="automatic"
-                                checked={carData.transmission === "automatic"}
-                                onChange={(e) => updateCarData({ transmission: e.target.value })}
+                                checked={carData.Transmission === "automatic"}
+                                onChange={(e) => updateCarData({ Transmission: e.target.value })}
                                 className="text-blue-600"
                             />
                             <span>Automatic</span>
@@ -235,8 +235,8 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <input
                                 type="radio"
                                 value="manual"
-                                checked={carData.transmission === "manual"}
-                                onChange={(e) => updateCarData({ transmission: e.target.value })}
+                                checked={carData.Transmission === "manual"}
+                                onChange={(e) => updateCarData({ Transmission: e.target.value })}
                                 className="text-blue-600"
                             />
                             <span>Manual</span>
@@ -252,8 +252,8 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <input
                                 type="radio"
                                 value="gasoline"
-                                checked={carData.fuel === "gasoline"}
-                                onChange={(e) => updateCarData({ fuel: e.target.value })}
+                                checked={carData.Fuel === "gasoline"}
+                                onChange={(e) => updateCarData({ Fuel: e.target.value })}
                                 className="text-blue-600"
                             />
                             <span>Gasoline</span>
@@ -262,8 +262,8 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <input
                                 type="radio"
                                 value="diesel"
-                                checked={carData.fuel === "diesel"}
-                                onChange={(e) => updateCarData({ fuel: e.target.value })}
+                                checked={carData.Fuel === "diesel"}
+                                onChange={(e) => updateCarData({ Fuel: e.target.value })}
                                 className="text-blue-600"
                             />
                             <span>Diesel</span>
@@ -278,15 +278,15 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <FileUploadArea
                         title="Registration paper"
-                        field="registrationPaper"
-                        file={carData.documents.registrationPaper}
+                        field="RegistrationPaper"
+                        file={carData.Documents.RegistrationPaper}
                     />
                     <FileUploadArea
                         title="Certificate of inspection"
-                        field="certificateOfInspection"
-                        file={carData.documents.certificateOfInspection}
+                        field="CertificateOfInspection"
+                        file={carData.Documents.CertificateOfInspection}
                     />
-                    <FileUploadArea title="Insurance" field="insurance" file={carData.documents.insurance} />
+                    <FileUploadArea title="Insurance" field="Insurance" file={carData.Documents.Insurance} />
                 </div>
                 <p className="text-xs text-gray-500">File type: .doc, .docx, .pdf, .jpg, .jpeg, .png</p>
             </div>
@@ -296,7 +296,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                 <Button variant="outline" className="text-gray-600">
                     Cancel
                 </Button>
-                <Button onClick={handleNext}>
+                <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700 text-white">
                     Next
                 </Button>
             </div>

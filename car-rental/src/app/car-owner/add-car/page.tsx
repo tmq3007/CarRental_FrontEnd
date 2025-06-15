@@ -11,57 +11,57 @@ import Breadcrumb from "@/components/common/breadcum";
 // Types
 export interface CarData {
     // Basic Info
-    licensePlate: string
-    brandName: string
-    model: string
-    productionYear: string
-    transmission: string
-    color: string
-    numberOfSeats: string
-    fuel: string
-    documents: {
-        registrationPaper: File | null
-        certificateOfInspection: File | null
-        insurance: File | null
+    LicensePlate: string
+    BrandName: string
+    Model: string
+    ProductionYear: string
+    Transmission: string
+    Color: string
+    NumberOfSeats: string
+    Fuel: string
+    Documents: {
+        RegistrationPaper: File | null
+        CertificateOfInspection: File | null
+        Insurance: File | null
     }
 
     // Details
-    mileage: string
-    fuelConsumption: string
-    address: {
-        search: string
-        cityProvince: string
-        district: string
-        ward: string
-        houseNumber: string
+    Mileage: string
+    FuelConsumption: string
+    Address: {
+        Search: string
+        CityProvince: string
+        District: string
+        Ward: string
+        HouseNumber: string
     }
-    description: string
-    additionalFunctions: {
-        bluetooth: boolean
-        gps: boolean
-        camera: boolean
-        sunRoof: boolean
-        childLock: boolean
-        childSeat: boolean
-        dvd: boolean
-        usb: boolean
+    Description: string
+    AdditionalFunctions: {
+        Bluetooth: boolean
+        GPS: boolean
+        Camera: boolean
+        SunRoof: boolean
+        ChildLock: boolean
+        ChildSeat: boolean
+        DVD: boolean
+        USB: boolean
     }
-    images: {
-        front: File | null
-        back: File | null
-        left: File | null
-        right: File | null
+    Images: {
+        Front: File | null
+        Back: File | null
+        Left: File | null
+        Right: File | null
     }
 
     // Pricing
-    basePrice: string
-    requiredDeposit: string
-    termsOfUse: {
-        noSmoking: boolean
-        noFoodInCar: boolean
-        noPet: boolean
-        other: boolean
-        otherText: string
+    BasePrice: string
+    RequiredDeposit: string
+    TermsOfUse: {
+        NoSmoking: boolean
+        NoFoodInCar: boolean
+        NoPet: boolean
+        Other: boolean
+        OtherText: string
     }
 }
 
@@ -75,53 +75,58 @@ const steps = [
 export default function AddCarPage() {
     const [currentStep, setCurrentStep] = useState(1)
     const [carData, setCarData] = useState<CarData>({
-        licensePlate: "",
-        brandName: "",
-        model: "",
-        productionYear: "",
-        transmission: "automatic",
-        color: "",
-        numberOfSeats: "",
-        fuel: "gasoline",
-        documents: {
-            registrationPaper: null,
-            certificateOfInspection: null,
-            insurance: null,
+        // Basic Info
+        LicensePlate: "",
+        BrandName: "",
+        Model: "",
+        ProductionYear: "",
+        Transmission: "automatic",
+        Color: "",
+        NumberOfSeats: "",
+        Fuel: "gasoline",
+        Documents: {
+            RegistrationPaper: null,
+            CertificateOfInspection: null,
+            Insurance: null,
         },
-        mileage: "",
-        fuelConsumption: "",
-        address: {
-            search: "",
-            cityProvince: "",
-            district: "",
-            ward: "",
-            houseNumber: "",
+
+        // Details
+        Mileage: "",
+        FuelConsumption: "",
+        Address: {
+            Search: "",
+            CityProvince: "",
+            District: "",
+            Ward: "",
+            HouseNumber: "",
         },
-        description: "",
-        additionalFunctions: {
-            bluetooth: false,
-            gps: false,
-            camera: false,
-            sunRoof: false,
-            childLock: false,
-            childSeat: false,
-            dvd: false,
-            usb: false,
+        Description: "",
+        AdditionalFunctions: {
+            Bluetooth: false,
+            GPS: false,
+            Camera: false,
+            SunRoof: false,
+            ChildLock: false,
+            ChildSeat: false,
+            DVD: false,
+            USB: false,
         },
-        images: {
-            front: null,
-            back: null,
-            left: null,
-            right: null,
+        Images: {
+            Front: null,
+            Back: null,
+            Left: null,
+            Right: null,
         },
-        basePrice: "",
-        requiredDeposit: "",
-        termsOfUse: {
-            noSmoking: false,
-            noFoodInCar: false,
-            noPet: false,
-            other: false,
-            otherText: "",
+
+        // Pricing
+        BasePrice: "",
+        RequiredDeposit: "",
+        TermsOfUse: {
+            NoSmoking: false,
+            NoFoodInCar: false,
+            NoPet: false,
+            Other: false,
+            OtherText: "",
         },
     })
 

@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle } from "lucide-react"
-import { CarData } from "@/app/car-owner/add-car/page"
-
+import type { CarData } from "@/app/car-owner/add-car/page"
 
 interface PricingStepProps {
     carData: CarData
@@ -19,10 +18,10 @@ interface PricingStepProps {
 export default function PricingStep({ carData, updateCarData, onNext, onPrev }: PricingStepProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const handleTermsChange = (field: keyof CarData["termsOfUse"], value: boolean | string) => {
+    const handleTermsChange = (field: keyof CarData["TermsOfUse"], value: boolean | string) => {
         updateCarData({
-            termsOfUse: {
-                ...carData.termsOfUse,
+            TermsOfUse: {
+                ...carData.TermsOfUse,
                 [field]: value,
             },
         })
@@ -31,15 +30,15 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
 
-        if (!carData.basePrice.trim()) newErrors.basePrice = "Base price is required"
-        if (!carData.requiredDeposit.trim()) newErrors.requiredDeposit = "Required deposit is required"
+        if (!carData.BasePrice.trim()) newErrors.BasePrice = "Base price is required"
+        if (!carData.RequiredDeposit.trim()) newErrors.RequiredDeposit = "Required deposit is required"
 
         // Validate numeric values
-        if (carData.basePrice && isNaN(Number(carData.basePrice))) {
-            newErrors.basePrice = "Base price must be a valid number"
+        if (carData.BasePrice && isNaN(Number(carData.BasePrice))) {
+            newErrors.BasePrice = "Base price must be a valid number"
         }
-        if (carData.requiredDeposit && isNaN(Number(carData.requiredDeposit))) {
-            newErrors.requiredDeposit = "Required deposit must be a valid number"
+        if (carData.RequiredDeposit && isNaN(Number(carData.RequiredDeposit))) {
+            newErrors.RequiredDeposit = "Required deposit must be a valid number"
         }
 
         setErrors(newErrors)
@@ -56,44 +55,44 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
         <div className="space-y-6">
             {/* Base Price */}
             <div className="space-y-2">
-                <Label htmlFor="basePrice">Set base price for your car:</Label>
+                <Label htmlFor="BasePrice">Set base price for your car:</Label>
                 <div className="flex items-center space-x-2">
                     <Input
-                        id="basePrice"
+                        id="BasePrice"
                         type="number"
-                        value={carData.basePrice}
-                        onChange={(e) => updateCarData({ basePrice: e.target.value })}
-                        className={`flex-1 ${errors.basePrice ? "border-red-500" : ""}`}
+                        value={carData.BasePrice}
+                        onChange={(e) => updateCarData({ BasePrice: e.target.value })}
+                        className={`flex-1 ${errors.BasePrice ? "border-red-500" : ""}`}
                         placeholder="Enter price"
                     />
                     <span className="text-gray-600 font-medium">VND/Day</span>
                 </div>
-                {errors.basePrice && (
+                {errors.BasePrice && (
                     <p className="text-red-500 text-sm flex items-center gap-1">
                         <AlertCircle className="h-4 w-4" />
-                        {errors.basePrice}
+                        {errors.BasePrice}
                     </p>
                 )}
             </div>
 
             {/* Required Deposit */}
             <div className="space-y-2">
-                <Label htmlFor="requiredDeposit">Required deposit:</Label>
+                <Label htmlFor="RequiredDeposit">Required deposit:</Label>
                 <div className="flex items-center space-x-2">
                     <Input
-                        id="requiredDeposit"
+                        id="RequiredDeposit"
                         type="number"
-                        value={carData.requiredDeposit}
-                        onChange={(e) => updateCarData({ requiredDeposit: e.target.value })}
-                        className={`flex-1 ${errors.requiredDeposit ? "border-red-500" : ""}`}
+                        value={carData.RequiredDeposit}
+                        onChange={(e) => updateCarData({ RequiredDeposit: e.target.value })}
+                        className={`flex-1 ${errors.RequiredDeposit ? "border-red-500" : ""}`}
                         placeholder="Enter deposit amount"
                     />
                     <span className="text-gray-600 font-medium">VND</span>
                 </div>
-                {errors.requiredDeposit && (
+                {errors.RequiredDeposit && (
                     <p className="text-red-500 text-sm flex items-center gap-1">
                         <AlertCircle className="h-4 w-4" />
-                        {errors.requiredDeposit}
+                        {errors.RequiredDeposit}
                     </p>
                 )}
             </div>
@@ -105,49 +104,49 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id="noSmoking"
-                            checked={carData.termsOfUse.noSmoking}
-                            onCheckedChange={(checked) => handleTermsChange("noSmoking", checked as boolean)}
+                            id="NoSmoking"
+                            checked={carData.TermsOfUse.NoSmoking}
+                            onCheckedChange={(checked) => handleTermsChange("NoSmoking", checked as boolean)}
                         />
-                        <Label htmlFor="noSmoking">No smoking</Label>
+                        <Label htmlFor="NoSmoking">No smoking</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id="noFoodInCar"
-                            checked={carData.termsOfUse.noFoodInCar}
-                            onCheckedChange={(checked) => handleTermsChange("noFoodInCar", checked as boolean)}
+                            id="NoFoodInCar"
+                            checked={carData.TermsOfUse.NoFoodInCar}
+                            onCheckedChange={(checked) => handleTermsChange("NoFoodInCar", checked as boolean)}
                         />
-                        <Label htmlFor="noFoodInCar">No food in car</Label>
+                        <Label htmlFor="NoFoodInCar">No food in car</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id="noPet"
-                            checked={carData.termsOfUse.noPet}
-                            onCheckedChange={(checked) => handleTermsChange("noPet", checked as boolean)}
+                            id="NoPet"
+                            checked={carData.TermsOfUse.NoPet}
+                            onCheckedChange={(checked) => handleTermsChange("NoPet", checked as boolean)}
                         />
-                        <Label htmlFor="noPet">No pet</Label>
+                        <Label htmlFor="NoPet">No pet</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id="other"
-                            checked={carData.termsOfUse.other}
-                            onCheckedChange={(checked) => handleTermsChange("other", checked as boolean)}
+                            id="Other"
+                            checked={carData.TermsOfUse.Other}
+                            onCheckedChange={(checked) => handleTermsChange("Other", checked as boolean)}
                         />
-                        <Label htmlFor="other">Other</Label>
+                        <Label htmlFor="Other">Other</Label>
                     </div>
                 </div>
 
                 {/* Other Terms Text Area */}
-                {carData.termsOfUse.other && (
+                {carData.TermsOfUse.Other && (
                     <div className="space-y-2">
-                        <Label htmlFor="otherTerms">Please specify:</Label>
+                        <Label htmlFor="OtherTerms">Please specify:</Label>
                         <Textarea
-                            id="otherTerms"
-                            value={carData.termsOfUse.otherText}
-                            onChange={(e) => handleTermsChange("otherText", e.target.value)}
+                            id="OtherTerms"
+                            value={carData.TermsOfUse.OtherText}
+                            onChange={(e) => handleTermsChange("OtherText", e.target.value)}
                             placeholder="Specify other terms..."
                             rows={4}
                         />
@@ -156,11 +155,11 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-end space-x-4 pt-6">
+            <div className="flex justify-between pt-6">
                 <Button variant="outline" onClick={onPrev} className="text-gray-600">
                     Previous
                 </Button>
-                <Button onClick={handleNext}>
+                <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700 text-white">
                     Next
                 </Button>
             </div>

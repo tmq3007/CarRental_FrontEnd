@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
-import { CarData } from "@/app/car-owner/add-car/page"
+import type { CarData } from "@/app/car-owner/add-car/page"
 
 interface FinishStepProps {
     carData: CarData
@@ -14,7 +14,7 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
     // Get available images
-    const images = Object.values(carData.images).filter((img) => img !== null)
+    const images = Object.values(carData.Images).filter((img) => img !== null)
     const hasImages = images.length > 0
 
     const handleSubmit = async () => {
@@ -50,16 +50,16 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
     }
 
     // Generate car title
-    const carTitle = `${carData.brandName} ${carData.model} ${carData.productionYear}`.trim()
+    const carTitle = `${carData.BrandName} ${carData.Model} ${carData.ProductionYear}`.trim()
 
     // Format price
-    const formattedPrice = carData.basePrice
-        ? `${Number.parseInt(carData.basePrice).toLocaleString()}k/day`
+    const formattedPrice = carData.BasePrice
+        ? `${Number.parseInt(carData.BasePrice).toLocaleString()}k/day`
         : "Price not set"
 
     // Get location
     const location =
-        [carData.address.ward, carData.address.district, carData.address.cityProvince].filter(Boolean).join(", ") ||
+        [carData.Address.Ward, carData.Address.District, carData.Address.CityProvince].filter(Boolean).join(", ") ||
         "Location not specified"
 
     return (
@@ -164,29 +164,29 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
                         <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
                                 <span className="text-gray-600">License:</span>
-                                <span className="ml-2">{carData.licensePlate || "N/A"}</span>
+                                <span className="ml-2">{carData.LicensePlate || "N/A"}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Seats:</span>
-                                <span className="ml-2">{carData.numberOfSeats || "N/A"}</span>
+                                <span className="ml-2">{carData.NumberOfSeats || "N/A"}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Transmission:</span>
-                                <span className="ml-2 capitalize">{carData.transmission || "N/A"}</span>
+                                <span className="ml-2 capitalize">{carData.Transmission || "N/A"}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Fuel:</span>
-                                <span className="ml-2 capitalize">{carData.fuel || "N/A"}</span>
+                                <span className="ml-2 capitalize">{carData.Fuel || "N/A"}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Features */}
-                    {Object.values(carData.additionalFunctions).some(Boolean) && (
+                    {Object.values(carData.AdditionalFunctions).some(Boolean) && (
                         <div className="pt-4 border-t border-gray-200">
                             <h4 className="font-medium text-gray-800 mb-2">Features:</h4>
                             <div className="flex flex-wrap gap-2">
-                                {Object.entries(carData.additionalFunctions)
+                                {Object.entries(carData.AdditionalFunctions)
                                     .filter(([_, enabled]) => enabled)
                                     .map(([feature, _]) => (
                                         <span key={feature} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
@@ -200,11 +200,11 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-end space-x-4 pt-6">
+            <div className="flex justify-between pt-6">
                 <Button variant="outline" onClick={onPrev} className="text-gray-600">
                     Previous
                 </Button>
-                <Button onClick={handleSubmit} disabled={isSubmitting}>
+                <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white">
                     {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
             </div>
