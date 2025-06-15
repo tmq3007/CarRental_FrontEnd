@@ -2,8 +2,6 @@ import {BaseQueryApi, FetchArgs, fetchBaseQuery, FetchBaseQueryMeta} from "@redu
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {toast} from "sonner";
 import {resetUser} from "@/lib/slice/userSlice";
-import {router} from "next/client";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const BASE_URL = 'http://localhost:5227/api';
 
@@ -12,12 +10,6 @@ export const baseQuery = fetchBaseQuery({
     // Đảm bảo cookie được gửi kèm request
     credentials: 'include',
 });
-
-let appRouter: AppRouterInstance | null = null;
-
-export const setBaseQueryRouter = (router: AppRouterInstance) => {
-    appRouter = router;
-};
 
 export const baseQueryWithAuthCheck = async (
     args: FetchArgs,
@@ -45,10 +37,6 @@ export const baseQueryWithAuthCheck = async (
             });
             toast.error("Your session has expired. Please log in again.");
             api.dispatch(resetUser());
-
-            if (appRouter) {
-                appRouter.push("/signin"); // ✅ client redirect
-            }
         }
     }
 

@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
-import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 import {ApiResponse} from "@/lib/store";
 import {ChangePasswordDTO} from "@/lib/services/user-api";
 

@@ -1,7 +1,7 @@
 // src/lib/services/booking/booking-api.ts
 
 import { createApi } from "@reduxjs/toolkit/query/react";
-import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
 
 export interface BookingVO {

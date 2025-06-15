@@ -1,6 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi} from "@reduxjs/toolkit/query/react"
 import { ApiResponse } from "@/lib/store";
-import {baseQuery, baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 
 export interface UserProfile {
     id: string
