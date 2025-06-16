@@ -47,7 +47,7 @@ export default function BookingListPage() {
                                     <h2 className="text-lg font-semibold text-blue-800">{booking.carName}</h2>
                                     <div className="flex flex-col gap-3 ml-4 mr-4 mt-2">
                                         <Button
-                                            onClick={() => handleViewDetails(String(booking.bookingNumber))}
+
                                             className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full">View details</Button>
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>
