@@ -1,29 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { useGetBookingsQuery } from "@/lib/services/booking-api";
-import { BookingVO } from "@/lib/services/booking-api";
+import { useEffect, useState } from "react";
+import { useGetBookingsByAccountIdQuery, BookingVO } from "@/lib/services/booking-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function BookingListPage() {
-    const [page, setPage] = useState(1);
-    const pageSize = 5;
+    const [accountId, setAccountId] = useState<string | null>(null);
 
-    // Call API to fetch booking data
-    const { data, isLoading, isError } = useGetBookingsQuery({ page, pageSize });
-    console.log("API data:", data);
+    // Lấy accountId từ localStorage
+    useEffect(() => {
+        const storedAccountId = localStorage.getItem("accountId");
+        setAccountId(storedAccountId);
+    }, []);
 
-    // Access 'items' and 'totalCount' properties via 'data.data'
-    const bookings = data?.data.data || [];
-    const totalCount = data?.data?.totalCount || 0;
-    console.log(bookings);
+    // Gọi API theo accountId
+    const {
+        data,
+        isLoading,
+        isError,
+    } = useGetBookingsByAccountIdQuery({ accountId: accountId || "" }, { skip: !accountId });
 
-    // Calculate total pages
-    const totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
-
-    const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
-    const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+    const bookings = data?.data || [];
 
     if (isLoading) return <p className="p-6">Loading...</p>;
     if (isError) return <p className="p-6 text-red-500">Error loading bookings.</p>;
@@ -32,7 +30,7 @@ export default function BookingListPage() {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-2">My Bookings</h1>
             <p className="text-sm mb-4 text-gray-500">
-                You have {bookings.length} ongoing bookings.
+                You have {bookings.length} bookings.
             </p>
 
             <div className="space-y-6">
@@ -91,16 +89,6 @@ export default function BookingListPage() {
                 ) : (
                     !isLoading && <p className="text-center text-gray-500">No bookings found.</p>
                 )}
-            </div>
-
-            <div className="flex justify-between items-center mt-6">
-                <Button onClick={handlePrev} disabled={page === 1} className="bg-gray-300 text-black disabled:opacity-50">
-                    Previous
-                </Button>
-                <span className="text-sm">Page {page} of {totalPages}</span>
-                <Button onClick={handleNext} disabled={page >= totalPages} className="bg-gray-300 text-black disabled:opacity-50">
-                    Next
-                </Button>
             </div>
         </div>
     );
