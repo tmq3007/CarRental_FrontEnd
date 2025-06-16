@@ -1,6 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi} from "@reduxjs/toolkit/query/react"
 import { ApiResponse } from "@/lib/store";
-import {baseQuery} from "@/lib/services/config/baseQuery";
+import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
 
 export interface UserProfile {
     id: string
@@ -46,10 +46,13 @@ export interface RegisterDTO {
 
 export const userApi = createApi({
     reducerPath: "userApi",
-    baseQuery: baseQuery,
+    baseQuery: baseQueryWithAuthCheck,
     endpoints: (builder) => ({
         getUserById: builder.query<ApiResponse<UserProfile>, string>({
-            query: (id) => `User/profile/${id}`,
+            query: (id) => ({
+                url: `User/profile/${id}`,
+                method: 'GET',
+            }),
         }),
         updateUserProfile: builder.mutation<ApiResponse<UserProfile>, { id: string, dto: UserUpdateDTO }>({
             query: ({ id, dto }) => ({

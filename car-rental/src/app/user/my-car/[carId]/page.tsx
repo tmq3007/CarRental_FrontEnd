@@ -1,6 +1,5 @@
 "use client"
 
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Breadcrumb from "@/components/common/breadcum";
 import {CarImageCarousel} from "@/components/car/car-detail/car-image-carousel";
@@ -12,10 +11,10 @@ import {useGetCarDetailQuery} from "@/lib/services/car-api";
 import NoResult from "@/components/common/no-result";
 import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
 
-export default function MyCarDetailsPage({ params }: { params: { carId: string } }) {
+export default async function MyCarDetailsPage({ params }: { params: Promise< {carId: string }> }) {
     console.log("params.carId:", params); // Debug log
-    const { data: carDetail, isLoading, error } = useGetCarDetailQuery(params.carId);
-    //console.log("carDetail", carDetail)
+    const { data: carDetail, isLoading, error } = useGetCarDetailQuery((await params).carId);
+    console.log("carDetail", carDetail)
 
     if (isLoading) {
         return <CarDetailsPageSkeleton />
@@ -104,7 +103,7 @@ export default function MyCarDetailsPage({ params }: { params: { carId: string }
                     </div>
 
                     <div className="space-y-6">
-                        <CarInfoHeader carInfo={carInfo} onRentClick={handleRentClick} />
+                        <CarInfoHeader carInfo={carInfo} onRentClick={handleRentClick} isCarOwner={true} />
                     </div>
                 </div>
 

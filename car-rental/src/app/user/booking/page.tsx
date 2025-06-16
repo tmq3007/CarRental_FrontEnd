@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGetBookingsByAccountIdQuery, BookingVO } from "@/lib/services/booking-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function BookingListPage() {
     const [accountId, setAccountId] = useState<string | null>(null);
@@ -45,7 +46,9 @@ export default function BookingListPage() {
                                 <div className="flex justify-between items-start">
                                     <h2 className="text-lg font-semibold text-blue-800">{booking.carName}</h2>
                                     <div className="flex flex-col gap-3 ml-4 mr-4 mt-2">
-                                        <Button className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full">View details</Button>
+                                        <Button
+                                            onClick={() => handleViewDetails(String(booking.bookingNumber))}
+                                            className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full">View details</Button>
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>
                                                 <Button className="bg-gray-200 text-black hover:bg-gray-300 text-xs w-full">Confirm Pickup</Button>

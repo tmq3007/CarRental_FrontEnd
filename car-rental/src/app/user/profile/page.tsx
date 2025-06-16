@@ -16,11 +16,9 @@ import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import nà
 import { toast as sonnerToast } from "sonner"
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
 import InformationSkeleton from "@/components/skeleton/information-skeleton";
-import NotFound from "@/app/not-found";
 import NoResult from "@/components/common/no-result";
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
-import LoginPage from "@/app/(auth)/signin/page";
 
 export default function ProfilePage() {
 
@@ -67,10 +65,6 @@ export default function ProfilePage() {
             setPersonalInfo(extractUserProfileFromData(user.data))
         }
     }, [user])
-
-    if(personalInfo===null){
-        return <LoginPage/>
-    }
 
     const handlePersonalInfoChange = (field: string, value: string) => {
         setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))

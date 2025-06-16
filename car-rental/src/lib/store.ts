@@ -8,6 +8,7 @@ import storage from "@/lib/ssr-safe-storage";
 import { addressApi } from "@/lib/services/local-api/address-api";
 import { carApi } from "@/lib/services/car-api";
 import { bookingApi } from "./services/booking-api";
+import {vnpayApi} from "@/lib/services/vnp-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -15,6 +16,19 @@ export type ApiResponse<T> = {
     data: T;
 };
 
+// Pagination data type (same as before, but reusable)
+export type PaginationMetadata = {
+    pageNumber: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPages: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+}
+export type PaginationResponse<T> = {
+    data: T
+    PaginationMetadata: PaginationMetadata
+}
 const baseReducer = combineReducers({
     [userApi.reducerPath]: userApi.reducer,
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
@@ -22,6 +36,7 @@ const baseReducer = combineReducers({
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
     [bookingApi.reducerPath]: bookingApi.reducer,
+    [vnpayApi.reducerPath]: vnpayApi.reducer,
     user: userReducer,
 })
 
@@ -50,7 +65,8 @@ export const store = () => {
                 authApi.middleware,
                 addressApi.middleware,
                 carApi.middleware,
-                bookingApi.middleware
+                bookingApi.middleware,
+                vnpayApi.middleware
             ),
     })
 }

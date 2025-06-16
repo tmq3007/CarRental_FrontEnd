@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest) {
 
         cookie.delete("Access_Token");
 
-        return NextResponse.json({ message: 'Cookies cleared successfully' }, { status: 200 });
+        return NextResponse.redirect(new URL('/signin', req.url), { status: 307 });
     } catch (error) {
         return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }

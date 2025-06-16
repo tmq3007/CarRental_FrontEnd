@@ -7,6 +7,7 @@ import ScrollToTopButton from "@/components/common/scroll-button";
 import ChatToggleButton from "@/components/chat-bot/chatbox";
 import ReduxProvider, {Props} from "@/components/provider/StoreProvider";
 import { Toaster } from "@/components/ui/sonner"
+import RedirectOnLogout from "@/app/redirect-on-logout";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,14 +20,16 @@ const inter = Inter({ subsets: ["latin"] })
  }
 
 export default function RootLayout({ children }: Props) {
+
     return (
         <html lang="en" suppressHydrationWarning>
         <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
         <ReduxProvider>
+            <RedirectOnLogout />
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                     <main className="min-h-screen">
                         <Header />
-                        <div className="pt-20 sm:pt-24 md:pt-28">
+                        <div className="pt-28">
                             {children}
                         </div>
                         <Toaster />
