@@ -50,7 +50,7 @@ const useAuthRedirect = (
                 // messageApi.success('Login successful.', 1).then(() => {
                     if(userRole === 'admin') {
                         router.push('/admin/dashboard');
-                    } else if(userRole === 'customer') {
+                    } else if(userRole === 'customer' || userRole === 'car_owner') {
                         router.push('/home');
                     }
                 // });
