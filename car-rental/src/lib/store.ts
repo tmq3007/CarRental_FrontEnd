@@ -8,6 +8,7 @@ import storage from "@/lib/ssr-safe-storage";
 import { addressApi } from "@/lib/services/local-api/address-api";
 import { carApi } from "@/lib/services/car-api";
 import { bookingApi } from "./services/booking-api";
+import {vnpayApi} from "@/lib/services/vnp-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -22,6 +23,7 @@ const baseReducer = combineReducers({
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
     [bookingApi.reducerPath]: bookingApi.reducer,
+    [vnpayApi.reducerPath]: vnpayApi.reducer,
     user: userReducer,
 })
 
@@ -50,7 +52,8 @@ export const store = () => {
                 authApi.middleware,
                 addressApi.middleware,
                 carApi.middleware,
-                bookingApi.middleware
+                bookingApi.middleware,
+                vnpayApi.middleware
             ),
     })
 }

@@ -3,7 +3,7 @@ import Redis from 'ioredis'
 
 const redis = new Redis(process.env.REDIS_URL!)
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest ) {
 
     try {
         const { jti, email } = await req.json()
