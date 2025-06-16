@@ -12,14 +12,16 @@ import NoResult from "@/components/common/no-result"
 import Breadcrumb from "@/components/common/breadcum"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
+import {CarDetailsPage} from "@/components/car/car-detail/car-details-page";
+ import {useRouter} from "next/navigation";
 
 interface CarListPageProps {
     accountId: string
 }
 
 export default function CarListPage({ accountId }: CarListPageProps) {
-
-    const [currentPage, setCurrentPage] = useState(1)
+    const router = useRouter();
+     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [filters, setFilters] = useState<CarFilters>({
         sortBy: "id",
@@ -27,6 +29,9 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     })
     const [isTransitioning, setIsTransitioning] = useState(false)
 
+    const handleViewDetails = (carId: string) => {
+        router.push(`/user/my-car/${carId}`);
+    };
     const {
         data: cars,
         error,
@@ -163,6 +168,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     if (loading || !cars?.data?.data) {
         return <CarListSkeleton />
     }
+    
+
 
     return (
         <div className="min-h-screen bg-gray-50 p-6 transition-colors duration-300">
@@ -337,6 +344,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                             {/* Action Buttons */}
                                             <div className="flex flex-col gap-2">
                                                 <Button
+                                                    onClick={() => handleViewDetails(String(car.id))}
                                                     variant="outline"
                                                     size="sm"
                                                     className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105"

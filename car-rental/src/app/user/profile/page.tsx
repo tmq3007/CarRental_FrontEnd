@@ -20,10 +20,13 @@ import NotFound from "@/app/not-found";
 import NoResult from "@/components/common/no-result";
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
+import LoginPage from "@/app/(auth)/signin/page";
 
 export default function ProfilePage() {
 
+    // @ts-ignore
     const userId = useSelector((state: RootState) => state.user?.id);
+     console.log(userId);
      const {
         data: user,
         isLoading: userLoading,
@@ -33,21 +36,31 @@ export default function ProfilePage() {
 
     const [updateProfile] = useUpdateUserProfileMutation()
     const [changePassword] = useChangePasswordMutation()
-    const [personalInfo, setPersonalInfo] = useState<UserProfile | undefined>()
+    const [personalInfo, setPersonalInfo] = useState<UserProfile | null>(null)
 
-    const extractUserProfileFromData = (userData: any): UserProfile => ({
-        id: userData.id,
-        fullName: userData.fullName,
-        phoneNumber: userData.phoneNumber,
-        nationalId: userData.nationalId,
-        drivingLicenseUri: userData.drivingLicenseUri,
-        houseNumberStreet: userData.houseNumberStreet,
-        ward: userData.ward,
-        district: userData.district,
-        cityProvince: userData.cityProvince,
-        email: userData.email,
-        dob: userData.dob ? new Date(userData.dob).toISOString().split("T")[0] : "",
+    const [securityInfo, setSecurityInfo] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
     })
+    const extractUserProfileFromData = (userData: any): UserProfile | null => {
+        if (!userData) return null;
+
+        return {
+            id: userData.id,
+            fullName: userData.fullName,
+            phoneNumber: userData.phoneNumber,
+            nationalId: userData.nationalId,
+            drivingLicenseUri: userData.drivingLicenseUri,
+            houseNumberStreet: userData.houseNumberStreet,
+            ward: userData.ward,
+            district: userData.district,
+            cityProvince: userData.cityProvince,
+            email: userData.email,
+            dob: userData.dob ? new Date(userData.dob).toISOString().split("T")[0] : "",
+        }
+    }
+
 
     useEffect(() => {
         if (user) {
@@ -55,11 +68,9 @@ export default function ProfilePage() {
         }
     }, [user])
 
-    const [securityInfo, setSecurityInfo] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-    })
+    if(personalInfo===null){
+        return <LoginPage/>
+    }
 
     const handlePersonalInfoChange = (field: string, value: string) => {
         setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))
