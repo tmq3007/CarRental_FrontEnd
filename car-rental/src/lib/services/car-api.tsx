@@ -62,6 +62,5 @@ export const carApi = createApi({
 
 export const {
     useGetCarsQuery,
-
 } = carApi
 
