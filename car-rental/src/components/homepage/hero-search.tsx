@@ -6,9 +6,14 @@ import { CalendarDays, Clock, Search, MapPin } from "lucide-react"
 import Image from "next/image"
 import AddressInput from "../common/address-input"
 import { DateTimePicker } from "../common/date-time-picker"
+import { useRouter } from "next/navigation"
 
 interface SearchFormData {
-  pickupLocation: string
+  location: {
+    province: string;
+    district: string;
+    ward: string;
+  },
   pickupDateTime: Date | undefined
   dropoffDateTime: Date | undefined
 }
@@ -16,22 +21,38 @@ interface SearchFormData {
 export default function HeroSearchSection() {
   const defaultDate = new Date();
   const [searchData, setSearchData] = useState<SearchFormData>({
-    pickupLocation: "",
+    location: {
+      province: "",
+      district: "",
+      ward: ""
+    },
     pickupDateTime: defaultDate,
     dropoffDateTime: defaultDate,
   })
+  
+  const router = useRouter();
 
   const handleSearch = () => {
-    console.log("Search data:", searchData)
-    alert(
-      `Searching for cars in ${searchData.pickupLocation} from ${searchData.pickupDateTime?.toLocaleDateString()} to ${searchData.dropoffDateTime?.toLocaleDateString()}`,
-    )
+    const { province, district, ward } = searchData.location
+
+    const queryParams = new URLSearchParams({
+      province,
+      district,
+      ward,
+      pickupTime: searchData.pickupDateTime?.toISOString() || "",
+      dropoffTime: searchData.dropoffDateTime?.toISOString() || "",
+    }).toString()
+
+    router.push(`/search?${queryParams}`)
   }
 
-  const handleLocationChange = (value: string) => {
+  const handleLocationChange = (field: string, value: string) => {
     setSearchData((prev) => ({
       ...prev,
-      pickupLocation: value,
+      location: {
+        ...prev.location,
+        [field]: value,
+      },
     }))
   }
 
@@ -119,7 +140,7 @@ export default function HeroSearchSection() {
                         <p className="text-xs text-gray-500">Where do you want to pick up?</p>
                       </div>
                     </div>
-                    <AddressInput onLocationChange={handleLocationChange} orientation="horizontal" />
+                    <AddressInput location={searchData.location} onLocationChange={handleLocationChange} orientation="horizontal" />
                   </div>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-4">
