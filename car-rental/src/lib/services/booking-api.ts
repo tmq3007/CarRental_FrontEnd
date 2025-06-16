@@ -35,7 +35,15 @@ export const bookingApi = createApi({
             }),
             providesTags: ["Booking"],
         }),
+
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+            query: ({ accountId }) => ({
+                url: `/booking/${accountId}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
     }),
 });
 
-export const { useGetBookingsQuery } = bookingApi;
+export const { useGetBookingsQuery, useGetBookingsByAccountIdQuery } = bookingApi;
