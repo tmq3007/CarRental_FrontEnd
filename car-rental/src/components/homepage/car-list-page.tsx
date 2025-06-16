@@ -42,7 +42,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         pageSize,
         filters,
     })
-
+    const pagiantion = cars?.data?.data?.pagination
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
         const [sortBy, sortDirection] = value.split("-")
@@ -105,8 +105,10 @@ export default function CarListPage({ accountId }: CarListPageProps) {
 
     const renderPaginationButtons = () => {
         if (!cars) return null
-
-        const { pageNumber, totalPages } = cars.data
+        const { pageNumber, totalPages } = { 
+            pageNumber: pagiantion?.pageNumber ?? 1, 
+            totalPages: pagiantion?.totalPages ?? 1 
+        }
         const buttons = []
 
         buttons.push(
@@ -115,7 +117,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber - 1)}
-                disabled={!cars.data.hasPreviousPage}
+                disabled={!pagiantion?.hasPreviousPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {"<<<"}
@@ -155,7 +157,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber + 1)}
-                disabled={!cars.data.hasNextPage}
+                disabled={!pagiantion?.hasNextPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {">>>"}
@@ -186,7 +188,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6 animate-in slide-in-from-top duration-500">
                     <h1 className="text-2xl font-bold transition-all duration-300">
-                        List of Cars {cars?.data?.totalRecords ? `(${cars.data.totalRecords} total)` : ""}
+                        List of Cars {pagiantion?.totalRecords ? `(${pagiantion?.totalRecords} total)` : ""}
                     </h1>
                     <div className="flex gap-4">
                         <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
@@ -230,7 +232,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Car Cards */}
                 {cars?.data?.data && (
                     <div className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
-                        {cars.data.data.length === 0 ? (
+                        {cars.data.data.data.length === 0 ? (
                             <div className="text-center py-12 animate-in fade-in duration-500">
                                 <p className="text-gray-500 mb-4">Not Found Any Car</p>
                                 <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
@@ -238,7 +240,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                 </Button>
                             </div>
                         ) : (
-                            cars.data.data.map((car, index) => (
+                            cars.data.data.data.map((car: CarVO_ViewACar, index: number) => (
                                 <Card
                                     key={car.id}
                                     className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom duration-500"
@@ -377,7 +379,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 )}
 
                 {/* Pagination */}
-                {cars?.data?.totalPages && cars.data.totalPages > 1 && (
+                {pagiantion?.totalPages && pagiantion.totalPages > 1 && (
                     <div className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
                         <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
 
@@ -409,8 +411,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Pagination Info */}
                 {cars?.data && (
                     <div className="text-center mt-4 text-sm text-gray-600 animate-in fade-in duration-500">
-                        Showing {(cars.data.pageNumber - 1) * cars.data.pageSize + 1} to{" "}
-                        {Math.min(cars.data.pageNumber * cars.data.pageSize, cars.data.totalRecords)} of {cars.data.totalRecords}{" "}
+                        Showing {(pagiantion?.pageNumber ? (pagiantion.pageNumber - 1) * pagiantion.pageSize + 1 : 0)} to{" "}
+                        {pagiantion?.pageNumber ? Math.min((pagiantion.pageNumber ?? 0) * (pagiantion.pageSize ?? 0), pagiantion.totalRecords ?? 0) : 0} of {pagiantion?.totalRecords ?? 0}{" "}
                         cars
                     </div>
                 )}

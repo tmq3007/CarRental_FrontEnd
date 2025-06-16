@@ -54,7 +54,7 @@ export default function SearchPage() {
       ? currentFilters.dropoffTime.toISOString()
       : null,
     page: currentPage,
-    pageSize: pageSize, // Add pageSize to query criteria
+    pageSize: pageSize,
   };
 
   const { data, isLoading, error } = useSearchCarsQuery(queryCriteria);
