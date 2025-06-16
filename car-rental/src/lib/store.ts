@@ -16,6 +16,19 @@ export type ApiResponse<T> = {
     data: T;
 };
 
+// Pagination data type (same as before, but reusable)
+export type PaginationMetadata = {
+    pageNumber: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPages: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+}
+export type PaginationResponse<T> = {
+    data: T
+    PaginationMetadata: PaginationMetadata
+}
 const baseReducer = combineReducers({
     [userApi.reducerPath]: userApi.reducer,
     [deepSeekApi.reducerPath]: deepSeekApi.reducer,
