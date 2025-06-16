@@ -103,7 +103,7 @@ export default function MyCarDetailsPage({ params }: { params: { carId: string }
                     </div>
 
                     <div className="space-y-6">
-                        <CarInfoHeader carInfo={carInfo} onRentClick={handleRentClick} />
+                        <CarInfoHeader carInfo={carInfo} onRentClick={handleRentClick} isCarOwner={true} />
                     </div>
                 </div>
 
