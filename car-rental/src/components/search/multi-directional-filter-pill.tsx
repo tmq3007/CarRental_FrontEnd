@@ -23,9 +23,9 @@ interface MultiDirectionalFilterPillProps {
   onClearAll: () => void
   activeFiltersCount: number
   location: {
-    province: string
-    district: string
-    ward: string
+    province?: string
+    district?: string
+    ward?: string
   }
   pickupTime: Date | undefined
   dropoffTime: Date | undefined

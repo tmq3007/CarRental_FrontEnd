@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Information from "@/app/car-rent/user/profile/information"
-import Security from "@/app/car-rent/user/profile/security"
+import Information from "@/components/user/profile/information"
+import Security from "@/components/user/profile/security"
 import Breadcrumb from "@/components/common/breadcum"
 import {
     useGetUserByIdQuery,

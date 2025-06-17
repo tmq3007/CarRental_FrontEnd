@@ -1,6 +1,13 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import localData from "@/lib/services/local-api/vietnam-address.json";
 
+
+export interface Location{
+    province?: string;
+    district?: string;
+    ward?: string;
+}
+
 export interface Province {
     code: number;
     name: string;
