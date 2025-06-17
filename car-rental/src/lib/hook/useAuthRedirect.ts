@@ -51,7 +51,7 @@ const useAuthRedirect = (
                     if(userRole === 'admin') {
                         router.push('/admin/dashboard');
                     } else if(userRole === 'customer' || userRole === 'car_owner') {
-                        router.push('/home');
+                        router.push('/car-rent/home');
                     }
                 // });
 

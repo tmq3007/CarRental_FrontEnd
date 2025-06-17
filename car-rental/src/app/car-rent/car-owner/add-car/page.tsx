@@ -2,10 +2,10 @@
 import React, { useState } from "react"
 
 // Import step components
-import BasicInfoStep from "@/app/car-owner/add-car/basic-info-step"
-import DetailsStep from "@/app/car-owner/add-car/details-step"
-import PricingStep from "@/app/car-owner/add-car/pricing-step"
-import FinishStep from "@/app/car-owner/add-car/finish-step"
+import BasicInfoStep from "@/components/car/add-car/basic-info-step"
+import DetailsStep from "@/components/car/add-car/details-step"
+import PricingStep from "@/components/car/add-car/pricing-step"
+import FinishStep from "@/components/car/add-car/finish-step"
 import Breadcrumb from "@/components/common/breadcum";
 import {AddCarDTO} from "@/lib/services/car-api";
 
@@ -40,9 +40,12 @@ export default function AddCarPage() {
         FuelConsumption: "",
         Address: {
             Search: "",
-            CityProvince: "",
-            District: "",
-            Ward: "",
+            ProvinceCode: null,
+            ProvinceName: "",
+            DistrictCode: null,
+            DistrictName: "",
+            WardCode: null,
+            WardName: "",
             HouseNumber: "",
         },
         Description: "",

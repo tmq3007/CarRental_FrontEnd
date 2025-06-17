@@ -107,9 +107,12 @@ export interface AddCarDTO {
   FuelConsumption: string;
   Address: {
     Search: string;
-    CityProvince: string;
-    District: string;
-    Ward: string;
+    ProvinceCode: number | null
+    ProvinceName: string
+    DistrictCode: number | null
+    DistrictName: string
+    WardCode: number | null
+    WardName: string
     HouseNumber: string;
   };
   Description: string;

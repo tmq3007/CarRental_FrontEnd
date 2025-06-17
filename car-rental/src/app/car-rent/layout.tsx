@@ -22,19 +22,17 @@ const inter = Inter({ subsets: ["latin"] })
 export default function RootLayout({ children }: Props) {
 
     return (
-        <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
-        <ReduxProvider>
-            <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
-                    <main className="min-h-screen">
-                        <div>
+        <>
+            {/*<RedirectOnLogout />*/}
+                    <div>
+                        <Header />
+                        <div  className="pt-28">
                             {children}
                         </div>
-                        <Toaster />
-                    </main>
-            </ThemeProvider>
-        </ReduxProvider>
-        </body>
-        </html>
+                        <Footer />
+                        <ScrollToTopButton />
+                        <ChatToggleButton />
+                    </div>
+        </>
     )
 }
