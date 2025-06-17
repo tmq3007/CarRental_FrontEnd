@@ -38,7 +38,7 @@ interface ValidationErrors {
 }
 
 interface InformationProps {
-    personalInfo: UserProfile | undefined
+    personalInfo: UserProfile | null
     onPersonalInfoChange: (field: string, value: string) => void
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
     onSave: () => void

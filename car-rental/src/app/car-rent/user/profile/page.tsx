@@ -15,10 +15,11 @@ import {
 import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import này
 import { toast as sonnerToast } from "sonner"
 import SecuritySkeleton from "@/components/skeleton/security-skeleton";
-import InformationSkeleton from "@/components/skeleton/information-skeleton";
-import NoResult from "@/components/common/no-result";
+
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
+import LoadingPage from "@/components/common/loading";
+import NoResult from "@/components/common/no-result";
 
 export default function ProfilePage() {
 
@@ -177,7 +178,9 @@ export default function ProfilePage() {
     if (userError) {
         return <NoResult />
     }
-
+    if(userLoading){
+        return <LoadingPage />
+    }
     return (
         <div className="min-h-screen bg-gray-50 p-4">
 
@@ -201,7 +204,7 @@ export default function ProfilePage() {
                                 ) : (
                                     personalInfo && (
                                         <Information
-                                            personalInfo={personalInfo}
+                                            personalInfo={personalInfo || undefined}
                                             onPersonalInfoChange={handlePersonalInfoChange}
                                             onFileUpload={handleFileUpload}
                                             onSave={handlePersonalSave}

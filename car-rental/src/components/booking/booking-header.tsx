@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {useState} from "react";
 
 interface BookingHeaderProps {
     title: string
@@ -12,8 +13,12 @@ interface BookingHeaderProps {
     basePrice?: string
     total?: string
     deposit?: string
-    bookingNo: string
-    bookingStatus: string
+    bookingNo?: string
+    bookingStatus?: string
+    carImageFront?: string
+    carImageBack?: string
+    carImageLeft?: string
+    carImageRight?: string
 }
 
 export default function BookingHeader({
@@ -22,12 +27,35 @@ export default function BookingHeader({
                                           fromDate = "13/02/2022 - 12:00 PM",
                                           toDate = "23/02/2022 - 14:00 PM",
                                           numberOfDays = 10,
-                                          basePrice,
-                                          total,
-                                          deposit,
+                                          basePrice = "500,000",
+                                          total = "5,000,000",
+                                          deposit = "1,000,000",
                                           bookingNo = "012345",
                                           bookingStatus = "Confirmed",
+                                          carImageFront ,
+                                          carImageBack ,
+                                          carImageLeft,
+                                          carImageRight,
                                       }: BookingHeaderProps) {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const carImages = [
+        { src: carImageFront, alt: "Front view" },
+        { src: carImageBack, alt: "Back view" },
+        { src: carImageLeft, alt: "Left side view" },
+        { src: carImageRight, alt: "Right side view" }
+    ]
+    const nextImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === carImages.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? carImages.length - 1 : prevIndex - 1
+        );
+    };
+
     return (
         <>
             <h1 className="text-2xl font-bold mb-6 ">{title}</h1>
@@ -36,19 +64,28 @@ export default function BookingHeader({
                 {/* Car Image Section */}
                 <div className="flex-shrink-0">
                     <div className="border rounded-md flex items-center justify-center w-80 h-52 relative bg-gray-50">
-                        <ChevronLeft className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 cursor-pointer" />
+                        <ChevronLeft
+                            className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-600"
+                            onClick={prevImage}
+                        />
                         <img
-                            src="/placeholder.svg?height=208&width=320"
-                            alt="Car placeholder"
+                            src={carImages[currentImageIndex].src}
+                            alt={carImages[currentImageIndex].alt}
                             className="w-full h-full object-cover rounded-md"
                         />
-                        <ChevronRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 cursor-pointer" />
+                        <ChevronRight
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-600"
+                            onClick={nextImage}
+                        />
                     </div>
                     <div className="flex justify-center mt-2">
                         <div className="flex gap-1">
-                            <div className="w-2 h-2 bg-gray-800 rounded-full"></div>
-                            <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                            <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                            {carImages.map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full ${index === currentImageIndex ? 'bg-gray-800' : 'bg-gray-300'}`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -73,15 +110,15 @@ export default function BookingHeader({
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <span className="font-medium">Base price:</span>
-                                <span>{basePrice}</span>
+                                <span>{basePrice} VND</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <span className="font-medium">Total:</span>
-                                <span>{total}</span>
+                                <span>{total} VND</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <span className="font-medium">Deposit:</span>
-                                <span>{deposit}</span>
+                                <span>{deposit} VND</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <span className="font-medium">Booking No.:</span>

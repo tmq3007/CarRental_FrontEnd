@@ -27,7 +27,7 @@ export default function BookingListPage() {
     const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
     const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
     const handleViewDetails = (bookingId: string) => {
-        router.push(`/user/my-booking/${bookingId}`);
+        router.push(`/car-rent/user/booking/${bookingId}`);
     };
     if (isLoading) return <p className="p-6">Loading...</p>;
     if (isError) return <p className="p-6 text-red-500">Error loading bookings.</p>;
