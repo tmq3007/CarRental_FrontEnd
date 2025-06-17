@@ -61,7 +61,10 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
 
     // Get location
     const location =
-        [carData.Address.Ward, carData.Address.District, carData.Address.CityProvince].filter(Boolean).join(", ") ||
+        [carData.Address.HouseNumber, carData.Address.WardName, carData.Address.DistrictName, carData.Address.ProvinceName]
+            .filter(Boolean)
+            .join(", ") ||
+        carData.Address.Search ||
         "Location not specified"
 
     return (
