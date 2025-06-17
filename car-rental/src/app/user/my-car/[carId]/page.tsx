@@ -8,8 +8,7 @@ import {CarInfoHeader} from "@/components/car/car-detail/car-info-header";
 import {BasicInformationTab} from "@/components/car/car-detail/basic-information-tab";
 import {DetailsTab} from "@/components/car/car-detail/details-tab";
 import {TermsOfUseTab} from "@/components/car/car-detail/terms-of-use-tab";
-import {useGetCarDetailQuery} from "@/lib/services/car-api";
-import NoResult from "@/components/common/no-result";
+ import NoResult from "@/components/common/no-result";
 import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
 
 export default function MyCarDetailsPage({ params }: { params: { carId: string } }) {

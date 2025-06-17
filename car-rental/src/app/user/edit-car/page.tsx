@@ -5,13 +5,11 @@ import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store"
 
-export default function EditCarPage() {
+export default function EditCarPage({carId} : {carId:string}) {
     const params = useParams()
     const carIdFromParams = params?.carId as string
 
 
-    const carIdFromStore = useSelector((state: RootState) => state.car?.id)
-    const carId = carIdFromParams || carIdFromStore || ""
 
     if (isNaN(Number(carId))) {
         return (
