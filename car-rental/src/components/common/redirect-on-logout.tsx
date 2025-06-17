@@ -11,7 +11,7 @@ export default function RedirectOnLogout() {
     const user_email = useSelector((state: RootState) => state.user.email);
 
     useEffect(() => {
-        const isExcluded = pathname === '/car-rent' || pathname === '/car-rent/home';
+        const isExcluded = pathname === '/' || pathname === '/home';
 
         if (!user_email && !isExcluded) {
             router.push('/signin');
