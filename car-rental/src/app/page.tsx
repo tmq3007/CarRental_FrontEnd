@@ -8,7 +8,9 @@ export default function HomePage() {
     return (
         <>
             <Header/>
+            <div className="pt-28">
             <GuestHomepageLayout/>
+            </div>
             <Footer/>
             <ScrollToTopButton />
             <ChatToggleButton />
