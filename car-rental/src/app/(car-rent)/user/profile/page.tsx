@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Information from "@/app/user/profile/information"
-import Security from "@/app/user/profile/security"
+import Information from "@/components/user/profile/information"
+import Security from "@/components/user/profile/security"
 import Breadcrumb from "@/components/common/breadcum"
 import {
     useGetUserByIdQuery,
@@ -32,6 +32,8 @@ export default function ProfilePage() {
         refetch: refetchUser,
     } = useGetUserByIdQuery(userId)
 
+
+
     const [updateProfile] = useUpdateUserProfileMutation()
     const [changePassword] = useChangePasswordMutation()
     const [personalInfo, setPersonalInfo] = useState<UserProfile | null>(null)
@@ -58,7 +60,6 @@ export default function ProfilePage() {
             dob: userData.dob ? new Date(userData.dob).toISOString().split("T")[0] : "",
         }
     }
-
 
     useEffect(() => {
         if (user) {

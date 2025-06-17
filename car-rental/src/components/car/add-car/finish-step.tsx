@@ -3,13 +3,16 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 import {AddCarDTO, useAddCarMutation} from "@/lib/services/car-api";
+import LoadingPage from "@/components/common/loading";
+import { toast } from "sonner";
 
 interface FinishStepProps {
     carData: AddCarDTO
     onPrev: () => void
+    setPageLoading: (loading: boolean) => void
 }
 
-export default function FinishStep({ carData, onPrev }: FinishStepProps) {
+export default function FinishStep({ carData, onPrev, setPageLoading }: FinishStepProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [addCar, { isLoading, isError, isSuccess }] = useAddCarMutation();
@@ -25,17 +28,19 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
         try {
             console.log("Submitting car data:", carData);
 
+            setPageLoading(true)
+
             const response = await addCar(carData).unwrap();
 
             console.log("Success:", response);
 
-            alert("Car submitted successfully!");
+            toast.success("Car submitted successfully!");
             // Optionally reset form or redirect
         } catch (error) {
             console.error("Error submitting car:", error);
-            alert("Error submitting car. Please try again.");
+            toast.error("Failed to submit car. Please try again.");
         } finally {
-            setIsSubmitting(false);
+            setPageLoading(false);
         }
     };
 
@@ -61,7 +66,10 @@ export default function FinishStep({ carData, onPrev }: FinishStepProps) {
 
     // Get location
     const location =
-        [carData.Address.Ward, carData.Address.District, carData.Address.CityProvince].filter(Boolean).join(", ") ||
+        [carData.Address.HouseNumber, carData.Address.WardName, carData.Address.DistrictName, carData.Address.ProvinceName]
+            .filter(Boolean)
+            .join(", ") ||
+        carData.Address.Search ||
         "Location not specified"
 
     return (

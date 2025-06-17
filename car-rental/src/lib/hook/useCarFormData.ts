@@ -21,9 +21,9 @@ export function useCarFormData() {
 
         // ✅ Address (nested object)
         formData.append("SearchAddress", dto.Address.Search);
-        formData.append("CityProvince", dto.Address.CityProvince);
-        formData.append("District", dto.Address.District);
-        formData.append("Ward", dto.Address.Ward);
+        formData.append("CityProvince", dto.Address.ProvinceName);
+        formData.append("District", dto.Address.DistrictName);
+        formData.append("Ward", dto.Address.WardName);
         formData.append("HouseNumber", dto.Address.HouseNumber);
 
         // ✅ AdditionalFunctions (booleans)

@@ -28,6 +28,7 @@ export default function Header() {
     const dispatch = useDispatch();
     const router = useRouter();
 
+    const email = useSelector((state: RootState) => state.user?.email);
     const username = useSelector((state: RootState) => state.user?.full_name);
 
     // Debounced scroll handler to prevent rapid state changes
@@ -183,7 +184,7 @@ export default function Header() {
                     {/* Right side - User menu and mobile menu */}
                     <div className="flex items-center gap-2">
                         {/* User dropdown */}
-                        {username ? (
+                        {email ? (
                             <DropdownMenu modal={false}>
                                 <DropdownMenuTrigger asChild>
                                     <Button
@@ -197,7 +198,7 @@ export default function Header() {
                                             <div
                                                 className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                                         </div>
-                                        <span className="hidden sm:inline">Welcome, {username}</span>
+                                        <span className="hidden sm:inline">Welcome, {username ? username : email}</span>
                                         <ChevronDown
                                             className={`transition-all duration-300 ${isScrolled ? "h-3 w-3" : "h-4 w-4"}`} />
                                     </Button>

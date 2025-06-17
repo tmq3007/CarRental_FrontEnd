@@ -2,12 +2,13 @@
 import React, { useState } from "react"
 
 // Import step components
-import BasicInfoStep from "@/app/car-owner/add-car/basic-info-step"
-import DetailsStep from "@/app/car-owner/add-car/details-step"
-import PricingStep from "@/app/car-owner/add-car/pricing-step"
-import FinishStep from "@/app/car-owner/add-car/finish-step"
+import BasicInfoStep from "@/components/car/add-car/basic-info-step"
+import DetailsStep from "@/components/car/add-car/details-step"
+import PricingStep from "@/components/car/add-car/pricing-step"
+import FinishStep from "@/components/car/add-car/finish-step"
 import Breadcrumb from "@/components/common/breadcum";
 import {AddCarDTO} from "@/lib/services/car-api";
+import LoadingPage from "@/components/common/loading";
 
 
 const steps = [
@@ -19,6 +20,7 @@ const steps = [
 
 export default function AddCarPage() {
     const [currentStep, setCurrentStep] = useState(1)
+    const [isPageLoading, setIsPageLoading] = useState(false)
     const [AddCarDTO, setAddCarDTO] = useState<AddCarDTO>({
         // Basic Info
         LicensePlate: "",
@@ -40,9 +42,12 @@ export default function AddCarPage() {
         FuelConsumption: "",
         Address: {
             Search: "",
-            CityProvince: "",
-            District: "",
-            Ward: "",
+            ProvinceCode: null,
+            ProvinceName: "",
+            DistrictCode: null,
+            DistrictName: "",
+            WardCode: null,
+            WardName: "",
             HouseNumber: "",
         },
         Description: "",
@@ -91,6 +96,10 @@ export default function AddCarPage() {
         }
     }
 
+    const setPageLoading = (loading: boolean) => {
+        setIsPageLoading(loading)
+    }
+
     const renderStep = () => {
         switch (currentStep) {
             case 1:
@@ -100,16 +109,20 @@ export default function AddCarPage() {
             case 3:
                 return <PricingStep carData={AddCarDTO} updateCarData={updateAddCarDTO} onNext={nextStep} onPrev={prevStep} />
             case 4:
-                return <FinishStep carData={AddCarDTO} onPrev={prevStep} />
+                return <FinishStep carData={AddCarDTO} onPrev={prevStep} setPageLoading={setPageLoading} />
             default:
                 return null
         }
     }
 
+    if (isPageLoading) {
+        return <LoadingPage />
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 p-4">
 
-            <div className="max-w-5xl mx-auto">
+            <div className="mx-auto">
                 <Breadcrumb items={[{ label: "Home", path: "/" }, { label: "Profile" }]} />
 
             {/* Main Content */}
