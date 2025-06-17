@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Props) {
         <ReduxProvider>
             <ThemeProvider attribute="class" defaultTheme="white" enableSystem>
                     <main className="min-h-screen">
-                        <div className="pt-28">
+                        <div>
                             {children}
                         </div>
                         <Toaster />

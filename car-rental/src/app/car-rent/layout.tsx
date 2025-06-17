@@ -26,7 +26,7 @@ export default function RootLayout({ children }: Props) {
             <RedirectOnLogout />
                     <div>
                         <Header />
-                        <div>
+                        <div  className="pt-28">
                             {children}
                         </div>
                         <Footer />
