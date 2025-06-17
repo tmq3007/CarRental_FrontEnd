@@ -39,16 +39,6 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const emailValidation = validateEmail(email)
-        const passwordValidation = validateNewPassword(password)
-
-        toast.error(emailValidation)
-        toast.error(passwordValidation)
-
-        if (emailValidation || passwordValidation) {
-            return
-        }
-
         setIsLoading(true)
 
         // Simulate API call
@@ -56,7 +46,7 @@ export default function LoginPage() {
             const data = await Login ({ Email: email, Password: password }).unwrap()
             setLoginData(data)
         } catch (error) {
-            console.error("Login failed:", error)
+            toast.error("Login failed. Please check your credentials and try again.");
         } finally {
             setIsLoading(false)
         }
