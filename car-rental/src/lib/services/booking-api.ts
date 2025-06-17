@@ -1,7 +1,7 @@
 // src/lib/services/booking/booking-api.ts
 
 import { createApi } from "@reduxjs/toolkit/query/react";
-import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
 
 export interface BookingVO {
@@ -35,7 +35,25 @@ export const bookingApi = createApi({
             }),
             providesTags: ["Booking"],
         }),
+
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+            query: ({ accountId }) => ({
+                url: `/booking/${accountId}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
+        cancelBooking: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/cancel`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
     }),
 });
 
-export const { useGetBookingsQuery } = bookingApi;
+export const {
+    useGetBookingsQuery,
+    useGetBookingsByAccountIdQuery,
+    useCancelBookingMutation, } = bookingApi;

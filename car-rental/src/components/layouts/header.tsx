@@ -101,7 +101,7 @@ export default function Header() {
         <header
             className={`fixed top-0 left-0 pt-0 right-0 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${isScrolled ? "py-2" : "py-4"
                 }`}
-                style={{ zIndex: 100 }}
+            style={{ zIndex: 100 }}
         >
             {/* Top info bar - only visible when not scrolled */}
             <div
@@ -128,7 +128,7 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-4 p-1">
                 <div className="flex items-center justify-between">
                     {/* Left side - Logo and tagline */}
-                    <Link href="/"> 
+                    <Link href="/">
                         <div
                             className={`flex items-center gap-3 text-white transition-all duration-300 ease-in-out ${isScrolled ? "scale-90" : "scale-100"
                                 }`}
@@ -227,7 +227,7 @@ export default function Header() {
                                             handleDropdownItemClick("My Bookings")
                                         }}
                                     >
-                                        <Link href="/user/profile"> My Bookings </Link>
+                                        <Link href="/user/booking"> My Bookings </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
