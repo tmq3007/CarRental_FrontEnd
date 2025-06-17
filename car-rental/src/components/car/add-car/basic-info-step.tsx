@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, AlertCircle } from "lucide-react"
+import { Upload, AlertCircle, Check } from "lucide-react"
 import {AddCarDTO} from "@/lib/services/car-api";
 
 interface BasicInfoStepProps {
@@ -35,6 +35,17 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
         if (!carData.Color.trim()) newErrors.Color = "Color is required"
         if (!carData.NumberOfSeats.trim()) newErrors.NumberOfSeats = "Number of seats is required"
 
+        // Validate required documents
+        if (!carData.Documents.RegistrationPaper) {
+            newErrors.RegistrationPaper = "Registration paper is required"
+        }
+        if (!carData.Documents.CertificateOfInspection) {
+            newErrors.CertificateOfInspection = "Certificate of inspection is required"
+        }
+        if (!carData.Documents.Insurance) {
+            newErrors.Insurance = "Insurance document is required"
+        }
+
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -43,6 +54,26 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
         if (validateForm()) {
             onNext()
         }
+    }
+
+    const getFieldClassName = (value: string, errorKey: string) => {
+        if (value.trim()) {
+            return "border-green-500 bg-green-50 focus:border-green-600 focus:ring-green-200"
+        }
+        if (errors[errorKey]) {
+            return "border-red-500 focus:border-red-500 focus:ring-red-200"
+        }
+        return "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+    }
+
+    const getSelectClassName = (value: string, errorKey: string) => {
+        if (value.trim()) {
+            return "border-green-500 bg-green-50 focus:border-green-600 focus:ring-green-200"
+        }
+        if (errors[errorKey]) {
+            return "border-red-500 focus:border-red-500 focus:ring-red-200"
+        }
+        return ""
     }
 
     const FileUploadArea = ({
@@ -55,10 +86,24 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
         file: File | null
     }) => (
         <div className="text-center">
-            <h4 className="font-medium text-gray-700 mb-2">{title}:</h4>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-gray-400 transition-colors">
-                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-2">{file ? file.name : "Drag and drop"}</p>
+            <h4 className="font-medium text-gray-700 mb-2">{title}: *</h4>
+            <div
+                className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+                    file
+                        ? "border-green-300 bg-green-50"
+                        : errors[field]
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300 hover:border-gray-400"
+                }`}
+            >
+                <Upload
+                    className={`h-8 w-8 mx-auto mb-2 ${
+                        file ? "text-green-500" : errors[field] ? "text-red-400" : "text-gray-400"
+                    }`}
+                />
+                <p className={`text-sm mb-2 ${file ? "text-green-700" : "text-gray-600"}`}>
+                    {file ? `✓ ${file.name}` : "Drag and drop"}
+                </p>
                 <p className="text-xs text-gray-500 mb-3">OR</p>
                 <input
                     type="file"
@@ -68,9 +113,15 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                     id={`file-${field}`}
                 />
                 <label htmlFor={`file-${field}`} className="text-blue-600 hover:text-blue-700 cursor-pointer text-sm underline">
-                    Select file
+                    {file ? "Change file" : "Select file"}
                 </label>
             </div>
+            {errors[field] && !file && (
+                <p className="text-red-500 text-sm flex items-center justify-center gap-1 mt-2">
+                    <AlertCircle className="h-4 w-4" />
+                    {errors[field]}
+                </p>
+            )}
         </div>
     )
 
@@ -86,14 +137,17 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* License Plate */}
                 <div className="space-y-2">
-                    <Label htmlFor="LicensePlate">License plate: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="LicensePlate">License plate: *</Label>
+                        {carData.LicensePlate.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Input
                         id="LicensePlate"
                         value={carData.LicensePlate}
                         onChange={(e) => updateCarData({ LicensePlate: e.target.value })}
-                        className={errors.LicensePlate ? "border-red-500" : ""}
+                        className={getFieldClassName(carData.LicensePlate, "LicensePlate")}
                     />
-                    {errors.LicensePlate && (
+                    {errors.LicensePlate && !carData.LicensePlate.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.LicensePlate}
@@ -103,9 +157,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Color */}
                 <div className="space-y-2">
-                    <Label htmlFor="Color">Color: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="Color">Color: *</Label>
+                        {carData.Color.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Select value={carData.Color} onValueChange={(value) => updateCarData({ Color: value })}>
-                        <SelectTrigger className={errors.Color ? "border-red-500" : ""}>
+                        <SelectTrigger className={getSelectClassName(carData.Color, "Color")}>
                             <SelectValue placeholder="Select color" />
                         </SelectTrigger>
                         <SelectContent>
@@ -117,7 +174,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="gray">Gray</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.Color && (
+                    {errors.Color && !carData.Color.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.Color}
@@ -127,9 +184,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Brand Name */}
                 <div className="space-y-2">
-                    <Label htmlFor="BrandName">Brand name: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="BrandName">Brand name: *</Label>
+                        {carData.BrandName.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Select value={carData.BrandName} onValueChange={(value) => updateCarData({ BrandName: value })}>
-                        <SelectTrigger className={errors.BrandName ? "border-red-500" : ""}>
+                        <SelectTrigger className={getSelectClassName(carData.BrandName, "BrandName")}>
                             <SelectValue placeholder="Select brand" />
                         </SelectTrigger>
                         <SelectContent>
@@ -141,7 +201,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="ford">Ford</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.BrandName && (
+                    {errors.BrandName && !carData.BrandName.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.BrandName}
@@ -151,9 +211,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Model */}
                 <div className="space-y-2">
-                    <Label htmlFor="Model">Model: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="Model">Model: *</Label>
+                        {carData.Model.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Select value={carData.Model} onValueChange={(value) => updateCarData({ Model: value })}>
-                        <SelectTrigger className={errors.Model ? "border-red-500" : ""}>
+                        <SelectTrigger className={getSelectClassName(carData.Model, "Model")}>
                             <SelectValue placeholder="Select model" />
                         </SelectTrigger>
                         <SelectContent>
@@ -163,7 +226,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="navara">Navara</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.Model && (
+                    {errors.Model && !carData.Model.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.Model}
@@ -173,9 +236,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Production Year */}
                 <div className="space-y-2">
-                    <Label htmlFor="ProductionYear">Production year: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="ProductionYear">Production year: *</Label>
+                        {carData.ProductionYear.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Select value={carData.ProductionYear} onValueChange={(value) => updateCarData({ ProductionYear: value })}>
-                        <SelectTrigger className={errors.ProductionYear ? "border-red-500" : ""}>
+                        <SelectTrigger className={getSelectClassName(carData.ProductionYear, "ProductionYear")}>
                             <SelectValue placeholder="Select year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -186,7 +252,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             ))}
                         </SelectContent>
                     </Select>
-                    {errors.ProductionYear && (
+                    {errors.ProductionYear && !carData.ProductionYear.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.ProductionYear}
@@ -196,9 +262,12 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Number of Seats */}
                 <div className="space-y-2">
-                    <Label htmlFor="NumberOfSeats">No. of seats: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label htmlFor="NumberOfSeats">No. of seats: *</Label>
+                        {carData.NumberOfSeats.trim() && <Check className="h-4 w-4 text-green-500" />}
+                    </div>
                     <Select value={carData.NumberOfSeats} onValueChange={(value) => updateCarData({ NumberOfSeats: value })}>
-                        <SelectTrigger className={errors.NumberOfSeats ? "border-red-500" : ""}>
+                        <SelectTrigger className={getSelectClassName(carData.NumberOfSeats, "NumberOfSeats")}>
                             <SelectValue placeholder="Select seats" />
                         </SelectTrigger>
                         <SelectContent>
@@ -209,7 +278,7 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
                             <SelectItem value="8">8</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.NumberOfSeats && (
+                    {errors.NumberOfSeats && !carData.NumberOfSeats.trim() && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
                             {errors.NumberOfSeats}
@@ -219,7 +288,10 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Transmission */}
                 <div className="space-y-2">
-                    <Label>Transmission: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label>Transmission: *</Label>
+                        <Check className="h-4 w-4 text-green-500" />
+                    </div>
                     <div className="flex space-x-4">
                         <label className="flex items-center space-x-2">
                             <input
@@ -246,7 +318,10 @@ export default function BasicInfoStep({ carData, updateCarData, onNext }: BasicI
 
                 {/* Fuel */}
                 <div className="space-y-2">
-                    <Label>Fuel: *</Label>
+                    <div className="flex items-center gap-2">
+                        <Label>Fuel: *</Label>
+                        <Check className="h-4 w-4 text-green-500" />
+                    </div>
                     <div className="flex space-x-4">
                         <label className="flex items-center space-x-2">
                             <input

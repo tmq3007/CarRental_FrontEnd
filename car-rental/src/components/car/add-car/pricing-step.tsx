@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Check } from "lucide-react"
 import {AddCarDTO} from "@/lib/services/car-api";
 
 interface PricingStepProps {
@@ -51,23 +51,36 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
         }
     }
 
+    const getFieldClassName = (value: string, errorKey: string) => {
+        if (value.trim()) {
+            return "border-green-500 bg-green-50 focus:border-green-600 focus:ring-green-200"
+        }
+        if (errors[errorKey]) {
+            return "border-red-500 focus:border-red-500 focus:ring-red-200"
+        }
+        return "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+    }
+
     return (
         <div className="space-y-6">
             {/* Base Price */}
             <div className="space-y-2">
-                <Label htmlFor="BasePrice">Set base price for your car:</Label>
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="BasePrice">Set base price for your car: *</Label>
+                    {carData.BasePrice.trim() && <Check className="h-4 w-4 text-green-500" />}
+                </div>
                 <div className="flex items-center space-x-2">
                     <Input
                         id="BasePrice"
                         type="number"
                         value={carData.BasePrice}
                         onChange={(e) => updateCarData({ BasePrice: e.target.value })}
-                        className={`flex-1 ${errors.BasePrice ? "border-red-500" : ""}`}
+                        className={`flex-1 ${getFieldClassName(carData.BasePrice, "BasePrice")}`}
                         placeholder="Enter price"
                     />
                     <span className="text-gray-600 font-medium">VND/Day</span>
                 </div>
-                {errors.BasePrice && (
+                {errors.BasePrice && !carData.BasePrice.trim() && (
                     <p className="text-red-500 text-sm flex items-center gap-1">
                         <AlertCircle className="h-4 w-4" />
                         {errors.BasePrice}
@@ -77,19 +90,22 @@ export default function PricingStep({ carData, updateCarData, onNext, onPrev }: 
 
             {/* Required Deposit */}
             <div className="space-y-2">
-                <Label htmlFor="RequiredDeposit">Required deposit:</Label>
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="RequiredDeposit">Required deposit: *</Label>
+                    {carData.RequiredDeposit.trim() && <Check className="h-4 w-4 text-green-500" />}
+                </div>
                 <div className="flex items-center space-x-2">
                     <Input
                         id="RequiredDeposit"
                         type="number"
                         value={carData.RequiredDeposit}
                         onChange={(e) => updateCarData({ RequiredDeposit: e.target.value })}
-                        className={`flex-1 ${errors.RequiredDeposit ? "border-red-500" : ""}`}
+                        className={`flex-1 ${getFieldClassName(carData.RequiredDeposit, "RequiredDeposit")}`}
                         placeholder="Enter deposit amount"
                     />
                     <span className="text-gray-600 font-medium">VND</span>
                 </div>
-                {errors.RequiredDeposit && (
+                {errors.RequiredDeposit && !carData.RequiredDeposit.trim() && (
                     <p className="text-red-500 text-sm flex items-center gap-1">
                         <AlertCircle className="h-4 w-4" />
                         {errors.RequiredDeposit}
