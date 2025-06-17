@@ -19,6 +19,7 @@ import InformationSkeleton from "@/components/skeleton/information-skeleton";
 import NoResult from "@/components/common/no-result";
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
+import LoadingPage from "@/components/common/loading";
 
 export default function ProfilePage() {
 
@@ -175,7 +176,7 @@ export default function ProfilePage() {
     }
 
     if (userError) {
-        return <NoResult />
+        return <LoadingPage />
     }
 
     return (
