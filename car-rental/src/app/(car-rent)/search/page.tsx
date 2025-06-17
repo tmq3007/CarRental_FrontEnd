@@ -1,64 +1,88 @@
-"use client";
+"use client"
 
-import { useState, useCallback } from "react";
-import SearchResultComponent from "@/components/search/search-result-component";
-import FilterPillComponent from "@/components/search/floating-filter-pill";
-import { FilterCriteria, QueryCriteria, useSearchCarsQuery } from "@/lib/services/car-api";
-import { useSearchParams } from "next/navigation";
+import { useState, useCallback, useMemo } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import SearchResultComponent from "@/components/search/search-result-component"
+import FilterPillComponent from "@/components/search/floating-filter-pill"
+import { FilterCriteria, QueryCriteria, useSearchCarsQuery } from "@/lib/services/car-api"
+import toQueryParams from "@/lib/hook/useToQueryParam"
 
 export default function SearchPage() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Helpers
+  const parseDateParam = (param: string | null): Date | null => {
+    if (!param) return null
+    const date = new Date(param)
+    return isNaN(date.getTime()) ? null : date
+  }
 
   const location = {
-    province: searchParams.get("province") || "",
-    district: searchParams.get("district") || "",
-    ward: searchParams.get("ward") || "",
-  };
+    province: searchParams.get("locationProvince") || "",
+    district: searchParams.get("locationDistrict") || "",
+    ward: searchParams.get("locationWard") || "",
+  }
 
-  const parseDateParam = (param: string | null): Date | null => {
-    if (!param) return null;
-    const date = new Date(param);
-    return isNaN(date.getTime()) ? null : date;
-  };
-
-  const pickupTime = parseDateParam(searchParams.get("pickupTime"));
-  const dropoffTime = parseDateParam(searchParams.get("dropoffTime"));
-
-  const [currentFilters, setCurrentFilters] = useState<FilterCriteria>({
-    priceRange: [0, 1000],
-    dailyPriceMax: 200,
-    carTypes: [],
-    fuelTypes: [],
-    transmissionTypes: [],
-    brands: [],
-    seats: [],
-    searchQuery: "",
+  const initialFilters: FilterCriteria = {
+    priceRange: [
+      parseInt(searchParams.get("priceMin") || "0", 10),
+      parseInt(searchParams.get("priceMax") || "10000000", 10),
+    ],
+    carTypes: searchParams.getAll("carTypes").length
+      ? searchParams.getAll("carTypes")
+      : (searchParams.get("carTypes") ? [searchParams.get("carTypes")!] : []),
+    fuelTypes: searchParams.getAll("fuelTypes").length
+      ? searchParams.getAll("fuelTypes")
+      : (searchParams.get("fuelTypes") ? [searchParams.get("fuelTypes")!] : []),
+    transmissionTypes: searchParams.getAll("transmissionTypes").length
+      ? searchParams.getAll("transmissionTypes")
+      : (searchParams.get("transmissionTypes") ? [searchParams.get("transmissionTypes")!] : []),
+    brands: searchParams.getAll("brands").length
+      ? searchParams.getAll("brands")
+      : (searchParams.get("brands") ? [searchParams.get("brands")!] : []),
+    seats: searchParams.getAll("seats").length
+      ? searchParams.getAll("seats")
+      : (searchParams.get("seats") ? [searchParams.get("seats")!] : []),
+    searchQuery: searchParams.get("searchQuery") || "",
     location: Object.values(location).some((v) => v) ? location : undefined,
-    pickupTime,
-    dropoffTime,
-    order: "asc",
-    sortBy: "newest",
-  });
+    pickupTime: parseDateParam(searchParams.get("pickupTime")),
+    dropoffTime: parseDateParam(searchParams.get("dropoffTime")),
+    order: (searchParams.get("order") as "asc" | "desc") || "asc",
+    sortBy: searchParams.get("sortBy") || "newest",
+  }
 
-  // Add state for current page and page size
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Default page size
+  const initialPage = parseInt(searchParams.get("page") || "1", 10)
+  const initialPageSize = parseInt(searchParams.get("pageSize") || "10", 10)
 
-  // Convert FilterCriteria to QueryCriteria for RTK Query, including page and pageSize
-  const queryCriteria: QueryCriteria = {
+  const [currentFilters, setCurrentFilters] = useState<FilterCriteria>(initialFilters)
+  const [currentPage, setCurrentPage] = useState(initialPage)
+  const [pageSize, setPageSize] = useState(initialPageSize)
+
+  // Build query params + update URL
+  const updateUrl = (filters: FilterCriteria, page = currentPage, size = pageSize) => {
+    const queryString = toQueryParams({
+      ...filters,
+      pickupTime: filters.pickupTime ? filters.pickupTime.toISOString() : null,
+      dropoffTime: filters.dropoffTime ? filters.dropoffTime.toISOString() : null,
+      page,
+      pageSize: size,
+    })
+
+    router.push(`/search?${queryString}`, { scroll: false })
+  }
+
+  const queryCriteria: QueryCriteria = useMemo(() => ({
     ...currentFilters,
-    pickupTime: currentFilters.pickupTime instanceof Date && !isNaN(currentFilters.pickupTime.getTime())
-      ? currentFilters.pickupTime.toISOString()
-      : null,
-    dropoffTime: currentFilters.dropoffTime instanceof Date && !isNaN(currentFilters.dropoffTime.getTime())
-      ? currentFilters.dropoffTime.toISOString()
-      : null,
+    pickupTime: currentFilters.pickupTime ? currentFilters.pickupTime.toISOString() : null,
+    dropoffTime: currentFilters.dropoffTime ? currentFilters.dropoffTime.toISOString() : null,
     page: currentPage,
-    pageSize: pageSize,
-  };
+    pageSize,
+  }), [currentFilters, currentPage, pageSize])
 
-  const { data, isLoading, error } = useSearchCarsQuery(queryCriteria);
-  const cars = data?.data.data || [];
+  const { data, isLoading, error } = useSearchCarsQuery(queryCriteria)
+
+  const cars = data?.data.data || []
   const pagination = data?.data.pagination || {
     pageNumber: 1,
     pageSize: 10,
@@ -66,37 +90,32 @@ export default function SearchPage() {
     totalPages: 1,
     hasPreviousPage: false,
     hasNextPage: false,
-  };
+  }
 
-  const rentalDays =
-    currentFilters.pickupTime && currentFilters.dropoffTime
-      ? Math.max(
+  const rentalDays = currentFilters.pickupTime && currentFilters.dropoffTime
+    ? Math.max(
         1,
-        Math.ceil(
-          (currentFilters.dropoffTime.getTime() - currentFilters.pickupTime.getTime()) /
-          (1000 * 60 * 60 * 24)
-        )
+        Math.ceil((currentFilters.dropoffTime.getTime() - currentFilters.pickupTime.getTime()) / (1000 * 60 * 60 * 24))
       )
-      : 7;
+    : 7
 
+  // Handlers
   const handleFilterChange = useCallback((filters: FilterCriteria) => {
-    setCurrentFilters(filters);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, []);
+    setCurrentFilters(filters)
+    setCurrentPage(1)
+    updateUrl(filters, 1)
+  }, [updateUrl])
 
   const handleSortChange = useCallback((sortBy: string, order: "asc" | "desc") => {
-    setCurrentFilters((prev) => ({
-      ...prev,
-      sortBy,
-      order,
-    }));
-    setCurrentPage(1); // Reset to first page when sort changes
-  }, []);
+    const updatedFilters = { ...currentFilters, sortBy, order }
+    setCurrentFilters(updatedFilters)
+    setCurrentPage(1)
+    updateUrl(updatedFilters, 1)
+  }, [currentFilters, updateUrl])
 
   const handleClearFilters = useCallback(() => {
-    setCurrentFilters({
-      priceRange: [0, 1000],
-      dailyPriceMax: 200,
+    const resetFilters: FilterCriteria = {
+      priceRange: [0, 10000000],
       carTypes: [],
       fuelTypes: [],
       transmissionTypes: [],
@@ -108,23 +127,28 @@ export default function SearchPage() {
       dropoffTime: null,
       order: "asc",
       sortBy: "newest",
-    });
-  }, []);
-
-  const getLocationString = () => {
-    if (!currentFilters.location) return "";
-    const { province, district, ward } = currentFilters.location;
-    return `${province}${district ? `, ${district}` : ""}${ward ? `, ${ward}` : ""}`;
-  };
+    }
+    setCurrentFilters(resetFilters)
+    setCurrentPage(1)
+    updateUrl(resetFilters, 1)
+  }, [updateUrl])
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  };
+    setCurrentPage(newPage)
+    updateUrl(currentFilters, newPage)
+  }
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when page size changes
-  };
+    setPageSize(newPageSize)
+    setCurrentPage(1)
+    updateUrl(currentFilters, 1, newPageSize)
+  }
+
+  const getLocationString = () => {
+    if (!currentFilters.location) return ""
+    const { province, district, ward } = currentFilters.location
+    return `${province}${district ? `, ${district}` : ""}${ward ? `, ${ward}` : ""}`
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,6 +158,7 @@ export default function SearchPage() {
           rentalDays={rentalDays}
           initialSortBy={currentFilters.sortBy}
           initialOrder={currentFilters.order}
+          initialFilters={currentFilters}
         />
 
         <SearchResultComponent
@@ -152,5 +177,5 @@ export default function SearchPage() {
         />
       </div>
     </div>
-  );
+  )
 }

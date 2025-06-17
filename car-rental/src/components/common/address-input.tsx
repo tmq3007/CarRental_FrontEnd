@@ -21,7 +21,7 @@ interface AddressInputProps {
   onLocationChange: (field: string, value: string) => void
   orientation?: "horizontal" | "vertical"
   spacing?: "sm" | "md" | "lg"
-  location: { province: string; district: string; ward: string }
+  location: { province?: string; district?: string; ward?: string }
 }
 
 interface ComboBoxProps {

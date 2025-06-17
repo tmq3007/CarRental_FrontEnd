@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery, baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
 import { ApiResponse, PaginationMetadata, PaginationResponse } from "@/lib/store";
 import { useCarFormData } from "@/lib/hook/useCarFormData";
+import toQueryParams from "../hook/useToQueryParam";
 
 export interface CarSearchVO {
   id: string;
@@ -145,7 +146,6 @@ export interface AddCarDTO {
 // Define the filter criteria interface
 export interface FilterCriteria {
     priceRange: [number, number];
-    dailyPriceMax: number;
     carTypes: string[];
     fuelTypes: string[];
     transmissionTypes: string[];
@@ -183,30 +183,7 @@ export interface QueryCriteria {
   pageSize: number;
 }
 
-// Utility convert filter object to URL query string
-const toQueryParams = (filters: QueryCriteria): string => {
-  const params = new URLSearchParams();
-  params.append("priceRangeMin", filters.priceRange[0].toString());
-  params.append("priceRangeMax", filters.priceRange[1].toString());
-  if (filters.carTypes.length) params.append("carTypes", filters.carTypes.join(","));
-  if (filters.fuelTypes.length) params.append("fuelTypes", filters.fuelTypes.join(","));
-  if (filters.transmissionTypes.length) params.append("transmissionTypes", filters.transmissionTypes.join(","));
-  if (filters.brands.length) params.append("brands", filters.brands.join(","));
-  if (filters.seats.length) params.append("seats", filters.seats.join(","));
-  if (filters.searchQuery.trim()) params.append("searchQuery", filters.searchQuery);
-  if (filters.location) {
-    if (filters.location.province) params.append("locationProvince", filters.location.province);
-    if (filters.location.district) params.append("locationDistrict", filters.location.district);
-    if (filters.location.ward) params.append("locationWard", filters.location.ward);
-  }
-  if (filters.pickupTime) params.append("pickupTime", filters.pickupTime);
-  if (filters.dropoffTime) params.append("dropoffTime", filters.dropoffTime);
-  params.append("page", filters.page.toString());
-  params.append("pageSize", filters.pageSize.toString());
-  params.append("sortBy", filters.sortBy);
-  params.append("order", filters.order);
-  return params.toString();
-};
+
 
 // Tạo carApi chung
 export const carApi = createApi({
