@@ -28,6 +28,7 @@ export default function Header() {
     const dispatch = useDispatch();
     const router = useRouter();
 
+    const email = useSelector((state: RootState) => state.user?.email);
     const username = useSelector((state: RootState) => state.user?.full_name);
 
     // Debounced scroll handler to prevent rapid state changes
@@ -98,8 +99,9 @@ export default function Header() {
 
     return (
         <header
-            className={`fixed top-0 left-0 pt-0 right-0 z-50 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${isScrolled ? "py-2" : "py-4"
+            className={`fixed top-0 left-0 pt-0 right-0 bg-gradient-to-r from-green-500 to-green-600 shadow-lg transition-all duration-300 ease-in-out max-width: 100vw ${isScrolled ? "py-2" : "py-4"
                 }`}
+                style={{ zIndex: 100 }}
         >
             {/* Top info bar - only visible when not scrolled */}
             <div
@@ -182,7 +184,7 @@ export default function Header() {
                     {/* Right side - User menu and mobile menu */}
                     <div className="flex items-center gap-2">
                         {/* User dropdown */}
-                        {username ? (
+                        {email ? (
                             <DropdownMenu modal={false}>
                                 <DropdownMenuTrigger asChild>
                                     <Button
@@ -196,7 +198,7 @@ export default function Header() {
                                             <div
                                                 className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                                         </div>
-                                        <span className="hidden sm:inline">Welcome, {username}</span>
+                                        <span className="hidden sm:inline">Welcome, {username ? username : email}</span>
                                         <ChevronDown
                                             className={`transition-all duration-300 ${isScrolled ? "h-3 w-3" : "h-4 w-4"}`} />
                                     </Button>
@@ -214,7 +216,7 @@ export default function Header() {
                                             handleDropdownItemClick("My Profile")
                                         }}
                                     >
-                                        <Link href="/user/profile">
+                                        <Link href="/car-rent/user/profile">
                                             My Profile
                                         </Link>
                                     </DropdownMenuItem>

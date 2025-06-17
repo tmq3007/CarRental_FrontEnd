@@ -1,32 +1,13 @@
 "use client"
 
 import { Filter } from "lucide-react"
-import CarRentalListCard from "./list-view-card"
-import CarRentalGridCard from "./grid-view-card"
+import CarRentalListCard from "./cards/list-view-card"
+import CarRentalGridCard from "./cards/grid-view-card"
+import { CarSearchVO } from "@/lib/services/car-api"
 
-interface CarData {
-  id: number
-  brand: string
-  model: string
-  type: string
-  rating: number
-  reviews: number
-  bookedTime: string
-  originalPrice: number
-  discountedPrice: number
-  dailyPrice: number
-  images: string[]
-  specs: {
-    engine: string
-    fuel: string
-    transmission: string
-    efficiency: string
-    capacity: string
-  }
-}
 
 interface CarGridProps {
-  filteredCars: CarData[]
+  filteredCars: CarSearchVO[]
   viewMode: "list" | "grid"
   clearAllFilters: () => void
 }
@@ -76,5 +57,3 @@ export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: Car
     </div>
   )
 }
-
-export type { CarData }

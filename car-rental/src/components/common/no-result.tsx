@@ -56,7 +56,7 @@ export default function NoResult() {
                 >
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <Button asChild className="group hover:scale-105 transition-transform duration-200">
-                            <Link href="/home">
+                            <Link href="/car-rent/home">
                                 <Home className="w-4 h-4 mr-2 group-hover:animate-pulse" />
                                 Go back home
                             </Link>
