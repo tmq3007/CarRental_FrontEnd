@@ -5,10 +5,23 @@ import { useGetBookingsByAccountIdQuery, BookingVO } from "@/lib/services/bookin
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useCancelBookingMutation } from "@/lib/services/booking-api";
 
 export default function BookingListPage() {
     const [accountId, setAccountId] = useState<string | null>(null);
+    const [cancelBooking] = useCancelBookingMutation();
+    const handleCancelBooking = async (booking: BookingVO) => {
+        const confirmed = window.confirm("Are you sure you want to cancel this booking?");
+        if (!confirmed) return;
 
+        try {
+            await cancelBooking({ bookingId: booking.bookingNumber }).unwrap();
+            alert("Booking cancelled successfully.");
+        } catch (err) {
+            console.error("Error cancelling booking", err);
+            alert("Failed to cancel booking. Please try again.");
+        }
+    };
     // Lấy accountId từ localStorage
     useEffect(() => {
         const storedAccountId = localStorage.getItem("accountId");
@@ -52,7 +65,8 @@ export default function BookingListPage() {
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>
                                                 <Button className="bg-gray-200 text-black hover:bg-gray-300 text-xs w-full">Confirm Pickup</Button>
-                                                <Button className="bg-red-500 hover:bg-red-600 text-white text-xs w-full">Cancel Booking</Button>
+                                                <Button className="bg-red-500 hover:bg-red-600 text-white text-xs w-full"
+                                                    onClick={() => handleCancelBooking(booking)}>Cancel Booking</Button>
                                             </>
                                         )}
                                         {booking.status === "waiting_confirmed" && (
