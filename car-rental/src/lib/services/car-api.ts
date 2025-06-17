@@ -3,7 +3,6 @@ import { baseQuery, baseQueryWithAuthCheck } from "@/lib/services/config/baseQue
 import { ApiResponse, PaginationMetadata, PaginationResponse } from "@/lib/store";
 import { useCarFormData } from "@/lib/hook/useCarFormData";
 
-// Các interface chung
 export interface CarSearchVO {
   id: string;
   brand: string;
@@ -162,7 +161,6 @@ export interface FilterCriteria {
 }
 export interface QueryCriteria {
   priceRange: [number, number];
-  dailyPriceMax: number;
   carTypes: string[];
   fuelTypes: string[];
   transmissionTypes: string[];
@@ -187,7 +185,6 @@ const toQueryParams = (filters: QueryCriteria): string => {
   const params = new URLSearchParams();
   params.append("priceRangeMin", filters.priceRange[0].toString());
   params.append("priceRangeMax", filters.priceRange[1].toString());
-  params.append("dailyPriceMax", filters.dailyPriceMax.toString());
   if (filters.carTypes.length) params.append("carTypes", filters.carTypes.join(","));
   if (filters.fuelTypes.length) params.append("fuelTypes", filters.fuelTypes.join(","));
   if (filters.transmissionTypes.length) params.append("transmissionTypes", filters.transmissionTypes.join(","));

@@ -7,7 +7,7 @@ import ScrollToTopButton from "@/components/common/scroll-button";
 import ChatToggleButton from "@/components/chat-bot/chatbox";
 import ReduxProvider, {Props} from "@/components/provider/StoreProvider";
 import { Toaster } from "@/components/ui/sonner"
-import RedirectOnLogout from "@/app/redirect-on-logout";
+import RedirectOnLogout from "@/components/common/redirect-on-logout";
 
 const inter = Inter({ subsets: ["latin"] })
 
