@@ -8,6 +8,7 @@ import { useCancelBookingMutation } from "@/lib/services/booking-api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { toast } from "sonner";
+import { useConfirmPickupMutation } from "@/lib/services/booking-api";
 
 export default function BookingListPage() {
     const userId = useSelector((state: RootState) => state.user?.id);
@@ -33,6 +34,24 @@ export default function BookingListPage() {
             setCancellingId(null);
         }
     };
+    const [confirmPickup] = useConfirmPickupMutation();
+
+    const handleConfirmPickup = async (booking: BookingVO) => {
+        const confirmed = window.confirm("Are you sure you want to confirm pick-up?");
+        if (!confirmed) return;
+
+        try {
+            await confirmPickup({ bookingNumber: booking.bookingNumber }).unwrap();
+            toast.success("Pick-up confirmed successfully", {
+                description: `Booking No: ${booking.bookingNumber}`,
+            });
+        } catch (error) {
+            toast.error("Failed to confirm pick-up", {
+                description: "Please try again later.",
+            });
+        }
+    };
+
 
     const {
         data,
@@ -75,7 +94,8 @@ export default function BookingListPage() {
 
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>
-                                                <Button className="w-full text-sm py-2 rounded-md bg-gray-200 text-black hover:bg-gray-300">
+                                                <Button className="w-full text-sm py-2 rounded-md bg-gray-200 text-black hover:bg-gray-300"
+                                                    onClick={() => handleConfirmPickup(booking)}>
                                                     Confirm Pick-up
                                                 </Button>
                                                 <Button
@@ -129,3 +149,6 @@ export default function BookingListPage() {
         </div>
     );
 }
+
+
+

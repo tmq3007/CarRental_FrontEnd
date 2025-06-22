@@ -50,10 +50,20 @@ export const bookingApi = createApi({
             }),
             invalidatesTags: ["Booking"],
         }),
+        confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
+            query: ({ bookingNumber }) => ({
+                url: `/booking/${bookingNumber}/confirm-pickup`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+
     }),
 });
 
 export const {
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
-    useCancelBookingMutation, } = bookingApi;
+    useCancelBookingMutation,
+    useConfirmPickupMutation
+} = bookingApi;
