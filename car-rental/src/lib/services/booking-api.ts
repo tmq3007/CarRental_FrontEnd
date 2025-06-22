@@ -57,6 +57,14 @@ export const bookingApi = createApi({
             }),
             invalidatesTags: ["Booking"],
         }),
+        returnCar: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/return`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+
 
     }),
 });
@@ -65,5 +73,7 @@ export const {
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
     useCancelBookingMutation,
-    useConfirmPickupMutation
+    useConfirmPickupMutation,
+    useReturnCarMutation
+
 } = bookingApi;

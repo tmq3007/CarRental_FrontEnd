@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGetBookingsByAccountIdQuery, BookingVO } from "@/lib/services/booking-api";
+import { useGetBookingsByAccountIdQuery, BookingVO, useReturnCarMutation } from "@/lib/services/booking-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCancelBookingMutation } from "@/lib/services/booking-api";
@@ -51,6 +51,38 @@ export default function BookingListPage() {
             });
         }
     };
+    const [returnCar] = useReturnCarMutation();
+
+    const handleReturnCar = async (booking: BookingVO) => {
+        const pickupDate = new Date(booking.pickupDate);
+        const returnDate = new Date(booking.returnDate);
+        const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const total = booking.basePrice * numberOfDays;
+        const deposit = booking.deposit;
+
+        let message = "";
+        if (total > deposit) {
+            const diff = total - deposit;
+            message = `Please confirm to return the car. The remaining amount of ${diff.toLocaleString()} VND will be deducted from your wallet.`;
+        } else {
+            const refund = deposit - total;
+            message = `Please confirm to return the car. The exceeding amount of ${refund.toLocaleString()} VND will be returned to your wallet.`;
+        }
+
+        const confirmed = window.confirm(message);
+        if (!confirmed) return;
+
+        try {
+            await returnCar({ bookingId: booking.bookingNumber }).unwrap();
+            toast.success("Car returned successfully", {
+                description: `Booking No: ${booking.bookingNumber}`,
+            });
+        } catch (error: any) {
+            const errMsg = error?.data?.message || "Failed to return car";
+            toast.error("Error", { description: errMsg });
+        }
+    };
+
 
 
     const {
@@ -109,7 +141,10 @@ export default function BookingListPage() {
                                         )}
 
                                         {booking.status === "in_progress" && (
-                                            <Button className="w-full text-sm py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
+                                            <Button
+                                                className="w-full text-sm py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
+                                                onClick={() => handleReturnCar(booking)}
+                                            >
                                                 Return Car
                                             </Button>
                                         )}
