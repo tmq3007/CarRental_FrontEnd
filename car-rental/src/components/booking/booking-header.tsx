@@ -3,10 +3,13 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {useState} from "react";
+import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 interface BookingHeaderProps {
     title: string
     carName: string
+    carId: string
     fromDate: string
     toDate: string
     numberOfDays: number
@@ -36,8 +39,10 @@ export default function BookingHeader({
                                           carImageBack ,
                                           carImageLeft,
                                           carImageRight,
+                                            carId
                                       }: BookingHeaderProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
     const carImages = [
         { src: carImageFront, alt: "Front view" },
         { src: carImageBack, alt: "Back view" },
@@ -135,14 +140,19 @@ export default function BookingHeader({
 
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-2 ml-4">
-                        <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-1 h-8">
-                            View details
-                        </Button>
+                        <Link href={`/user/booking/car-detail/${carId}`} passHref>
+                            <Button
+                                variant="default"
+                                className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-1 h-8 w-full"
+                            >
+                                View Car Details
+                            </Button>
+                        </Link>
                         <Button variant="outline" className="border-gray-300 text-sm px-3 py-1 h-8">
                             Confirm Pick-up
                         </Button>
                         <Button variant="destructive" className="text-sm px-3 py-1 h-8">
-                            Cancel booking
+                            Cancel Booking
                         </Button>
                     </div>
                 </div>

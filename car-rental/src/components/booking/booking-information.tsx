@@ -9,8 +9,9 @@ import { CalendarIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import { useState } from "react"
-import {BookingDetailVO} from "@/lib/services/booking-api";
+import {useEffect, useState} from "react"
+import {BookingDetailVO, BookingEditDTO, useUpdateBookingMutation} from "@/lib/services/booking-api";
+import {AddressComponent} from "@/components/common/address-input-information";
 
 interface BookingInformationProps {
     bookingDetail: BookingDetailVO
@@ -23,21 +24,150 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
     const [driverDob, setDriverDob] = useState<Date | undefined>(
         bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined
     )
-    const [sameAsRenter, setSameAsRenter] = useState(false)
+    const [updateBooking, { isLoading }] = useUpdateBookingMutation()
 
-    const handleRenterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value } = e.target
-        // In a real app, you would update the state here
-    }
+    const [sameAsRenter, setSameAsRenter] = useState(bookingDetail.isRenterSameAsDriver)
+    // State for editable driver information
+    const [driverInfo, setDriverInfo] = useState({
+        fullName: bookingDetail.driverFullName || "",
+        phoneNumber: bookingDetail.driverPhoneNumber || "",
+        email: bookingDetail.driverEmail || "",
+        nationalId: bookingDetail.driverNationalId || "",
+        houseNumberStreet: bookingDetail.driverHouseNumberStreet || "",
+        ward: bookingDetail.driverWard || "",
+        district: bookingDetail.driverDistrict || "",
+        cityProvince: bookingDetail.driverCityProvince || "",
+    })
+    // Original driver info for comparison
+    const [originalDriverInfo, setOriginalDriverInfo] = useState(driverInfo)
+    const [hasChanges, setHasChanges] = useState(false)
+
+    // Check for changes whenever driverInfo or driverDob changes
+    useEffect(() => {
+        const dobChanged = driverDob?.getTime() !== (bookingDetail.driverDob ? new Date(bookingDetail.driverDob).getTime() : undefined)
+        const infoChanged = JSON.stringify(driverInfo) !== JSON.stringify(originalDriverInfo)
+        setHasChanges(dobChanged || infoChanged)
+    }, [driverInfo, driverDob, originalDriverInfo, bookingDetail.driverDob])
 
     const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
-        // In a real app, you would update the state here
+        setDriverInfo(prev => ({
+            ...prev,
+            [id]: value
+        }))
+    }
+
+    // const handleSave = () => {
+    //     // Here you would typically send the updated data to your API
+    //     console.log("Saving changes:", {
+    //         ...driverInfo,
+    //         dob: driverDob
+    //     })
+    //
+    //     // Update original data to reflect the saved state
+    //     setOriginalDriverInfo(driverInfo)
+    //     setHasChanges(false)
+    //
+    //     // You might want to show a success message here
+    // }
+
+    const handleSave = async () => {
+        try {
+            const updateData: BookingEditDTO = {
+                driverFullName: driverInfo.fullName,
+                driverDob: driverDob ? format(driverDob, 'yyyy-MM-dd') : undefined,
+                driverPhoneNumber: driverInfo.phoneNumber,
+                driverEmail: driverInfo.email,
+                driverNationalId: driverInfo.nationalId,
+                driverHouseNumberStreet: driverInfo.houseNumberStreet,
+                driverWard: driverInfo.ward,
+                driverDistrict: driverInfo.district,
+                driverCityProvince: driverInfo.cityProvince,
+                // Note: driverDrivingLicenseUri is not included as it's handled separately
+            }
+
+            await updateBooking({
+                bookingNumber: bookingDetail.bookingNumber,
+                bookingDto: updateData
+            }).unwrap()
+
+            // Update original data to reflect the saved state
+            setOriginalDriverInfo(driverInfo)
+            setHasChanges(false)
+            setDriverDob(updateData.driverDob ? new Date(updateData.driverDob) : undefined)
+
+            console.log("Driver Dob:", driverDob)
+            console.log("Renter Dob:", bookingDetail.renterDob)
+
+            const isSameAsRenterNow = (
+                driverInfo.fullName === bookingDetail.renterFullName &&
+                driverInfo.phoneNumber === bookingDetail.renterPhoneNumber &&
+                driverInfo.email === bookingDetail.renterEmail &&
+                driverInfo.nationalId === bookingDetail.renterNationalId &&
+                driverInfo.houseNumberStreet === bookingDetail.renterHouseNumberStreet &&
+                driverInfo.ward === bookingDetail.renterWard &&
+                driverInfo.district === bookingDetail.renterDistrict &&
+                driverInfo.cityProvince === bookingDetail.renterCityProvince &&
+                (driverDob ? format(driverDob, 'yyyy-MM-dd') : undefined) ===
+                (bookingDetail.renterDob ? format(new Date(bookingDetail.renterDob), 'yyyy-MM-dd') : undefined)
+            )
+
+
+            // Nếu giống thì tự động check "Same as renter"
+            if (isSameAsRenterNow) {
+                setSameAsRenter(true)
+            }
+
+            // You might want to show a success toast here
+        } catch (error) {
+            // Handle error (show error toast, etc.)
+            console.error('Failed to update booking:', error)
+        }
+    }
+
+    const handleSameAsRenterChange = (checked: boolean) => {
+        setSameAsRenter(checked)
+
+        if (checked) {
+            // Đặt thông tin tài xế giống với người thuê
+            setDriverInfo({
+                fullName: bookingDetail.renterFullName || "",
+                phoneNumber: bookingDetail.renterPhoneNumber || "",
+                email: bookingDetail.renterEmail || "",
+                nationalId: bookingDetail.renterNationalId || "",
+                houseNumberStreet: bookingDetail.renterHouseNumberStreet || "",
+                ward: bookingDetail.renterWard || "",
+                district: bookingDetail.renterDistrict || "",
+                cityProvince: bookingDetail.renterCityProvince || "",
+            })
+            setDriverDob(bookingDetail.renterDob ? new Date(bookingDetail.renterDob) : undefined)
+
+            // Đánh dấu có thay đổi để người dùng có thể lưu
+            setHasChanges(true)
+        } else {
+            // Khôi phục về thông tin tài xế gốc
+            setDriverInfo(originalDriverInfo)
+            setDriverDob(bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined)
+
+            // Kiểm tra xem có thay đổi không
+            const dobChanged = bookingDetail.driverDob ?
+                new Date(bookingDetail.driverDob).getTime() !== driverDob?.getTime() :
+                driverDob !== undefined
+            const infoChanged = JSON.stringify(originalDriverInfo) !== JSON.stringify(driverInfo)
+            setHasChanges(dobChanged || infoChanged)
+        }
+    }
+    const handleDiscard = () => {
+        // Reset to original values
+        setDriverInfo(originalDriverInfo)
+        setDriverDob(bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined)
+        setHasChanges(false)
     }
 
     return (
         <div className="border rounded-md p-6 mt-4">
             <div className="space-y-6">
+                {/* Renter's Information - Read Only */}
                 <div>
                     <h3 className="text-lg font-medium mb-4">Renter&apos;s Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -46,7 +176,6 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                             <Input
                                 id="renterFullName"
                                 value={bookingDetail.renterFullName || ""}
-                                onChange={handleRenterChange}
                                 readOnly
                             />
                         </div>
@@ -55,23 +184,23 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                             <Label htmlFor="dob">Date of birth*</Label>
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal">
+                                    <Button variant="outline" className="w-full justify-start text-left font-normal" aria-readonly={true}>
                                         {renterDob ? format(renterDob, "P") : "N/A"}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar mode="single" selected={renterDob} onSelect={setRenterDob} initialFocus />
+                                    <Calendar mode="single" selected={renterDob} onSelect={setRenterDob} initialFocus disabled />
                                 </PopoverContent>
                             </Popover>
                         </div>
+
 
                         <div className="space-y-2">
                             <Label htmlFor="phone">Phone number*</Label>
                             <Input
                                 id="renterPhoneNumber"
                                 value={bookingDetail.renterPhoneNumber || ""}
-                                onChange={handleRenterChange}
                                 readOnly
                             />
                         </div>
@@ -82,7 +211,6 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                                 id="renterEmail"
                                 type="email"
                                 value={bookingDetail.renterEmail || ""}
-                                onChange={handleRenterChange}
                                 readOnly
                             />
                         </div>
@@ -92,7 +220,6 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                             <Input
                                 id="renterNationalId"
                                 value={bookingDetail.renterNationalId || ""}
-                                onChange={handleRenterChange}
                                 readOnly
                             />
                         </div>
@@ -131,6 +258,7 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                     </div>
                 </div>
 
+                {/* Driver's Information - Editable when not same as renter */}
                 <div>
                     <h3 className="text-lg font-medium mb-4">Driver&apos;s Information</h3>
                     <div className="mb-4">
@@ -138,9 +266,8 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                             <Checkbox
                                 id="same-as-renter"
                                 checked={sameAsRenter}
-                                onCheckedChange={(checked) => {
-                                    setSameAsRenter(checked as boolean)
-                                }}
+                                onCheckedChange={handleSameAsRenterChange}
+                                disabled={isLoading}
                             />
                             <label
                                 htmlFor="same-as-renter"
@@ -154,12 +281,11 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                     {!sameAsRenter && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="driver-fullName">Full Name*</Label>
+                                <Label htmlFor="driverFullName">Full Name*</Label>
                                 <Input
-                                    id="driverFullName"
-                                    value={bookingDetail.driverFullName || ""}
+                                    id="fullName"
+                                    value={driverInfo.fullName}
                                     onChange={handleDriverChange}
-                                    readOnly
                                 />
                             </div>
 
@@ -168,49 +294,55 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                            {driverDob ? format(driverDob, "P") : "N/A"}
+                                            {driverDob ? format(driverDob, "P") : "Select date"}
                                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar mode="single" selected={driverDob} onSelect={setDriverDob} initialFocus />
+                                        <Calendar
+                                            mode="single"
+                                            selected={driverDob}
+                                            onSelect={setDriverDob}
+                                            initialFocus
+                                            // fromYear={1900}
+                                            // toYear={new Date().getFullYear() - 18}
+                                        />
                                     </PopoverContent>
                                 </Popover>
                             </div>
 
+
+
                             <div className="space-y-2">
-                                <Label htmlFor="driver-phone">Phone number*</Label>
+                                <Label htmlFor="driverPhoneNumber">Phone number*</Label>
                                 <Input
-                                    id="driverPhoneNumber"
-                                    value={bookingDetail.driverPhoneNumber || ""}
+                                    id="phoneNumber"
+                                    value={driverInfo.phoneNumber}
                                     onChange={handleDriverChange}
-                                    readOnly
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="driver-email">Email address*</Label>
+                                <Label htmlFor="driverEmail">Email address*</Label>
                                 <Input
-                                    id="driverEmail"
+                                    id="email"
                                     type="email"
-                                    value={bookingDetail.driverEmail || ""}
+                                    value={driverInfo.email}
                                     onChange={handleDriverChange}
-                                    readOnly
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="driver-nationalId">National ID No.*</Label>
+                                <Label htmlFor="driverNationalId">National ID No.*</Label>
                                 <Input
-                                    id="driverNationalId"
-                                    value={bookingDetail.driverNationalId || ""}
+                                    id="nationalId"
+                                    value={driverInfo.nationalId}
                                     onChange={handleDriverChange}
-                                    readOnly
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="driver-license">Driving license*</Label>
+                                <Label htmlFor="driverDrivingLicenseUri">Driving license*</Label>
                                 <div className="flex gap-2">
                                     <Input
                                         id="driverDrivingLicenseUri"
@@ -231,17 +363,75 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
                                     )}
                                 </div>
                             </div>
+                            <AddressComponent
+                                mode="booking"
+                                houseNumberStreet={driverInfo.houseNumberStreet}
+                                cityProvince={driverInfo.cityProvince}
+                                district={driverInfo.district}
+                                ward={driverInfo.ward}
+                                onHouseNumberStreetChange={(value) => setDriverInfo(prev => ({ ...prev, houseNumberStreet: value }))}
+                                onCityProvinceChange={(value) => setDriverInfo(prev => ({ ...prev, cityProvince: value }))}
+                                onDistrictChange={(value) => setDriverInfo(prev => ({ ...prev, district: value }))}
+                                onWardChange={(value) => setDriverInfo(prev => ({ ...prev, ward: value }))}
+                               // errors={errors}
+                            />
+                            {(hasChanges || sameAsRenter) && (
+                                <div className="flex justify-center gap-2 mt-4">
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleDiscard}
+                                        disabled={isLoading}
+                                    >
+                                        Discard
+                                    </Button>
+                                    <Button
+                                        onClick={handleSave}
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? "Saving..." : "Save Changes"}
+                                    </Button>
+                                </div>
+                            )}
+                            {/*<div className="space-y-2">*/}
+                            {/*    <Label htmlFor="driverHouseNumberStreet">House number & Street*</Label>*/}
+                            {/*    <Input*/}
+                            {/*        id="houseNumberStreet"*/}
+                            {/*        value={driverInfo.houseNumberStreet}*/}
+                            {/*        onChange={handleDriverChange}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
 
-                            <div className="space-y-2 md:col-span-2">
-                                <Label htmlFor="driver-address">Address*</Label>
-                                <Input
-                                    id="driverHouseNumberStreet"
-                                    value={`${bookingDetail.driverHouseNumberStreet || ""}, ${bookingDetail.driverWard || ""}, ${bookingDetail.driverDistrict || ""}, ${bookingDetail.driverCityProvince || ""}`}
-                                    readOnly
-                                />
-                            </div>
+                            {/*<div className="space-y-2">*/}
+                            {/*    <Label htmlFor="driverWard">Ward*</Label>*/}
+                            {/*    <Input*/}
+                            {/*        id="ward"*/}
+                            {/*        value={driverInfo.ward}*/}
+                            {/*        onChange={handleDriverChange}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+
+                            {/*<div className="space-y-2">*/}
+                            {/*    <Label htmlFor="driverDistrict">District*</Label>*/}
+                            {/*    <Input*/}
+                            {/*        id="district"*/}
+                            {/*        value={driverInfo.district}*/}
+                            {/*        onChange={handleDriverChange}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+
+                            {/*<div className="space-y-2">*/}
+                            {/*    <Label htmlFor="driverCityProvince">City/Province*</Label>*/}
+                            {/*    <Input*/}
+                            {/*        id="cityProvince"*/}
+                            {/*        value={driverInfo.cityProvince}*/}
+                            {/*        onChange={handleDriverChange}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+
                         </div>
                     )}
+
                 </div>
             </div>
         </div>

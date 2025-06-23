@@ -18,17 +18,10 @@ export interface BookingVO {
     status: string;
 }
 
-export interface TransactionVO {
-    amount: number;
-    message?: string;
-    createdAt?: string;
-    status?: string;
-    type?: string;
-}
-
 export interface BookingDetailVO {
     bookingNumber: string;
     carName: string;
+    carId: string;
     status: string;
     pickUpTime?: string;
     dropOffTime?: string;
@@ -57,6 +50,9 @@ export interface BookingDetailVO {
     driverWard?: string;
     driverDistrict?: string;
     driverCityProvince?: string;
+
+    //check renter is driver
+    isRenterSameAsDriver?: boolean;
 
     // Car information
     licensePlate?: string;
@@ -90,8 +86,21 @@ export interface BookingDetailVO {
     basePrice?: number;
     deposit?: number;
     paymentType?: string;
-    transactions?: TransactionVO[];
+ }
+
+export interface BookingEditDTO {
+    driverFullName?: string | null;
+    driverDob?: string | null; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
+    driverEmail?: string | null;
+    driverPhoneNumber?: string | null;
+    driverNationalId?: string | null;
+    //driverDrivingLicenseUri?: string | null;
+    driverHouseNumberStreet?: string | null;
+    driverWard?: string | null;
+    driverDistrict?: string | null;
+    driverCityProvince?: string | null;
 }
+
 
 export interface PaginatedBookingResponse {
     data: BookingVO[];
@@ -119,10 +128,22 @@ export const bookingApi = createApi({
             providesTags: (result, error, bookingNumber) => [{ type: "Booking", id: bookingNumber }],
         }),
 
+        updateBooking: build.mutation<ApiResponse<BookingDetailVO>, { bookingNumber: string; bookingDto: BookingEditDTO }>({
+            query: ({ bookingNumber, bookingDto }) => ({
+                url: `/booking/edit/${bookingNumber}`,
+                method: "PUT",
+                body: bookingDto,
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [
+                { type: "Booking", id: bookingNumber },
+                "Booking",
+            ],
+        }),
     }),
 });
 
 export const {
     useGetBookingsQuery ,
-    useGetBookingDetailQuery
+    useGetBookingDetailQuery,
+    useUpdateBookingMutation
     } = bookingApi;

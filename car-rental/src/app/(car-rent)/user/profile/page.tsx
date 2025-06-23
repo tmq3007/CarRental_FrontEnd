@@ -200,7 +200,7 @@ export default function ProfilePage() {
 
                             <TabsContent value="information">
                                 {userLoading ? (
-                                    <InformationSkeleton />
+                                    <LoadingPage />
                                 ) : (
                                     personalInfo && (
                                         <Information
@@ -218,7 +218,7 @@ export default function ProfilePage() {
 
                             <TabsContent value="security">
                                 {userLoading ? (
-                                    <SecuritySkeleton />
+                                    <LoadingPage/>
                                 ) : (<Security
                                     securityInfo={securityInfo}
                                     onSecurityChange={handleSecurityChange}

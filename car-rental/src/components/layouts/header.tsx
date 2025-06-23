@@ -216,7 +216,7 @@ export default function Header() {
                                             handleDropdownItemClick("My Profile")
                                         }}
                                     >
-                                        <Link href="/user/profile">
+                                        <Link href="user/profile">
                                             My Profile
                                         </Link>
                                     </DropdownMenuItem>
@@ -227,7 +227,7 @@ export default function Header() {
                                             handleDropdownItemClick("My Bookings")
                                         }}
                                     >
-                                        <Link href="/user/profile"> My Bookings </Link>
+                                        <Link href="user/booking"> My Bookings </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"

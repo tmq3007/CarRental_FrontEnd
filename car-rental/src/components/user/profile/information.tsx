@@ -22,6 +22,7 @@ import {
     hasValidationErrors, validateEmail,
 } from "@/lib/validation/user-profile-validation"
 import { useGetDistrictsQuery, useGetProvincesQuery, useGetWardsQuery } from "@/lib/services/local-api/address-api"
+import {AddressComponent} from "@/components/common/address-input-information";
 
 
 interface ValidationErrors {
@@ -226,89 +227,99 @@ export default function Information({
                         />
                         <ErrorMessage error={errors.phoneNumber} />
                     </div>
+                    <AddressComponent
+                        mode="profile"
+                        houseNumberStreet={personalInfo.houseNumberStreet}
+                        cityProvince={personalInfo.cityProvince}
+                        district={personalInfo.district}
+                        ward={personalInfo.ward}
+                        onHouseNumberStreetChange={(value) => onPersonalInfoChange("houseNumberStreet", value)}
+                        onCityProvinceChange={(value) => onPersonalInfoChange("cityProvince", value)}
+                        onDistrictChange={(value) => onPersonalInfoChange("district", value)}
+                        onWardChange={(value) => onPersonalInfoChange("ward", value)}
+                     />
+                    {/*<div>*/}
+                    {/*    <Label className="text-sm font-medium">Address:</Label>*/}
+                    {/*    <div className="space-y-2 mt-1">*/}
+                    {/*        <div>*/}
+                    {/*            <Input*/}
+                    {/*                id="houseNumberStreet"*/}
+                    {/*                value={personalInfo.houseNumberStreet || ""}*/}
+                    {/*                onChange={(e) => onPersonalInfoChange("houseNumberStreet", e.target.value)}*/}
+                    {/*                placeholder="House number and street (optional)"*/}
+                    {/*            />*/}
+                    {/*            /!*<ErrorMessage error={errors.houseNumberStreet} />*!/*/}
+                    {/*        </div>*/}
 
-                    <div>
-                        <Label className="text-sm font-medium">Address:</Label>
-                        <div className="space-y-2 mt-1">
-                            <div>
-                                <Input
-                                    id="houseNumberStreet"
-                                    value={personalInfo.houseNumberStreet || ""}
-                                    onChange={(e) => onPersonalInfoChange("houseNumberStreet", e.target.value)}
-                                    placeholder="House number and street (optional)"
-                                />
-                                {/*<ErrorMessage error={errors.houseNumberStreet} />*/}
-                            </div>
+                    {/*        <div>*/}
+                    {/*            <Label className="text-sm font-medium">City/Province:</Label>*/}
+                    {/*            <Select*/}
+                    {/*                onValueChange={handleProvinceChange}*/}
+                    {/*                value={currentProvince?.code.toString() || ""}*/}
+                    {/*            >*/}
+                    {/*                <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>*/}
+                    {/*                    <SelectValue placeholder="Select City/Province">*/}
+                    {/*                        {personalInfo.cityProvince || "Select City/Province"}*/}
+                    {/*                    </SelectValue>*/}
+                    {/*                </SelectTrigger>*/}
+                    {/*                <SelectContent>*/}
+                    {/*                    {provinces.map((province) => (*/}
+                    {/*                        <SelectItem key={province.code} value={province.code.toString()}>*/}
+                    {/*                            {province.name}*/}
+                    {/*                        </SelectItem>*/}
+                    {/*                    ))}*/}
+                    {/*                </SelectContent>*/}
+                    {/*            </Select>*/}
+                    {/*            <ErrorMessage error={errors.cityProvince} />*/}
+                    {/*        </div>*/}
 
-                            <div>
-                                <Label className="text-sm font-medium">City/Province:</Label>
-                                <Select
-                                    onValueChange={handleProvinceChange}
-                                    value={currentProvince?.code.toString() || ""}
-                                >
-                                    <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select City/Province">
-                                            {personalInfo.cityProvince || "Select City/Province"}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {provinces.map((province) => (
-                                            <SelectItem key={province.code} value={province.code.toString()}>
-                                                {province.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <ErrorMessage error={errors.cityProvince} />
-                            </div>
+                    {/*        <div>*/}
+                    {/*            <Label className="text-sm font-medium">District:</Label>*/}
+                    {/*            <Select*/}
+                    {/*                onValueChange={handleDistrictChange}*/}
+                    {/*                value={currentDistrict?.code.toString() || ""}*/}
+                    {/*                disabled={!personalInfo.cityProvince}*/}
+                    {/*            >*/}
+                    {/*                <SelectTrigger className={errors.district ? "border-red-500" : ""}>*/}
+                    {/*                    <SelectValue placeholder="Select District">*/}
+                    {/*                        {personalInfo.district || "Select District"}*/}
+                    {/*                    </SelectValue>*/}
+                    {/*                </SelectTrigger>*/}
+                    {/*                <SelectContent>*/}
+                    {/*                    {districts.map((district) => (*/}
+                    {/*                        <SelectItem key={district.code} value={district.code.toString()}>*/}
+                    {/*                            {district.name}*/}
+                    {/*                        </SelectItem>*/}
+                    {/*                    ))}*/}
+                    {/*                </SelectContent>*/}
+                    {/*            </Select>*/}
+                    {/*            <ErrorMessage error={errors.district} />*/}
+                    {/*        </div>*/}
 
-                            <div>
-                                <Label className="text-sm font-medium">District:</Label>
-                                <Select
-                                    onValueChange={handleDistrictChange}
-                                    value={currentDistrict?.code.toString() || ""}
-                                    disabled={!personalInfo.cityProvince}
-                                >
-                                    <SelectTrigger className={errors.district ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select District">
-                                            {personalInfo.district || "Select District"}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {districts.map((district) => (
-                                            <SelectItem key={district.code} value={district.code.toString()}>
-                                                {district.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <ErrorMessage error={errors.district} />
-                            </div>
-
-                            <div>
-                                <Label className="text-sm font-medium">Ward:</Label>
-                                <Select
-                                    onValueChange={handleWardChange}
-                                    value={currentWard?.code.toString() || ""}
-                                    disabled={!personalInfo.district}
-                                >
-                                    <SelectTrigger className={errors.ward ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select Ward">
-                                            {personalInfo.ward || "Select Ward"}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {wards.map((ward) => (
-                                            <SelectItem key={ward.code} value={ward.code.toString()}>
-                                                {ward.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <ErrorMessage error={errors.ward} />
-                            </div>
-                        </div>
-                    </div>
+                    {/*        <div>*/}
+                    {/*            <Label className="text-sm font-medium">Ward:</Label>*/}
+                    {/*            <Select*/}
+                    {/*                onValueChange={handleWardChange}*/}
+                    {/*                value={currentWard?.code.toString() || ""}*/}
+                    {/*                disabled={!personalInfo.district}*/}
+                    {/*            >*/}
+                    {/*                <SelectTrigger className={errors.ward ? "border-red-500" : ""}>*/}
+                    {/*                    <SelectValue placeholder="Select Ward">*/}
+                    {/*                        {personalInfo.ward || "Select Ward"}*/}
+                    {/*                    </SelectValue>*/}
+                    {/*                </SelectTrigger>*/}
+                    {/*                <SelectContent>*/}
+                    {/*                    {wards.map((ward) => (*/}
+                    {/*                        <SelectItem key={ward.code} value={ward.code.toString()}>*/}
+                    {/*                            {ward.name}*/}
+                    {/*                        </SelectItem>*/}
+                    {/*                    ))}*/}
+                    {/*                </SelectContent>*/}
+                    {/*            </Select>*/}
+                    {/*            <ErrorMessage error={errors.ward} />*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>
 
                 {/* Right Column */}
@@ -358,27 +369,27 @@ export default function Information({
                                 <ErrorMessage error={errors.email} />
                             </div>
 
-                            <div>
-                                <Label className="text-sm font-medium">City/Province:</Label>
-                                <Select
-                                    onValueChange={handleProvinceChange}
-                                    value={currentProvince?.code.toString() || ""}
-                                >
-                                    <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select City/Province">
-                                            {personalInfo.cityProvince || "Select City/Province"}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {provinces.map((province) => (
-                                            <SelectItem key={province.code} value={province.code.toString()}>
-                                                {province.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <ErrorMessage error={errors.cityProvince} />
-                            </div>
+                            {/*<div>*/}
+                            {/*    <Label className="text-sm font-medium">City/Province:</Label>*/}
+                            {/*    <Select*/}
+                            {/*        onValueChange={handleProvinceChange}*/}
+                            {/*        value={currentProvince?.code.toString() || ""}*/}
+                            {/*    >*/}
+                            {/*        <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>*/}
+                            {/*            <SelectValue placeholder="Select City/Province">*/}
+                            {/*                {personalInfo.cityProvince || "Select City/Province"}*/}
+                            {/*            </SelectValue>*/}
+                            {/*        </SelectTrigger>*/}
+                            {/*        <SelectContent>*/}
+                            {/*            {provinces.map((province) => (*/}
+                            {/*                <SelectItem key={province.code} value={province.code.toString()}>*/}
+                            {/*                    {province.name}*/}
+                            {/*                </SelectItem>*/}
+                            {/*            ))}*/}
+                            {/*        </SelectContent>*/}
+                            {/*    </Select>*/}
+                            {/*    <ErrorMessage error={errors.cityProvince} />*/}
+                            {/*</div>*/}
 
                             <div>
 
