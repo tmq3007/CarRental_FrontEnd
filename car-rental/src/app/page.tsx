@@ -9,7 +9,7 @@ export default function HomePage() {
         <>
             <Header/>
             <div className="pt-28">
-            <GuestHomepageLayout/>
+                <GuestHomepageLayout/>
             </div>
             <Footer/>
             <ScrollToTopButton />
