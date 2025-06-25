@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import type React from "react"
+import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Information from "@/components/user/profile/information"
@@ -9,43 +10,35 @@ import Breadcrumb from "@/components/common/breadcum"
 import {
     useGetUserByIdQuery,
     useUpdateUserProfileMutation,
-    UserProfile,
-    useChangePasswordMutation
+    type UserProfile,
+    useChangePasswordMutation,
 } from "@/lib/services/user-api"
-import { toast as shadToast } from "@/hooks/use-toast" // Đổi tên import này
+import { toast as shadToast } from "@/hooks/use-toast"
 import { toast as sonnerToast } from "sonner"
-import SecuritySkeleton from "@/components/skeleton/security-skeleton";
-
-import {useSelector} from "react-redux";
-import {RootState} from "@/lib/store";
-import LoadingPage from "@/components/common/loading";
-import NoResult from "@/components/common/no-result";
+import { useSelector } from "react-redux"
+import type { RootState } from "@/lib/store"
+import LoadingPage from "@/components/common/loading"
+import NoResult from "@/components/common/no-result"
 
 export default function ProfilePage() {
-
     // @ts-ignore
-    const userId = useSelector((state: RootState) => state.user?.id);
-     console.log(userId);
-     const {
-        data: user,
-        isLoading: userLoading,
-        error: userError,
-        refetch: refetchUser,
-    } = useGetUserByIdQuery(userId)
+    const userId = useSelector((state: RootState) => state.user?.id)
 
-
+    const { data: user, isLoading: userLoading, error: userError, refetch: refetchUser } = useGetUserByIdQuery(userId)
 
     const [updateProfile] = useUpdateUserProfileMutation()
     const [changePassword] = useChangePasswordMutation()
     const [personalInfo, setPersonalInfo] = useState<UserProfile | null>(null)
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
     const [securityInfo, setSecurityInfo] = useState({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     })
+
     const extractUserProfileFromData = (userData: any): UserProfile | null => {
-        if (!userData) return null;
+        if (!userData) return null
 
         return {
             id: userData.id,
@@ -68,8 +61,25 @@ export default function ProfilePage() {
         }
     }, [user])
 
-    const handlePersonalInfoChange = (field: string, value: string) => {
-        setPersonalInfo((prev) => (prev ? { ...prev, [field]: value } : prev))
+    const handlePersonalInfoChange = (field: string, value: string | File) => {
+        if (field === "drivingLicenseUri" && value instanceof File) {
+            setUploadedFile(value)
+            // Create preview URL
+            const previewUrl = URL.createObjectURL(value)
+            setPersonalInfo((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        drivingLicenseUri: value.name,
+                        drivingLicensePreview: previewUrl,
+                    }
+                    : prev,
+            )
+        } else if (field === "drivingLicensePreview") {
+            setPersonalInfo((prev) => (prev ? { ...prev, [field]: value as string } : prev))
+        } else {
+            setPersonalInfo((prev) => (prev ? { ...prev, [field]: value as string } : prev))
+        }
     }
 
     const handleSecurityChange = (field: string, value: string) => {
@@ -77,17 +87,11 @@ export default function ProfilePage() {
     }
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+        const file = event.target.files?.[0]
         if (file) {
-            // Tạo URL tạm thời để hiển thị preview
-            const fileUrl = URL.createObjectURL(file);
-
-            // Cập nhật cả tên file và URL preview
-            setPersonalInfo((prev) =>
-                prev ? { ...prev, drivingLicenseUri: file.name, drivingLicensePreview: fileUrl } : prev
-            );
+            handlePersonalInfoChange("drivingLicenseUri", file)
         }
-    };
+    }
 
     const handlePersonalSave = async () => {
         if (!personalInfo) return
@@ -97,31 +101,35 @@ export default function ProfilePage() {
                 fullName: personalInfo.fullName,
                 phoneNumber: personalInfo.phoneNumber,
                 nationalId: personalInfo.nationalId,
-                drivingLicenseUri: personalInfo.drivingLicenseUri,
+                drivingLicenseUri: uploadedFile || personalInfo.drivingLicenseUri,
                 houseNumberStreet: personalInfo.houseNumberStreet,
                 ward: personalInfo.ward,
                 district: personalInfo.district,
                 cityProvince: personalInfo.cityProvince,
                 dob: personalInfo.dob,
-                email: personalInfo.email
+                email: personalInfo.email,
             }
 
-           const response = await updateProfile({ id: userId, dto: updateData }).unwrap()
-            // Sử dụng cả 2 toast
+            const response = await updateProfile({ id: userId, dto: updateData }).unwrap()
+
             shadToast({
                 title: "Success",
                 description: response.message,
                 variant: "default",
             })
             sonnerToast.success(response.message)
+
+            // Reset uploaded file after successful save
+            setUploadedFile(null)
             refetchUser()
-        } catch (error) {
+        } catch (error: any) {
+            const errorMessage = error?.data?.message || "Failed to update profile"
             shadToast({
                 title: "Error",
-                description: "Failed to update profile",
+                description: errorMessage,
                 variant: "destructive",
             })
-            sonnerToast.error("Failed to update profile")
+            sonnerToast.error(errorMessage)
         }
     }
 
@@ -142,8 +150,8 @@ export default function ProfilePage() {
                 dto: {
                     currentPassword: securityInfo.currentPassword,
                     newPassword: securityInfo.newPassword,
-                    confirmPassword: securityInfo.confirmPassword
-                }
+                    confirmPassword: securityInfo.confirmPassword,
+                },
             }).unwrap()
 
             shadToast({
@@ -158,32 +166,34 @@ export default function ProfilePage() {
                 newPassword: "",
                 confirmPassword: "",
             })
-        } catch (error) {
+        } catch (error: any) {
+            const errorMessage = error?.data?.message || "Failed to change password. Please check your current password."
             shadToast({
                 title: "Error",
-                description: "Failed to change password. Please check your current password.",
+                description: errorMessage,
                 variant: "destructive",
             })
-            sonnerToast.error("Failed to change password. Please check your current password.")
+            sonnerToast.error(errorMessage)
         }
     }
 
     const handleDiscard = () => {
         if (user) {
             setPersonalInfo(extractUserProfileFromData(user.data))
-            setSecurityInfo({currentPassword: "", newPassword: "", confirmPassword: "" })
+            setSecurityInfo({ currentPassword: "", newPassword: "", confirmPassword: "" })
+            setUploadedFile(null)
         }
     }
 
     if (userError) {
         return <NoResult />
     }
-    if(userLoading){
+    if (userLoading) {
         return <LoadingPage />
     }
+
     return (
         <div className="min-h-screen bg-gray-50 p-4">
-
             <div className="max-w-5xl mx-auto">
                 <Breadcrumb items={[{ label: "Home", path: "/" }, { label: "Profile" }]} />
 
@@ -204,7 +214,7 @@ export default function ProfilePage() {
                                 ) : (
                                     personalInfo && (
                                         <Information
-                                            personalInfo={personalInfo || undefined}
+                                            personalInfo={personalInfo}
                                             onPersonalInfoChange={handlePersonalInfoChange}
                                             onFileUpload={handleFileUpload}
                                             onSave={handlePersonalSave}
@@ -215,16 +225,17 @@ export default function ProfilePage() {
                                 )}
                             </TabsContent>
 
-
                             <TabsContent value="security">
                                 {userLoading ? (
-                                    <LoadingPage/>
-                                ) : (<Security
-                                    securityInfo={securityInfo}
-                                    onSecurityChange={handleSecurityChange}
-                                    onSave={handleSecuritySave}
-                                    onDiscard={handleDiscard}
-                                />)}
+                                    <LoadingPage />
+                                ) : (
+                                    <Security
+                                        securityInfo={securityInfo}
+                                        onSecurityChange={handleSecurityChange}
+                                        onSave={handleSecuritySave}
+                                        onDiscard={handleDiscard}
+                                    />
+                                )}
                             </TabsContent>
                         </Tabs>
                     </CardContent>

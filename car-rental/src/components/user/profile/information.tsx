@@ -5,25 +5,18 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, AlertCircle } from "lucide-react"
-import {UserProfile, useUpdateUserProfileMutation} from "@/lib/services/user-api"
+import type { UserProfile } from "@/lib/services/user-api"
 import {
     validateFullName,
     validatePhoneNumber,
     validateNationalId,
-    validateDrivingLicenseUri,
-    validateHouseNumberStreet,
-    validateWard,
-    validateDistrict,
-    validateCityProvince,
     validateDateOfBirth,
     validateUserProfile,
-    hasValidationErrors, validateEmail,
+    hasValidationErrors,
+    validateEmail,
 } from "@/lib/validation/user-profile-validation"
-import { useGetDistrictsQuery, useGetProvincesQuery, useGetWardsQuery } from "@/lib/services/local-api/address-api"
-import {AddressComponent} from "@/components/common/address-input-information";
-
+import { AddressComponent } from "@/components/common/address-input-information"
 
 interface ValidationErrors {
     fullName?: string
@@ -40,11 +33,11 @@ interface ValidationErrors {
 
 interface InformationProps {
     personalInfo: UserProfile | null
-    onPersonalInfoChange: (field: string, value: string) => void
+    onPersonalInfoChange: (field: string, value: string | File) => void
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
     onSave: () => void
     onDiscard: () => void
-    userId: string,
+    userId: string
 }
 
 export default function Information({
@@ -57,63 +50,16 @@ export default function Information({
                                     }: InformationProps) {
     const [errors, setErrors] = useState<ValidationErrors>({})
     const [isFormValid, setIsFormValid] = useState(false)
-    const [showSaving, setShowSaving] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-    　
+    const [showSaving, setShowSaving] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
     const handleSave = () => {
-        setShowSaving(true);
-        onSave(); // Gọi hàm save từ props
+        setShowSaving(true)
+        onSave()
 
-        // Sau 2 giây sẽ tắt trạng thái "Saving..."
         setTimeout(() => {
-            setShowSaving(false);
-        }, 2000);
-    };
-    // Fetch Provinces
-    const { data: provinces = [] } = useGetProvincesQuery()
-
-    // Fetch Districts when cityProvince changes
-    const { data: districts = [] } = useGetDistrictsQuery(
-        provinces.find(p => p.name === personalInfo?.cityProvince)?.code || 0,
-        { skip: !personalInfo?.cityProvince }
-    )
-
-    // Fetch Wards when district changes
-    const { data: wards = [] } = useGetWardsQuery(
-        districts.find(d => d.name === personalInfo?.district)?.code || 0,
-        { skip: !personalInfo?.district }
-    )
-
-    // Find current selections by name
-    const currentProvince = provinces.find(p => p.name === personalInfo?.cityProvince)
-    const currentDistrict = districts.find(d => d.name === personalInfo?.district)
-    const currentWard = wards.find(w => w.name === personalInfo?.ward)
-
-    // Handlers for address changes
-    const handleProvinceChange = (code: string) => {
-        const selectedProvince = provinces.find(p => p.code.toString() === code)
-        if (selectedProvince) {
-            onPersonalInfoChange("cityProvince", selectedProvince.name)
-            // Reset dependent fields
-            onPersonalInfoChange("district", "")
-            onPersonalInfoChange("ward", "")
-        }
-    }
-
-    const handleDistrictChange = (code: string) => {
-        const selectedDistrict = districts.find(d => d.code.toString() === code)
-        if (selectedDistrict) {
-            onPersonalInfoChange("district", selectedDistrict.name)
-            // Reset dependent field
-            onPersonalInfoChange("ward", "")
-        }
-    }
-
-    const handleWardChange = (code: string) => {
-        const selectedWard = wards.find(w => w.code.toString() === code)
-        if (selectedWard) {
-            onPersonalInfoChange("ward", selectedWard.name)
-        }
+            setShowSaving(false)
+        }, 2000)
     }
 
     // General field change handler
@@ -131,7 +77,7 @@ export default function Information({
             case "nationalId":
                 error = validateNationalId(value)
                 break
-            case "dateOfBirth":
+            case "dob":
                 error = validateDateOfBirth(value)
                 break
             case "email":
@@ -139,7 +85,22 @@ export default function Information({
                 break
         }
 
-        setErrors(prev => ({ ...prev, [field]: error }))
+        setErrors((prev) => ({ ...prev, [field]: error }))
+    }
+
+    // Enhanced file upload handler
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            setSelectedFile(file)
+
+            // Create URL for preview
+            const fileUrl = URL.createObjectURL(file)
+
+            // Update the personal info with the file and preview
+            onPersonalInfoChange("drivingLicenseUri", file)
+            onPersonalInfoChange("drivingLicensePreview", fileUrl)
+        }
     }
 
     // Check form validity
@@ -150,39 +111,32 @@ export default function Information({
             fullName: personalInfo.fullName,
             phoneNumber: personalInfo.phoneNumber,
             nationalId: personalInfo.nationalId,
-            // drivingLicenseUri: personalInfo.drivingLicenseUri,
-            // houseNumberStreet: personalInfo.houseNumberStreet,
-            // ward: personalInfo.ward,
-            // district: personalInfo.district,
-            // cityProvince: personalInfo.cityProvince,
             dob: personalInfo.dob,
-            email: personalInfo.email
+            email: personalInfo.email,
         })
 
         setErrors(newErrors)
         setIsFormValid(!hasValidationErrors(newErrors))
     }, [personalInfo])
 
-　
-    // Hàm này chuyển đổi date từ các định dạng khác nhau sang YYYY-MM-DD
+    // Format date for input
     const formatDateForInput = (dateString: string | undefined): string => {
-        if (!dateString) return "";
+        if (!dateString) return ""
 
-        // Nếu date đã đúng định dạng YYYY-MM-DD thì trả về luôn
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-            return dateString;
+            return dateString
         }
 
-        // Xử lý các định dạng date khác
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "";
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) return ""
 
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, "0")
+        const day = String(date.getDate()).padStart(2, "0")
 
-        return `${year}-${month}-${day}`;
-    };
+        return `${year}-${month}-${day}`
+    }
+
     const ErrorMessage = ({ error }: { error?: string }) => {
         if (!error) return null
         return (
@@ -199,7 +153,7 @@ export default function Information({
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left Column */}
-                <div className="space-y-2">
+                <div className="space-y-4">
                     <div>
                         <Label htmlFor="fullName" className="text-sm font-medium">
                             Full Name: <span className="text-red-500">*</span>
@@ -227,6 +181,7 @@ export default function Information({
                         />
                         <ErrorMessage error={errors.phoneNumber} />
                     </div>
+
                     <AddressComponent
                         mode="profile"
                         houseNumberStreet={personalInfo.houseNumberStreet}
@@ -237,93 +192,11 @@ export default function Information({
                         onCityProvinceChange={(value) => onPersonalInfoChange("cityProvince", value)}
                         onDistrictChange={(value) => onPersonalInfoChange("district", value)}
                         onWardChange={(value) => onPersonalInfoChange("ward", value)}
-                     />
-                    {/*<div>*/}
-                    {/*    <Label className="text-sm font-medium">Address:</Label>*/}
-                    {/*    <div className="space-y-2 mt-1">*/}
-                    {/*        <div>*/}
-                    {/*            <Input*/}
-                    {/*                id="houseNumberStreet"*/}
-                    {/*                value={personalInfo.houseNumberStreet || ""}*/}
-                    {/*                onChange={(e) => onPersonalInfoChange("houseNumberStreet", e.target.value)}*/}
-                    {/*                placeholder="House number and street (optional)"*/}
-                    {/*            />*/}
-                    {/*            /!*<ErrorMessage error={errors.houseNumberStreet} />*!/*/}
-                    {/*        </div>*/}
-
-                    {/*        <div>*/}
-                    {/*            <Label className="text-sm font-medium">City/Province:</Label>*/}
-                    {/*            <Select*/}
-                    {/*                onValueChange={handleProvinceChange}*/}
-                    {/*                value={currentProvince?.code.toString() || ""}*/}
-                    {/*            >*/}
-                    {/*                <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>*/}
-                    {/*                    <SelectValue placeholder="Select City/Province">*/}
-                    {/*                        {personalInfo.cityProvince || "Select City/Province"}*/}
-                    {/*                    </SelectValue>*/}
-                    {/*                </SelectTrigger>*/}
-                    {/*                <SelectContent>*/}
-                    {/*                    {provinces.map((province) => (*/}
-                    {/*                        <SelectItem key={province.code} value={province.code.toString()}>*/}
-                    {/*                            {province.name}*/}
-                    {/*                        </SelectItem>*/}
-                    {/*                    ))}*/}
-                    {/*                </SelectContent>*/}
-                    {/*            </Select>*/}
-                    {/*            <ErrorMessage error={errors.cityProvince} />*/}
-                    {/*        </div>*/}
-
-                    {/*        <div>*/}
-                    {/*            <Label className="text-sm font-medium">District:</Label>*/}
-                    {/*            <Select*/}
-                    {/*                onValueChange={handleDistrictChange}*/}
-                    {/*                value={currentDistrict?.code.toString() || ""}*/}
-                    {/*                disabled={!personalInfo.cityProvince}*/}
-                    {/*            >*/}
-                    {/*                <SelectTrigger className={errors.district ? "border-red-500" : ""}>*/}
-                    {/*                    <SelectValue placeholder="Select District">*/}
-                    {/*                        {personalInfo.district || "Select District"}*/}
-                    {/*                    </SelectValue>*/}
-                    {/*                </SelectTrigger>*/}
-                    {/*                <SelectContent>*/}
-                    {/*                    {districts.map((district) => (*/}
-                    {/*                        <SelectItem key={district.code} value={district.code.toString()}>*/}
-                    {/*                            {district.name}*/}
-                    {/*                        </SelectItem>*/}
-                    {/*                    ))}*/}
-                    {/*                </SelectContent>*/}
-                    {/*            </Select>*/}
-                    {/*            <ErrorMessage error={errors.district} />*/}
-                    {/*        </div>*/}
-
-                    {/*        <div>*/}
-                    {/*            <Label className="text-sm font-medium">Ward:</Label>*/}
-                    {/*            <Select*/}
-                    {/*                onValueChange={handleWardChange}*/}
-                    {/*                value={currentWard?.code.toString() || ""}*/}
-                    {/*                disabled={!personalInfo.district}*/}
-                    {/*            >*/}
-                    {/*                <SelectTrigger className={errors.ward ? "border-red-500" : ""}>*/}
-                    {/*                    <SelectValue placeholder="Select Ward">*/}
-                    {/*                        {personalInfo.ward || "Select Ward"}*/}
-                    {/*                    </SelectValue>*/}
-                    {/*                </SelectTrigger>*/}
-                    {/*                <SelectContent>*/}
-                    {/*                    {wards.map((ward) => (*/}
-                    {/*                        <SelectItem key={ward.code} value={ward.code.toString()}>*/}
-                    {/*                            {ward.name}*/}
-                    {/*                        </SelectItem>*/}
-                    {/*                    ))}*/}
-                    {/*                </SelectContent>*/}
-                    {/*            </Select>*/}
-                    {/*            <ErrorMessage error={errors.ward} />*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                    />
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-2">
+                <div className="space-y-4">
                     <div>
                         <Label htmlFor="dateOfBirth" className="text-sm font-medium">
                             Date of birth:
@@ -353,97 +226,62 @@ export default function Information({
                         />
                         <ErrorMessage error={errors.nationalId} />
                     </div>
+
                     <div>
                         <Label htmlFor="email" className="text-sm font-medium">
                             Email: <span className="text-red-500">*</span>
                         </Label>
-                        <div className="space-y-2 mt-1">
-                            <div>
-                                <Input
-                                    id="email"
-                                    value={personalInfo.email || ""}
-                                    onChange={(e) => handleFieldChange("email", e.target.value)}
-                                    className={`mt-1 ${errors.email ? "border-red-500 focus:border-red-500" : ""}`}
-                                    placeholder="Enter your email"
-                                />
-                                <ErrorMessage error={errors.email} />
-                            </div>
-
-                            {/*<div>*/}
-                            {/*    <Label className="text-sm font-medium">City/Province:</Label>*/}
-                            {/*    <Select*/}
-                            {/*        onValueChange={handleProvinceChange}*/}
-                            {/*        value={currentProvince?.code.toString() || ""}*/}
-                            {/*    >*/}
-                            {/*        <SelectTrigger className={errors.cityProvince ? "border-red-500" : ""}>*/}
-                            {/*            <SelectValue placeholder="Select City/Province">*/}
-                            {/*                {personalInfo.cityProvince || "Select City/Province"}*/}
-                            {/*            </SelectValue>*/}
-                            {/*        </SelectTrigger>*/}
-                            {/*        <SelectContent>*/}
-                            {/*            {provinces.map((province) => (*/}
-                            {/*                <SelectItem key={province.code} value={province.code.toString()}>*/}
-                            {/*                    {province.name}*/}
-                            {/*                </SelectItem>*/}
-                            {/*            ))}*/}
-                            {/*        </SelectContent>*/}
-                            {/*    </Select>*/}
-                            {/*    <ErrorMessage error={errors.cityProvince} />*/}
-                            {/*</div>*/}
-
-                            <div>
-
-                                <Label htmlFor="drivingLicense" className="text-sm   font-medium">
-                                    Driving license:
-                                </Label>
-                                <div >
-
-                                    <div className="flex gap-2  ">
-                                        <Input
-                                            id="drivingLicense"
-                                            type="file"
-                                            onChange={onFileUpload}
-                                            className="hidden"
-                                            accept="image/*" // Chỉ chấp nhận file ảnh
-                                        />
-                                        <div className="flex-1">
-                                            <Input
-                                                value={personalInfo.drivingLicenseUri || ""}
-                                                onChange={(e) => handleFieldChange("drivingLicenseUri", e.target.value)}
-                                                placeholder="Enter URL or upload file"
-                                                className={errors.drivingLicenseUri ? "border-red-500 focus:border-red-500" : ""}
-                                            />
-                                            <ErrorMessage error={errors.drivingLicenseUri} />
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => document.getElementById("drivingLicense")?.click()}
-                                            className="px-3"
-                                        >
-                                            <Upload className="h-4 w-4 mr-1" />
-                                            Upload
-                                        </Button>
-                                    </div>
-
-                                    {/* Hiển thị preview hình ảnh */}
-                                    {personalInfo.drivingLicensePreview && (
-                                        <div className="mt-5">
-
-                                            <img
-                                                src={personalInfo.drivingLicensePreview}
-                                                alt="Driving license preview"
-                                                className="max-w-xs max-h-40 border rounded-md"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                        </div>
+                        <Input
+                            id="email"
+                            value={personalInfo.email || ""}
+                            onChange={(e) => handleFieldChange("email", e.target.value)}
+                            className={`mt-1 ${errors.email ? "border-red-500 focus:border-red-500" : ""}`}
+                            placeholder="Enter your email"
+                        />
+                        <ErrorMessage error={errors.email} />
                     </div>
 
+                    <div>
+                        <Label htmlFor="drivingLicense" className="text-sm font-medium">
+                            Driving license:
+                        </Label>
+                        <div className="space-y-3 mt-1">
+                            {/* Hidden file input */}
+                            <Input id="drivingLicense" type="file" onChange={handleFileUpload} className="hidden" accept="image/*" />
+
+                            {/* Upload button */}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => document.getElementById("drivingLicense")?.click()}
+                                className="w-full"
+                            >
+                                <Upload className="h-4 w-4 mr-2" />
+                                {selectedFile || personalInfo.drivingLicenseUri ? "Change Image" : "Upload Image"}
+                            </Button>
+
+                            {/* Image preview */}
+                            {(personalInfo.drivingLicensePreview || personalInfo.drivingLicenseUri) && (
+                                <div className="border rounded-lg p-3 bg-gray-50">
+                                    <img
+                                        src={personalInfo.drivingLicensePreview || personalInfo.drivingLicenseUri || "/placeholder.svg"}
+                                        alt="Driving license preview"
+                                        className="w-full max-h-48 object-contain rounded-md"
+                                        onError={(e) => {
+                                            // Hide image if URL is invalid
+                                            e.currentTarget.style.display = "none"
+                                        }}
+                                    />
+                                    {personalInfo.drivingLicensePreview && (
+                                        <p className="text-xs text-green-600 mt-2 text-center font-medium">✓ New image selected</p>
+                                    )}
+                                    {!personalInfo.drivingLicensePreview && personalInfo.drivingLicenseUri && (
+                                        <p className="text-xs text-muted-foreground mt-2 text-center">Current driving license</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -461,11 +299,7 @@ export default function Information({
                 <Button variant="outline" onClick={onDiscard}>
                     Discard
                 </Button>
-                <Button
-                    onClick={handleSave}
-                    className="bg-blue-600 hover:bg-blue-700"
-                    disabled={!isFormValid }
-                >
+                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700" disabled={!isFormValid}>
                     {showSaving ? "Saving..." : "Save"}
                 </Button>
             </div>
