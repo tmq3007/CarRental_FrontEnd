@@ -14,6 +14,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
 import {CarDetailsPage} from "@/components/car/car-detail/car-details-page";
  import {useRouter} from "next/navigation";
+import LoadingPage from "@/components/common/loading";
 
 interface CarListPageProps {
     accountId: string
@@ -168,7 +169,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     }
 
     if (loading || !cars?.data?.data) {
-        return <CarListSkeleton />
+        return <LoadingPage />
     }
     
 
