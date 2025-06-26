@@ -3,7 +3,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {useState} from "react";
-import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 interface BookingHeaderProps {

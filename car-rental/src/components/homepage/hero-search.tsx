@@ -7,6 +7,9 @@ import Image from "next/image"
 import AddressInput from "../common/address-input"
 import { DateTimePicker } from "../common/date-time-picker"
 import { useRouter } from "next/navigation"
+import CountUp from "@/blocks/TextAnimations/CountUp/CountUp"
+import SplitText from "@/blocks/TextAnimations/SplitText/SplitText"
+
 
 interface SearchFormData {
   location: {
@@ -29,16 +32,16 @@ export default function HeroSearchSection() {
     pickupDateTime: defaultDate,
     dropoffDateTime: defaultDate,
   })
-  
+
   const router = useRouter();
 
   const handleSearch = () => {
     const { province, district, ward } = searchData.location
 
     const queryParams = new URLSearchParams({
-      province,
-      district,
-      ward,
+      locationProvince: province,
+      locationDistrict:district,
+      locationWard:ward,
       pickupTime: searchData.pickupDateTime?.toISOString() || "",
       dropoffTime: searchData.dropoffDateTime?.toISOString() || "",
     }).toString()
@@ -89,10 +92,35 @@ export default function HeroSearchSection() {
         {/* Hero Text */}
         <div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-            Where Every Journey
+            <SplitText
+              text="Where Every Journey"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white text-center"
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+            />
             <br className="hidden xs:block" />
             <span className="inline xs:hidden"> </span>
-            Become An Adventure
+            <SplitText
+              text="Become An Adventure"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white text-center"
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+            />
+            
           </h1>
 
           {/* Social Proof */}
@@ -108,7 +136,14 @@ export default function HeroSearchSection() {
               ))}
             </div>
             <div className="text-white mt-2 xs:mt-0">
-              <span className="font-semibold text-sm sm:text-base">33k People Booked</span>
+              <span className="font-semibold text-sm sm:text-base"><CountUp
+                from={0}
+                to={33000}
+                separator=","
+                direction="up"
+                duration={1}
+                className="count-up-text"
+              /> People Booked</span>
               <br />
               <span className="text-xs sm:text-sm opacity-90">Dream Place</span>
             </div>

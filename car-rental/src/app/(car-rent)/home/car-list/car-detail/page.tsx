@@ -1,7 +1,7 @@
 import {CarDetailsPage} from "@/components/car/car-detail/car-details-page";
 
 export default function Page() {
-    const carId = "9C5B209C-AD2D-421D-9F01-2609B5C1AE12"
+    const carId = "DD63B6FF-0559-4084-B392-02EF2AC777C5"
     return <CarDetailsPage carId={carId}/>
 }
 
