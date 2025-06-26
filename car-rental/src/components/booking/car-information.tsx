@@ -1,46 +1,77 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import {BookingDetailVO} from "@/lib/services/booking-api";
 
-export default function CarInformation() {
+interface CarInformationProps {
+    bookingDetail: BookingDetailVO
+}
+
+export default function CarInformation({ bookingDetail }: CarInformationProps) {
+    const documents = [
+        {
+            id: 1,
+            name: "Insurance",
+            note: bookingDetail.insuranceUriIsVerified ? "Verified" : "Not verified",
+            link: bookingDetail.insuranceUri
+        },
+        {
+            id: 2,
+            name: "Registration Paper",
+            note: bookingDetail.registrationPaperUriIsVerified ? "Verified" : "Not verified",
+            link: bookingDetail.registrationPaperUri
+        },
+        {
+            id: 3,
+            name: "Certificate of Inspection",
+            note: bookingDetail.certificateOfInspectionUriIsVerified ? "Verified" : "Not verified",
+            link: bookingDetail.certificateOfInspectionUri
+        }
+    ]
+
+    const features = [
+        { id: "isAutomatic", name: "Automatic Transmission", available: bookingDetail.isAutomatic },
+        { id: "isGasoline", name: "Gasoline Engine", available: bookingDetail.isGasoline },
+    ]
+
     return (
         <div className="border rounded-md p-6 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                     <div className="flex">
                         <div className="w-1/2 font-medium">License plate:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.licensePlate || "N/A"}</div>
                     </div>
                     <div className="flex">
                         <div className="w-1/2 font-medium">Brand name:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.brand}</div>
                     </div>
                     <div className="flex">
                         <div className="w-1/2 font-medium">Production year:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.productionYear}</div>
                     </div>
                     <div className="flex">
                         <div className="w-1/2 font-medium">Transmission:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.isAutomatic ? "Automatic" : "Manual"}</div>
                     </div>
                 </div>
 
                 <div className="space-y-4">
                     <div className="flex">
                         <div className="w-1/2 font-medium">Color:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.color}</div>
                     </div>
                     <div className="flex">
                         <div className="w-1/2 font-medium">Model:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.model}</div>
                     </div>
                     <div className="flex">
                         <div className="w-1/2 font-medium">No. of seats:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2">{bookingDetail.numberOfSeats}</div>
                     </div>
                     <div className="flex">
-                        <div className="w-1/2 font-medium">Fuel:</div>
-                        <div className="w-1/2"></div>
+                        <div className="w-1/2 font-medium">Fuel type:</div>
+                        <div className="w-1/2">{bookingDetail.isGasoline ? "Gasoline" : "Diesel"}</div>
                     </div>
                 </div>
             </div>
@@ -57,32 +88,22 @@ export default function CarInformation() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
-                            <TableCell>1</TableCell>
-                            <TableCell>Registration paper</TableCell>
-                            <TableCell>Verified</TableCell>
-                            <TableCell>
-                                <a href="#" className="text-blue-600 hover:underline">
-                                    View PDF
-                                </a>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>2</TableCell>
-                            <TableCell>Certificate of inspection</TableCell>
-                            <TableCell>Verified</TableCell>
-                            <TableCell>
-                                <a href="#" className="text-blue-600 hover:underline">
-                                    View PDF
-                                </a>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>3</TableCell>
-                            <TableCell>Insurance</TableCell>
-                            <TableCell>Not available</TableCell>
-                            <TableCell>Not available</TableCell>
-                        </TableRow>
+                        {documents.map((doc) => (
+                            <TableRow key={doc.id}>
+                                <TableCell>{doc.id}</TableCell>
+                                <TableCell>{doc.name}</TableCell>
+                                <TableCell>{doc.note}</TableCell>
+                                <TableCell>
+                                    {doc.link ? (
+                                        <a href={doc.link} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                                            View Document
+                                        </a>
+                                    ) : (
+                                        "Not available"
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </div>
@@ -90,85 +111,49 @@ export default function CarInformation() {
             <div className="mt-6 space-y-4">
                 <div className="flex">
                     <div className="w-1/4 font-medium">Mileage:</div>
-                    <div className="w-3/4"></div>
+                    <div className="w-3/4">{bookingDetail.mileage} km</div>
                 </div>
                 <div className="flex">
                     <div className="w-1/4 font-medium">Fuel consumption:</div>
-                    <div className="w-3/4">18 liter/100 km</div>
+                    <div className="w-3/4">{bookingDetail.fuelConsumption} liter/100 km</div>
                 </div>
                 <div className="flex">
                     <div className="w-1/4 font-medium">Address:</div>
-                    <div className="w-3/4">128 Trung Kinh, Yen Hoa, Cau Giay, Hanoi</div>
+                    <div className="w-3/4">{bookingDetail.carAddress}</div>
                 </div>
             </div>
 
             <div className="mt-6">
                 <div className="font-medium mb-2">Description:</div>
                 <p className="text-gray-600">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                    magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat.
+                    {bookingDetail.description || "No description provided"}
                 </p>
             </div>
 
             <div className="mt-6">
-                <div className="font-medium mb-4">Additional functions:</div>
+                <div className="font-medium mb-2">Additional functions:</div>
+                <p className="text-gray-600">
+                    {bookingDetail.additionalFunction || "No additional functions specified"}
+                </p>
+            </div>
+
+            <div className="mt-6">
+                <div className="font-medium mb-2">Car Features:</div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="bluetooth" />
-                        <Label htmlFor="bluetooth">Bluetooth</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="gps" />
-                        <Label htmlFor="gps">GPS</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="camera" defaultChecked />
-                        <Label htmlFor="camera">Camera</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="sunroof" />
-                        <Label htmlFor="sunroof">Sun roof</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="childlock" defaultChecked />
-                        <Label htmlFor="childlock">Child lock</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="childseat" defaultChecked />
-                        <Label htmlFor="childseat">Child seat</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="dvd" />
-                        <Label htmlFor="dvd">DVD</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="usb" />
-                        <Label htmlFor="usb">USB</Label>
-                    </div>
+                    {features.map((feature) => (
+                        <div key={feature.id} className="flex items-center space-x-2">
+                            <Checkbox id={feature.id} checked={feature.available} disabled />
+                            <Label htmlFor={feature.id}>{feature.name}</Label>
+                        </div>
+                    ))}
                 </div>
             </div>
 
             <div className="mt-6">
-                <div className="font-medium mb-4">Terms of use:</div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="no-smoking" />
-                        <Label htmlFor="no-smoking">No smoking</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="no-food" />
-                        <Label htmlFor="no-food">No food in car</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="no-pet" />
-                        <Label htmlFor="no-pet">No pet</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="other" />
-                        <Label htmlFor="other">Other</Label>
-                    </div>
-                </div>
+                <div className="font-medium mb-2">Terms of use:</div>
+                <p className="text-gray-600">
+                    {bookingDetail.termOfUse || "No specific terms provided"}
+                </p>
             </div>
         </div>
     )
