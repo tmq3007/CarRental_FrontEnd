@@ -14,7 +14,7 @@ import { TimePickerInput } from "../ui/time-picker-input"
 interface DateTimePickerProps {
   value?: Date
   onChange: (date: Date | undefined) => void
-  label: string
+  label?: string
   placeholder?: string
   icon?: React.ReactNode
 }
