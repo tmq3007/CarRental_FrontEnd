@@ -9,11 +9,6 @@ import { CheckCircle, Phone, Mail, MessageCircle, Calendar, Users, Settings, Lug
 import SpotlightCard from "@/blocks/Components/SpotlightCard/SpotlightCard";
 import { BookingState } from "@/app/(car-rent)/booking/page";
 
-interface Location {
-  province?: string;
-  district?: string;
-  ward?: string;
-}
 
 interface ConfirmationStepProps {
   bookingData: BookingState;
@@ -47,9 +42,9 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
       driverNationalId: bookingData.driverNationalId,
       driverDrivingLicenseUri: bookingData.driverDrivingLicenseUri,
       driverHouseNumberStreet: bookingData.driverHouseNumberStreet,
-      driverWard: bookingData.driverWard,
-      driverDistrict: bookingData.driverDistrict,
-      driverCityProvince: bookingData.driverCityProvince,
+      driverWard: bookingData.driverLocation.ward,
+      driverDistrict: bookingData.driverLocation.district,
+      driverCityProvince: bookingData.driverLocation.province,
       paymentType: bookingData.paymentType || "",
       deposit: bookingData.deposit || 0,
     };
@@ -166,7 +161,7 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
                   <div>
                     <p className="font-medium">{pickupLocation || "MyCarRental Manhattan"}</p>
                     <p className="text-sm text-gray-600">{bookingData.driverHouseNumberStreet || "123 Broadway Street"}</p>
-                    <p className="text-sm text-gray-600">{bookingData.driverCityProvince || "New York, NY 10001"}</p>
+                    <p className="text-sm text-gray-600">{bookingData.driverLocation.province || "New York, NY 10001"}</p>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Phone className="h-4 w-4 text-gray-500" />
@@ -195,7 +190,7 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
                   <div>
                     <p className="font-medium">{dropoffLocation || "MyCarRental Manhattan"}</p>
                     <p className="text-sm text-gray-600">{bookingData.driverHouseNumberStreet || "123 Broadway Street"}</p>
-                    <p className="text-sm text-gray-600">{bookingData.driverCityProvince || "New York, NY 10001"}</p>
+                    <p className="text-sm text-gray-600">{bookingData.driverLocation.district || "New York, NY 10001"}</p>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Phone className="h-4 w-4 text-gray-500" />
