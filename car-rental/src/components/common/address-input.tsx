@@ -16,12 +16,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-
+// Define the shape of the location object
+export interface Location {
+  province?: string;
+  district?: string;
+  ward?: string;
+}
 interface AddressInputProps {
   onLocationChange: (field: string, value: string) => void
   orientation?: "horizontal" | "vertical"
   spacing?: "sm" | "md" | "lg"
-  location: { province?: string; district?: string; ward?: string }
+  location: Location
 }
 
 interface ComboBoxProps {

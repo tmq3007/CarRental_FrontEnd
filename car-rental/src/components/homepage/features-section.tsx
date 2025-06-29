@@ -1,6 +1,7 @@
 
 import { Car, Shield, Clock, MapPin, Users, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import SpotlightCard from "@/blocks/Components/SpotlightCard/SpotlightCard"
 
 const features = [
   {
@@ -48,14 +49,16 @@ export default function FeaturesSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </CardContent>
+            <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow">
+              <SpotlightCard className="custom-spotlight-card rounded-xl" spotlightColor="rgba(0, 128, 0, 0.2)">
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <feature.icon className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </CardContent>
+              </SpotlightCard>
             </Card>
           ))}
         </div>
