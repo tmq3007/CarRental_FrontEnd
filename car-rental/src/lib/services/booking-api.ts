@@ -149,7 +149,24 @@ export const bookingApi = createApi({
             invalidatesTags: ["Booking"],
         }),
 
-
+        getBookingDetail: build.query<ApiResponse<BookingDetailVO>, string>({
+            query: (bookingNumber) => ({
+                url: `/booking/detail/${bookingNumber}`,
+                method: "GET",
+            }),
+            providesTags: (result, error, bookingNumber) => [{ type: "Booking", id: bookingNumber }],
+        }),
+        updateBooking: build.mutation<ApiResponse<BookingDetailVO>, { bookingNumber: string; bookingDto: BookingEditDTO }>({
+            query: ({ bookingNumber, bookingDto }) => ({
+                url: `/booking/edit/${bookingNumber}`,
+                method: "PUT",
+                body: bookingDto,
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [
+                { type: "Booking", id: bookingNumber },
+                "Booking",
+            ],
+        }),
     }),
 });
 
@@ -158,6 +175,7 @@ export const {
     useGetBookingsByAccountIdQuery,
     useCancelBookingMutation,
     useConfirmPickupMutation,
-    useReturnCarMutation
-
+    useReturnCarMutation,
+    useGetBookingDetailQuery,
+    useUpdateBookingMutation
 } = bookingApi;

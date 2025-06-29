@@ -9,12 +9,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { toast } from "sonner";
 import { useConfirmPickupMutation } from "@/lib/services/booking-api";
+import LoadingPage from "@/components/common/loading";
+import {useRouter} from "next/navigation";
 
 export default function BookingListPage() {
     const userId = useSelector((state: RootState) => state.user?.id);
     const [cancelBooking] = useCancelBookingMutation();
     const [cancellingId, setCancellingId] = useState<string | null>(null);
-
+    const router = useRouter();
     const handleCancelBooking = async (booking: BookingVO) => {
         const confirmed = window.confirm("Are you sure you want to cancel this booking?");
         if (!confirmed) return;
@@ -60,6 +62,7 @@ export default function BookingListPage() {
         const total = booking.basePrice * numberOfDays;
         const deposit = booking.deposit;
 
+
         let message = "";
         if (total > deposit) {
             const diff = total - deposit;
@@ -83,7 +86,9 @@ export default function BookingListPage() {
         }
     };
 
-
+    const handleViewDetails = (bookingId: string) => {
+        router.push(`/user/booking/${bookingId}`);
+    };
 
     const {
         data,
@@ -93,7 +98,7 @@ export default function BookingListPage() {
 
     const bookings = data?.data || [];
 
-    if (isLoading) return <p className="p-6">Loading...</p>;
+    if (isLoading) return <LoadingPage/>;
     if (isError) return <p className="p-6 text-red-500">Error loading bookings.</p>;
 
     return (
@@ -120,9 +125,15 @@ export default function BookingListPage() {
                                 <div className="flex justify-between items-start flex-wrap">
                                     <h2 className="text-lg font-semibold text-blue-800">{booking.carName}</h2>
                                     <div className="flex flex-col gap-3 ml-4">
-                                        <Button className="w-full text-sm py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
-                                            View details
-                                        </Button>
+                                        <Button
+                                            onClick={() => handleViewDetails(String(booking.bookingNumber))}
+                                            className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full">View details</Button>
+                                        {(booking.status === "confirmed" || booking.status === "pending_payment") && (
+                                            <>
+                                                <Button className="bg-gray-200 text-black hover:bg-gray-300 text-xs w-full">Confirm Pickup</Button>
+                                                <Button className="bg-red-500 hover:bg-red-600 text-white text-xs w-full">Cancel Booking</Button>
+                                            </>
+                                        )}
 
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>

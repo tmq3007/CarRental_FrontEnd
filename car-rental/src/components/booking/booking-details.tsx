@@ -7,10 +7,10 @@ import BookingHeader from "@/components/booking/booking-header"
 import BookingInformation from "@/components/booking/booking-information"
 import CarInformation from "@/components/booking/car-information"
 import PaymentInformation from "@/components/booking/payment-information"
-import {useGetBookingDetailQuery} from "@/lib/services/booking-api";
 import LoadingPage from "@/components/common/loading";
 import NoResult from "@/components/common/no-result";
 import Breadcrumb from "@/components/common/breadcum";
+import {useGetBookingDetailQuery} from "@/lib/services/booking-api";
 
 export default function BookingDetails({ bookingId }: { bookingId: string }) {
     const [activeTab, setActiveTab] = useState("booking-information")
