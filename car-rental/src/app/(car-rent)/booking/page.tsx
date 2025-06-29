@@ -1,19 +1,22 @@
 "use client";
 
-import type React from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
 import { CarSelectionStep } from "@/components/rent-a-car/car-selection-step";
 import { BookingSummaryStep } from "@/components/rent-a-car/booking-summary-step";
 import { CheckoutStep } from "@/components/rent-a-car/checkout-step";
 import { ConfirmationStep } from "@/components/rent-a-car/confirmation-step";
-import Stepper from "@/components/rent-a-car/stepper";
-import { OrderSummary } from "@/components/rent-a-car/order-summary";
 import { BookingPanel } from "@/components/rent-a-car/booking-panel";
+import { OrderSummary } from "@/components/rent-a-car/order-summary";
+import { Location } from "@/components/common/address-input";
+import { RootState } from "@/lib/store";
+import Stepper from "@/components/rent-a-car/stepper";
+import { useGetBookingCarAndUserQuery } from "@/lib/services/booking-api";
 
 interface Step {
   id: number;
@@ -21,56 +24,46 @@ interface Step {
   description: string;
   component: React.ReactNode;
 }
-
-interface Location {
-  province?: string;
-  district?: string;
-  ward?: string;
-}
-
-interface BookingState {
+export interface BookingState {
+  carId?: string;
+  driverId?: string;
   pickupDate?: Date;
   returnDate?: Date;
   pickupLocation: Location;
   dropoffLocation: Location;
+  rentalDays?: number;
+  paymentType?: string;
+  deposit?: number;
+  driverFullName?: string;
+  driverDob?: Date;
+  driverEmail?: string;
+  driverPhoneNumber?: string;
+  driverNationalId?: string;
+  driverDrivingLicenseUri?: string;
+  driverHouseNumberStreet?: string;
+  driverLocation: Location;
 }
-
-const steps: Step[] = [
-  {
-    id: 1,
-    title: "Car Selection",
-    description: "Choose your perfect vehicle",
-    component: <CarSelectionStep />,
-  },
-  {
-    id: 2,
-    title: "Booking Summary",
-    description: "Enter your details",
-    component: <BookingSummaryStep />,
-  },
-  {
-    id: 3,
-    title: "Checkout",
-    description: "Payment & confirmation",
-    component: <CheckoutStep />,
-  },
-  {
-    id: 4,
-    title: "Confirmation",
-    description: "Booking complete",
-    component: <ConfirmationStep />,
-  },
-];
-
 export default function CarRentalBooking() {
   const searchParams = useSearchParams();
+  // const carId = searchParams.get("carId");
+  const carId = "DD63B6FF-0559-4084-B392-02EF2AC777C5"; // For testing purposes, replace with actual carId from searchParams
 
-  // Parse query parameters
   const locationProvince = searchParams.get("locationProvince") || "";
   const pickupTime = searchParams.get("pickupTime");
   const dropoffTime = searchParams.get("dropoffTime");
+  const userId = useSelector((state: RootState) => state.user.id);
 
-  // Convert query parameter times to Date objects
+  // Fetch booking data
+  const { data: bookingResponse, isLoading, error ,isFetching} = useGetBookingCarAndUserQuery(carId ?? "", {
+    skip: !carId,
+  });
+
+  const car = bookingResponse?.data.car;
+  const user = bookingResponse?.data.user;
+  console.log(bookingResponse, "bookingResponse");
+  console.log(car, "car");
+  console.log(user, "user");
+
   const parseQueryDate = (time: string | null): Date | undefined => {
     if (!time) return undefined;
     try {
@@ -81,18 +74,64 @@ export default function CarRentalBooking() {
     }
   };
 
-  // Initialize state with query parameters
   const [bookingState, setBookingState] = useState<BookingState>({
+    carId: carId ?? undefined,
+    driverId: userId ?? undefined,
     pickupDate: parseQueryDate(pickupTime),
     returnDate: parseQueryDate(dropoffTime),
     pickupLocation: { province: locationProvince, district: "", ward: "" },
     dropoffLocation: { province: locationProvince, district: "", ward: "" },
+    rentalDays: undefined,
+    paymentType: undefined,
+    deposit: car?.deposit,
+    driverFullName: user?.fullName,
+    driverDob: user?.dob ? new Date(user.dob) : undefined,
+    driverEmail: user?.email,
+    driverPhoneNumber: user?.phoneNumber,
+    driverNationalId: user?.nationalId,
+    driverDrivingLicenseUri: user?.drivingLicenseUri,
+    driverHouseNumberStreet: user?.houseNumberStreet,
+    driverLocation: {
+      province: user?.cityProvince ?? "",
+      district: user?.district ?? "",
+      ward: user?.ward ?? "",
+    },
   });
+
+  useEffect(() => {
+    if (car && user) {
+      setBookingState((prev) => ({
+        ...prev,
+        carId: carId ?? undefined,
+        driverId: userId ?? undefined,
+        deposit: car.deposit,
+        driverFullName: prev.driverFullName || user.fullName,
+        driverDob: prev.driverDob || (user.dob ? new Date(user.dob) : undefined),
+        driverEmail: prev.driverEmail || user.email,
+        driverPhoneNumber: prev.driverPhoneNumber || user.phoneNumber,
+        driverNationalId: prev.driverNationalId || user.nationalId,
+        driverDrivingLicenseUri: prev.driverDrivingLicenseUri || user.drivingLicenseUri,
+        driverHouseNumberStreet: prev.driverHouseNumberStreet || user.houseNumberStreet,
+        driverLocation: {
+          province: prev.driverLocation.province || user.cityProvince || "",
+          district: prev.driverLocation.district || user.district || "",
+          ward: prev.driverLocation.ward || user.ward || "",
+        },
+      }));
+    }
+  }, [car, user, carId, userId]);
+
+  useEffect(() => {
+    if (bookingState.pickupDate && bookingState.returnDate) {
+      const diffTime = bookingState.returnDate.getTime() - bookingState.pickupDate.getTime();
+      const rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setBookingState((prev) => ({ ...prev, rentalDays: rentalDays > 0 ? rentalDays : 1 }));
+    }
+  }, [bookingState.pickupDate, bookingState.returnDate]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
 
-  // Handlers for updating booking state
   const handlePickupDateChange = (date: Date | undefined) => {
     setBookingState((prev) => ({ ...prev, pickupDate: date }));
   };
@@ -104,7 +143,6 @@ export default function CarRentalBooking() {
   const handlePickupLocationChange = (field: string, value: string) => {
     setBookingState((prev) => {
       const newPickupLocation = { ...prev.pickupLocation, [field]: value };
-      // Update dropoffLocation to mirror province and district
       const newDropoffLocation = {
         province: field === "province" ? value : prev.dropoffLocation.province,
         district: field === "district" ? value : field === "province" ? "" : prev.dropoffLocation.district,
@@ -119,10 +157,17 @@ export default function CarRentalBooking() {
   };
 
   const handleDropoffLocationChange = (field: string, value: string) => {
-    setBookingState((prev) => ({
-      ...prev,
-      dropoffLocation: { ...prev.dropoffLocation, [field]: value },
-    }));
+    if (field === "ward" || field === "street") {
+      setBookingState((prev) => ({
+        ...prev,
+        dropoffLocation: {
+          ...prev.dropoffLocation,
+          [field]: value,
+          province: prev.pickupLocation.province,
+          district: prev.pickupLocation.district,
+        },
+      }));
+    }
   };
 
   const nextStep = () => {
@@ -163,13 +208,75 @@ export default function CarRentalBooking() {
     }),
   };
 
+  // Conditionally render steps based on data availability
+  const steps: Step[] = [
+    {
+      id: 1,
+      title: "Car Selection",
+      description: "Choose your perfect vehicle",
+      component: car ? <CarSelectionStep car={car} /> : <div>Loading car details...</div>,
+    },
+    {
+      id: 2,
+      title: "Booking Summary",
+      description: "Enter your details",
+      component: car && user ? (
+        <BookingSummaryStep
+          bookingState={bookingState}
+          setBookingState={setBookingState}
+          car={car}
+          user={user}
+        />
+      ) : (
+        <div>Loading user and car details...</div>
+      ),
+    },
+    {
+      id: 3,
+      title: "Checkout",
+      description: "Payment & confirmation",
+      component: (
+        <CheckoutStep
+          onUpdatePaymentDetails={(details: { paymentType?: string; deposit?: number }) =>
+            setBookingState((prev) => ({ ...prev, ...details }))
+          }
+          paymentDetails={{ paymentType: bookingState.paymentType, deposit: bookingState.deposit }}
+          onNextStep={nextStep}
+        />
+      ),
+    },
+    {
+      id: 4,
+      title: "Confirmation",
+      description: "Booking complete",
+      component: <ConfirmationStep bookingData={bookingState} />,
+    },
+  ];
+
+  if ( isLoading || isFetching) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error || !carId || !userId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        Error: Unable to load car or user details. Please try again.
+        error: {typeof error === "string"
+          ? error
+          : error
+          ? JSON.stringify(error)
+          : "Unknown error"}
+        <br />
+      </div>
+    );
+  }
+
   const currentStepData = steps.find((step) => step.id === currentStep);
   const showBookingPanel = currentStep === 1;
   const showOrderSummary = currentStep === 2 || currentStep === 3;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Step Indicator */}
       <Stepper
         steps={steps.map((step) => ({
           id: step.id,
@@ -179,11 +286,8 @@ export default function CarRentalBooking() {
         currentStep={currentStep}
         onStepClick={goToStep}
       />
-
-      {/* Main Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className={cn("grid gap-8", showBookingPanel || showOrderSummary ? "lg:grid-cols-10" : "lg:grid-cols-1")}>
-          {/* Step Content */}
           <div className={cn("relative overflow-hidden", showBookingPanel || showOrderSummary ? "lg:col-span-6" : "lg:col-span-1")}>
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -202,8 +306,6 @@ export default function CarRentalBooking() {
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Booking Panel - Show on step 1 */}
           {showBookingPanel && (
             <div className="lg:col-span-4">
               <BookingPanel
@@ -212,27 +314,24 @@ export default function CarRentalBooking() {
                 returnDate={bookingState.returnDate}
                 pickupLocation={bookingState.pickupLocation}
                 dropoffLocation={bookingState.dropoffLocation}
-                onPickupDateChange={handlePickupDateChange}
-                onReturnDateChange={handleReturnDateChange}
-                onPickupLocationChange={handlePickupLocationChange}
-                onDropoffLocationChange={handleDropoffLocationChange}
+                onUpdatePickupDate={handlePickupDateChange}
+                onUpdateReturnDate={handleReturnDateChange}
+                onUpdatePickupLocation={handlePickupLocationChange}
+                onUpdateDropoffLocation={handleDropoffLocationChange}
               />
             </div>
           )}
-
-          {/* Order Summary - Show on steps 2 and 3 */}
           {showOrderSummary && (
             <div className="lg:col-span-4">
               <OrderSummary
                 currentStep={currentStep}
                 onNextStep={nextStep}
+                // Pass additional props if neede
                 // bookingState={bookingState}
               />
             </div>
           )}
         </div>
-
-        {/* Navigation Buttons - Only show when Booking Panel or Order Summary is not visible */}
         {!showBookingPanel && !showOrderSummary && (
           <div className="flex justify-between mt-8 max-w-4xl mx-auto">
             <Button
@@ -244,7 +343,6 @@ export default function CarRentalBooking() {
               <ChevronLeft className="h-4 w-4 mr-1" />
               Previous
             </Button>
-
             <div className="flex space-x-2">
               {currentStep === steps.length ? (
                 <Button className="bg-green-600 hover:bg-green-700">Book Another Car</Button>
