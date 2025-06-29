@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useConfirmPickupMutation } from "@/lib/services/booking-api";
 import LoadingPage from "@/components/common/loading";
 import {useRouter} from "next/navigation";
+import NoResult from "@/components/common/no-result";
 
 export default function BookingListPage() {
     const userId = useSelector((state: RootState) => state.user?.id);
@@ -99,7 +100,7 @@ export default function BookingListPage() {
     const bookings = data?.data || [];
 
     if (isLoading) return <LoadingPage/>;
-    if (isError) return <p className="p-6 text-red-500">Error loading bookings.</p>;
+    if (isError) return <NoResult/>;
 
     return (
         <div className="p-6">
