@@ -19,6 +19,7 @@ import {TransactionFilters} from "@/components/wallet/transaction-filter";
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
 import LoadingPage from "@/components/common/loading";
+import {useCreatePaymentMutation} from "@/lib/services/vnp-api";
 
 // You would get this from auth context or props
 
@@ -41,7 +42,7 @@ export default function WalletPage() {
         error: balanceError,
         refetch: refetchBalance,
     } = useGetWalletBalanceQuery(ACCOUNT_ID)
-
+    const [createPayment] = useCreatePaymentMutation();
     const [createWallet] = useCreateWalletMutation()
     const [withdrawMoney, { isLoading: isWithdrawing }] = useWithdrawMoneyMutation()
     const [topupMoney, { isLoading: isToppingUp }] = useTopupMoneyMutation()
@@ -91,32 +92,48 @@ export default function WalletPage() {
         }
     }
 
-    const handleTopup = async () => {
+    const handleTopup = async (paymentMethod: string) => {
         try {
-            const amount = Number.parseInt(topupAmount)
+            const amount = Number.parseInt(topupAmount);
             if (amount <= 0) {
-                toast.error("Please enter a valid amount")
-                return
+                toast.error("Please enter a valid amount");
+                return;
             }
 
+            if (paymentMethod === 'vnpay') {
+                // Handle VNPay payment - use the mutation function directly
+                const paymentUrl = await createPayment({
+                    OrderType: 'topup',
+                    Amount: amount,
+                    OrderDescription: `Top-up ${amount} VND to wallet`,
+                    Name: 'Customer Name' // You should get this from user data
+                }).unwrap();
+
+                // Redirect to VNPay payment page
+                window.location.href = paymentUrl.paymentUrl;
+                return;
+            }
+
+            // Original wallet top-up logic
             const result = await topupMoney({
                 accountId: ACCOUNT_ID,
                 dto: { amount, message: "Top-up to wallet" },
-            }).unwrap()
+            }).unwrap();
 
-            toast.success("Money topped up successfully")
-            setShowTopupModal(false)
-            setTopupAmount("")
+            toast.success("Money topped up successfully");
+            setShowTopupModal(false);
+            setTopupAmount("");
 
             // Force refetch both balance and transactions
             setTimeout(() => {
-                refetchBalance()
-                refetchTransactions()
-            }, 100)
+                refetchBalance();
+                refetchTransactions();
+            }, 100);
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to top-up money")
+            toast.error(error?.data?.message || "Failed to top-up money");
         }
-    }
+    };
+
 
     const handleSearch = () => {
         setCurrentPage(1)
