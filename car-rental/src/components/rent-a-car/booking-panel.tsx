@@ -1,18 +1,13 @@
 "use client";
 
 import type React from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import AddressInput from "../common/address-input";
+import AddressInput, { Location } from "../common/address-input";
 import { DateTimePicker } from "../common/date-time-picker";
-
-interface Location {
-  province?: string;
-  district?: string;
-  ward?: string;
-}
 
 interface BookingPanelProps {
   onNextStep: () => void;
@@ -20,10 +15,10 @@ interface BookingPanelProps {
   returnDate?: Date;
   pickupLocation: Location;
   dropoffLocation: Location;
-  onPickupDateChange: (date: Date | undefined) => void;
-  onReturnDateChange: (date: Date | undefined) => void;
-  onPickupLocationChange: (field: string, value: string) => void;
-  onDropoffLocationChange: (field: string, value: string) => void;
+  onUpdatePickupDate: (date: Date | undefined) => void;
+  onUpdateReturnDate: (date: Date | undefined) => void;
+  onUpdatePickupLocation: (field: string, value: string) => void;
+  onUpdateDropoffLocation: (field: string, value: string) => void;
 }
 
 export function BookingPanel({
@@ -32,11 +27,18 @@ export function BookingPanel({
   returnDate,
   pickupLocation,
   dropoffLocation,
-  onPickupDateChange,
-  onReturnDateChange,
-  onPickupLocationChange,
-  onDropoffLocationChange,
+  onUpdatePickupDate,
+  onUpdateReturnDate,
+  onUpdatePickupLocation,
+  onUpdateDropoffLocation,
 }: BookingPanelProps) {
+  const [errors, setErrors] = useState<{
+    pickupDate?: string;
+    returnDate?: string;
+    pickupLocation?: string;
+    dropoffLocation?: string;
+  }>({});
+
   const calculateTotal = () => {
     let total = 897; // Base rate for 3 days
     if (pickupDate && returnDate) {
@@ -45,6 +47,53 @@ export function BookingPanel({
     }
     total += 98; // Taxes & Fees
     return total;
+  };
+
+  const calculateRentalDays = () => {
+    if (pickupDate && returnDate) {
+      return Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
+    }
+    return 3; // Default to 3 days if dates are not set
+  };
+
+  const validateForm = () => {
+    const newErrors: {
+      pickupDate?: string;
+      returnDate?: string;
+      pickupLocation?: string;
+      dropoffLocation?: string;
+    } = {};
+
+    if (!pickupDate) {
+      newErrors.pickupDate = "Please select a pick-up date and time.";
+    }
+    if (!returnDate) {
+      newErrors.returnDate = "Please select a return date and time.";
+    }
+    if (pickupDate && returnDate && pickupDate >= returnDate) {
+      newErrors.returnDate = "Return date must be after pick-up date.";
+    }
+    if (!pickupLocation.province) {
+      newErrors.pickupLocation = "Please select a valid pick-up location.";
+    }
+    if (!dropoffLocation.province) {
+      newErrors.dropoffLocation = "Please select a valid drop-off location.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    // Format locations for CreateBookingDTO
+    const formattedPickupLocation = `${pickupLocation.ward || ""}, ${pickupLocation.district || ""}, ${pickupLocation.province || ""}`.trim();
+    const formattedDropoffLocation = `${dropoffLocation.ward || ""}, ${pickupLocation.district || ""}, ${pickupLocation.province || ""}`.trim();
+
+    onNextStep();
   };
 
   return (
@@ -58,9 +107,13 @@ export function BookingPanel({
           <Label htmlFor="pickupDate">Pick-up Date</Label>
           <DateTimePicker
             value={pickupDate}
-            onChange={onPickupDateChange}
+            onChange={(date) => {
+              onUpdatePickupDate(date);
+              setErrors((prev) => ({ ...prev, pickupDate: undefined }));
+            }}
             placeholder="Select pick-up date & time"
           />
+          {errors.pickupDate && <p className="text-red-500 text-sm">{errors.pickupDate}</p>}
         </div>
 
         {/* Return Date Selection */}
@@ -68,9 +121,13 @@ export function BookingPanel({
           <Label htmlFor="returnDate">Return Date</Label>
           <DateTimePicker
             value={returnDate}
-            onChange={onReturnDateChange}
+            onChange={(date) => {
+              onUpdateReturnDate(date);
+              setErrors((prev) => ({ ...prev, returnDate: undefined }));
+            }}
             placeholder="Select return date & time"
           />
+          {errors.returnDate && <p className="text-red-500 text-sm">{errors.returnDate}</p>}
         </div>
 
         {/* Pickup Location Selection */}
@@ -78,21 +135,24 @@ export function BookingPanel({
           <Label htmlFor="pickupLocation">Pick-up Location</Label>
           <AddressInput
             location={pickupLocation}
-            onLocationChange={onPickupLocationChange}
+            onLocationChange={onUpdatePickupLocation}
             orientation="horizontal"
             spacing="md"
           />
+          {errors.pickupLocation && <p className="text-red-500 text-sm">{errors.pickupLocation}</p>}
         </div>
 
         {/* Drop-off Location Selection */}
         <div className="space-y-2">
           <Label htmlFor="dropoffLocation">Drop-off Location</Label>
           <AddressInput
-            location={dropoffLocation}
-            onLocationChange={onDropoffLocationChange}
+            location={{ ...dropoffLocation, province: pickupLocation.province, district: pickupLocation.district }}
+            onLocationChange={onUpdateDropoffLocation}
             orientation="horizontal"
             spacing="md"
+            disabledFields={["province", "district"]}
           />
+          {errors.dropoffLocation && <p className="text-red-500 text-sm">{errors.dropoffLocation}</p>}
         </div>
 
         <Separator />
@@ -100,8 +160,8 @@ export function BookingPanel({
         {/* Pricing Breakdown */}
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span>Base Rate ({pickupDate && returnDate ? Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) : 3} days)</span>
-            <span>${pickupDate && returnDate ? (Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) * 299).toLocaleString() : "897"}</span>
+            <span>Base Rate ({calculateRentalDays()} days)</span>
+            <span>${(calculateRentalDays() * 299).toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span>Taxes & Fees</span>
@@ -118,7 +178,7 @@ export function BookingPanel({
 
         <Button
           className="w-full bg-indigo-600 hover:bg-indigo-700 h-12"
-          onClick={onNextStep}
+          onClick={handleNextStep}
           disabled={!pickupDate || !returnDate || !pickupLocation.province || !dropoffLocation.province}
         >
           Book Now →

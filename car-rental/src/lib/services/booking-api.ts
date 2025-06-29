@@ -3,6 +3,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
+import { CarVO_Detail } from "./car-api";
+import { UserProfile } from "./user-api";
 
 export interface BookingVO {
     carName: string;
@@ -87,7 +89,10 @@ export interface BookingDetailVO {
     deposit?: number;
     paymentType?: string;
 }
-
+export interface BookingCarAndUserResponse {
+    car: CarVO_Detail;
+    user: UserProfile;
+}
 export interface BookingEditDTO {
     driverFullName?: string | null;
     driverDob?: string | null; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
@@ -167,6 +172,13 @@ export const bookingApi = createApi({
                 "Booking",
             ],
         }),
+        getBookingCarAndUser: build.query<ApiResponse<BookingCarAndUserResponse>, string>({
+            query: (carId) => ({
+                url: `/booking/booking-informations/${carId}`,
+                method: "GET",
+            }),
+            providesTags: (result, error, carId) => [{ type: "Booking", id: carId }],
+        }),
     }),
 });
 
@@ -177,5 +189,6 @@ export const {
     useConfirmPickupMutation,
     useReturnCarMutation,
     useGetBookingDetailQuery,
-    useUpdateBookingMutation
+    useUpdateBookingMutation,
+    useGetBookingCarAndUserQuery
 } = bookingApi;

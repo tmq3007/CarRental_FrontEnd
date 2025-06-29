@@ -16,39 +16,44 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+
 // Define the shape of the location object
 export interface Location {
   province?: string;
   district?: string;
   ward?: string;
 }
+
 interface AddressInputProps {
-  onLocationChange: (field: string, value: string) => void
-  orientation?: "horizontal" | "vertical"
-  spacing?: "sm" | "md" | "lg"
-  location: Location
+  onLocationChange: (field: string, value: string) => void;
+  orientation?: "horizontal" | "vertical";
+  spacing?: "sm" | "md" | "lg";
+  location: Location;
+  disabledFields?: string[];
 }
 
 interface ComboBoxProps {
-  options: { value: string; label: string }[]
-  placeholder: string
-  label: string
-  isLoading: boolean
-  selectedValue: string | null
-  onSelect: (value: string | null) => void
+  options: { value: string; label: string }[];
+  placeholder: string;
+  label: string;
+  isLoading: boolean;
+  selectedValue: string | null;
+  onSelect: (value: string | null) => void;
+  disabled?: boolean;
 }
 
-const ComboBox = ({ options, placeholder, label, isLoading, selectedValue, onSelect }: ComboBoxProps) => {
+const ComboBox = ({ options, placeholder, label, isLoading, selectedValue, onSelect, disabled }: ComboBoxProps) => {
   const [open, setOpen] = useState(false)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={disabled ? () => {} : setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn("w-full justify-between", disabled && "opacity-50 cursor-not-allowed")}
+          disabled={disabled}
         >
           {isLoading ? (
             "Loading..."
@@ -97,6 +102,7 @@ const AddressInput = ({
   orientation = "vertical",
   spacing = "md",
   location,
+  disabledFields = [],
 }: AddressInputProps) => {
   const [selectedProvinceCode, setSelectedProvinceCode] = useState<number | null>(null)
   const [selectedDistrictCode, setSelectedDistrictCode] = useState<number | null>(null)
@@ -117,14 +123,31 @@ const AddressInput = ({
 
   // Sync local state with location prop
   useEffect(() => {
-    const province = provinces.find((p) => p.name === location.province)
-    const district = districts.find((d) => d.name === location.district)
-    const ward = wards.find((w) => w.name === location.ward)
+    if (location.province) {
+      const province = provinces.find((p) => p.name === location.province)
+      setSelectedProvinceCode(province?.code || null)
+    } else {
+      setSelectedProvinceCode(null)
+    }
+  }, [location.province, provinces])
 
-    setSelectedProvinceCode(province?.code || null)
-    setSelectedDistrictCode(district?.code || null)
-    setSelectedWardCode(ward?.code || null)
-  }, [location.province, location.district, location.ward, provinces, districts, wards])
+  useEffect(() => {
+    if (location.district && selectedProvinceCode) {
+      const district = districts.find((d) => d.name === location.district)
+      setSelectedDistrictCode(district?.code || null)
+    } else {
+      setSelectedDistrictCode(null)
+    }
+  }, [location.district, districts, selectedProvinceCode])
+
+  useEffect(() => {
+    if (location.ward && selectedDistrictCode) {
+      const ward = wards.find((w) => w.name === location.ward)
+      setSelectedWardCode(ward?.code || null)
+    } else {
+      setSelectedWardCode(null)
+    }
+  }, [location.ward, wards, selectedDistrictCode])
 
   // Convert provinces, districts, and wards to Combobox options format
   const provinceOptions = provincesLoading
@@ -150,39 +173,24 @@ const AddressInput = ({
 
   // Handle selection changes
   const handleProvinceSelect = (value: string | null) => {
-    if (!value) {
-      setSelectedProvinceCode(null)
-      setSelectedDistrictCode(null)
-      setSelectedWardCode(null)
-      onLocationChange("province", "")
-      return
-    }
     const province = provinces.find((p) => p.code.toString() === value)
     setSelectedProvinceCode(province?.code || null)
-    setSelectedDistrictCode(null) // Reset district
-    setSelectedWardCode(null) // Reset ward
+    setSelectedDistrictCode(null)
+    setSelectedWardCode(null)
     onLocationChange("province", province?.name || "")
+    onLocationChange("district", "")
+    onLocationChange("ward", "")
   }
 
   const handleDistrictSelect = (value: string | null) => {
-    if (!value) {
-      setSelectedDistrictCode(null)
-      setSelectedWardCode(null)
-      onLocationChange("district", "")
-      return
-    }
     const district = districts.find((d) => d.code.toString() === value)
     setSelectedDistrictCode(district?.code || null)
-    setSelectedWardCode(null) // Reset ward
+    setSelectedWardCode(null)
     onLocationChange("district", district?.name || "")
+    onLocationChange("ward", "")
   }
 
   const handleWardSelect = (value: string | null) => {
-    if (!value) {
-      setSelectedWardCode(null)
-      onLocationChange("ward", "")
-      return
-    }
     const ward = wards.find((w) => w.code.toString() === value)
     setSelectedWardCode(ward?.code || null)
     onLocationChange("ward", ward?.name || "")
@@ -221,6 +229,7 @@ const AddressInput = ({
           isLoading={provincesLoading}
           selectedValue={selectedProvinceCode?.toString() || null}
           onSelect={handleProvinceSelect}
+          disabled={disabledFields.includes("province")}
         />
       </div>
 
@@ -237,6 +246,7 @@ const AddressInput = ({
           isLoading={districtsLoading}
           selectedValue={selectedDistrictCode?.toString() || null}
           onSelect={handleDistrictSelect}
+          disabled={disabledFields.includes("district") || !selectedProvinceCode}
         />
       </div>
 
@@ -253,6 +263,7 @@ const AddressInput = ({
           isLoading={wardsLoading}
           selectedValue={selectedWardCode?.toString() || null}
           onSelect={handleWardSelect}
+          disabled={!selectedDistrictCode}
         />
       </div>
     </div>
