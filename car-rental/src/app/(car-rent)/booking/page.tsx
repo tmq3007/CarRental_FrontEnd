@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,8 @@ export default function CarRentalBooking() {
   const pickupTime = searchParams.get("pickupTime");
   const dropoffTime = searchParams.get("dropoffTime");
   const userId = useSelector((state: RootState) => state.user.id);
-
+  const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(0);
   // Fetch booking data
   const { data: bookingResponse, isLoading, error ,isFetching} = useGetBookingCarAndUserQuery(carId ?? "", {
     skip: !carId,
@@ -121,16 +122,22 @@ export default function CarRentalBooking() {
     }
   }, [car, user, carId, userId]);
 
-  useEffect(() => {
+  const rentalDays = useMemo(() => {
     if (bookingState.pickupDate && bookingState.returnDate) {
       const diffTime = bookingState.returnDate.getTime() - bookingState.pickupDate.getTime();
-      const rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setBookingState((prev) => ({ ...prev, rentalDays: rentalDays > 0 ? rentalDays : 1 }));
+      return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     }
+    return undefined;
   }, [bookingState.pickupDate, bookingState.returnDate]);
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [direction, setDirection] = useState(0);
+  // Keep rentalDays in state if computed value changes
+  useEffect(() => {
+    if (rentalDays !== undefined && rentalDays !== bookingState.rentalDays) {
+      setBookingState((prev) => ({ ...prev, rentalDays }));
+    }
+  }, [rentalDays]);
+
+
 
   const handlePickupDateChange = (date: Date | undefined) => {
     setBookingState((prev) => ({ ...prev, pickupDate: date }));
