@@ -216,7 +216,7 @@ export default function Header() {
                                             handleDropdownItemClick("My Profile")
                                         }}
                                     >
-                                        <Link href="/user/profile">
+                                        <Link href="user/profile">
                                             My Profile
                                         </Link>
                                     </DropdownMenuItem>

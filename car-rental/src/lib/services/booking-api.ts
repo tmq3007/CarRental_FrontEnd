@@ -18,6 +18,90 @@ export interface BookingVO {
     status: string;
 }
 
+export interface BookingDetailVO {
+    bookingNumber: string;
+    carName: string;
+    carId: string;
+    status: string;
+    pickUpTime?: string;
+    dropOffTime?: string;
+    accountEmail?: string;
+
+    // Renter's information
+    renterFullName?: string;
+    renterDob?: string;
+    renterPhoneNumber?: string;
+    renterEmail?: string;
+    renterNationalId?: string;
+    renterDrivingLicenseUri?: string;
+    renterHouseNumberStreet?: string;
+    renterWard?: string;
+    renterDistrict?: string;
+    renterCityProvince?: string;
+
+    // Driver's information
+    driverFullName?: string;
+    driverDob?: string;
+    driverPhoneNumber?: string;
+    driverEmail?: string;
+    driverNationalId?: string;
+    driverDrivingLicenseUri?: string;
+    driverHouseNumberStreet?: string;
+    driverWard?: string;
+    driverDistrict?: string;
+    driverCityProvince?: string;
+
+    //check renter is driver
+    isRenterSameAsDriver?: boolean;
+
+    // Car information
+    licensePlate?: string;
+    brand: string;
+    model: string;
+    color: string;
+    productionYear: number;
+    isAutomatic: boolean;
+    isGasoline: boolean;
+    numberOfSeats: number;
+    mileage: number;
+    fuelConsumption: number;
+    carAddress: string;
+    description: string;
+    additionalFunction: string;
+    termOfUse: string;
+    carImageFront: string;
+    carImageBack: string;
+    carImageLeft: string;
+    carImageRight: string;
+
+    // Documents
+    insuranceUri?: string;
+    insuranceUriIsVerified?: boolean;
+    registrationPaperUri?: string;
+    registrationPaperUriIsVerified?: boolean;
+    certificateOfInspectionUri?: string;
+    certificateOfInspectionUriIsVerified?: boolean;
+
+    // Payment information
+    basePrice?: number;
+    deposit?: number;
+    paymentType?: string;
+}
+
+export interface BookingEditDTO {
+    driverFullName?: string | null;
+    driverDob?: string | null; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
+    driverEmail?: string | null;
+    driverPhoneNumber?: string | null;
+    driverNationalId?: string | null;
+    //driverDrivingLicenseUri?: string | null;
+    driverHouseNumberStreet?: string | null;
+    driverWard?: string | null;
+    driverDistrict?: string | null;
+    driverCityProvince?: string | null;
+}
+
+
 export interface PaginatedBookingResponse {
     data: BookingVO[];
     totalCount: number;

@@ -38,10 +38,10 @@ export function CarInfoHeader({ carInfo, onRentClick, isCarOwner }: CarInfoHeade
     }
 
     return (
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-center">
             <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{carInfo.name}</h2>
-                <div className="space-y-8 mt-7">
+                <div className="space-y-4 mt-4">
                     <div className="flex items-center space-x-2">
                         <span className="text-sm text-gray-600">Ratings:</span>
                         <div className="flex space-x-1">

@@ -1,6 +1,23 @@
 import { Button } from "@/components/ui/button"
+import {BookingDetailVO} from "@/lib/services/booking-api";
 
-export default function PaymentInformation() {
+interface PaymentInformationProps {
+    bookingDetail: BookingDetailVO
+}
+
+export default function PaymentInformation({ bookingDetail }: PaymentInformationProps) {
+    // Format date for display
+    const formatDate = (dateString?: string): string => {
+        if (!dateString) return "N/A"
+        const date = new Date(dateString)
+        return date.toLocaleDateString()
+    }
+
+    // If paymentType is not defined or empty, don't show anything
+    if (!bookingDetail.paymentType) {
+        return null;
+    }
+
     return (
         <div className="border rounded-md p-6 mt-4">
             <div className="space-y-6">
@@ -22,21 +39,18 @@ export default function PaymentInformation() {
                         <path d="M12 18v2"></path>
                         <path d="M12 4v2"></path>
                     </svg>
-                    <h3 className="text-lg font-medium">My wallet</h3>
+                    <h3 className="text-lg font-medium">Payment Information</h3>
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <div className="text-gray-600">Current balance:</div>
-                    <div className="text-xl font-bold">20,000,000 VND</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="border rounded-md p-4">
+                        <div className="text-gray-600 text-sm">Payment Type</div>
+                        <div className="text-xl font-bold capitalize">
+                            {bookingDetail.paymentType}
+                        </div>
+                    </div>
                 </div>
 
-                <p className="text-gray-600">Please make sure to have sufficient balance when you return the car.</p>
-
-                <div>
-                    <Button variant="outline" className="text-blue-600 hover:text-blue-700">
-                        Go to My wallet
-                    </Button>
-                </div>
             </div>
         </div>
     )
