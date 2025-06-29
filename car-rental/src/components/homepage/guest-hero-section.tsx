@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import RenterPanel from "@/components/homepage/renter-panel"
 import CarOwnerPanel from "@/components/homepage/car-owner-panel"
 import { Star } from "lucide-react"
-import Hyperspeed from "@/blocks/Backgrounds/Hyperspeed/Hyperspeed"
 
 
 interface Particle {

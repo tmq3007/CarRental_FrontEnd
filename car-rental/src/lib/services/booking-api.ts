@@ -125,6 +125,35 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+            query: ({ accountId }) => ({
+                url: `/booking/${accountId}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
+        cancelBooking: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/cancel`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
+            query: ({ bookingNumber }) => ({
+                url: `/booking/${bookingNumber}/confirm-pickup`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        returnCar: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/return`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+
         getBookingDetail: build.query<ApiResponse<BookingDetailVO>, string>({
             query: (bookingNumber) => ({
                 url: `/booking/detail/${bookingNumber}`,
@@ -132,7 +161,6 @@ export const bookingApi = createApi({
             }),
             providesTags: (result, error, bookingNumber) => [{ type: "Booking", id: bookingNumber }],
         }),
-
         updateBooking: build.mutation<ApiResponse<BookingDetailVO>, { bookingNumber: string; bookingDto: BookingEditDTO }>({
             query: ({ bookingNumber, bookingDto }) => ({
                 url: `/booking/edit/${bookingNumber}`,
@@ -144,7 +172,7 @@ export const bookingApi = createApi({
                 "Booking",
             ],
         }),
-        getBookingCarAndUser: build.query<ApiResponse<BookingCarAndUserResponse>, string >({
+        getBookingCarAndUser: build.query<ApiResponse<BookingCarAndUserResponse>, string>({
             query: (carId) => ({
                 url: `/booking/booking-informations/${carId}`,
                 method: "GET",
@@ -156,6 +184,10 @@ export const bookingApi = createApi({
 
 export const {
     useGetBookingsQuery,
+    useGetBookingsByAccountIdQuery,
+    useCancelBookingMutation,
+    useConfirmPickupMutation,
+    useReturnCarMutation,
     useGetBookingDetailQuery,
     useUpdateBookingMutation,
     useGetBookingCarAndUserQuery

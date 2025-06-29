@@ -10,6 +10,7 @@ import { carApi } from "@/lib/services/car-api";
 import { bookingApi } from "./services/booking-api";
 import {vnpayApi} from "@/lib/services/vnp-api";
 import {dashboardApi} from "@/lib/services/dashboard-api";
+import {walletApi} from "@/lib/services/wallet-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -39,6 +40,7 @@ const baseReducer = combineReducers({
     [bookingApi.reducerPath]: bookingApi.reducer,
     [vnpayApi.reducerPath]: vnpayApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
+    [walletApi.reducerPath]: walletApi.reducer,
     user: userReducer,
 })
 
@@ -70,6 +72,7 @@ export const store = () => {
                 bookingApi.middleware,
                 vnpayApi.middleware,
                 dashboardApi.middleware,
+                walletApi.middleware,
             ),
     })
 }
