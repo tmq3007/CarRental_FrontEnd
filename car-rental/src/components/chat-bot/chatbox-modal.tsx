@@ -3,10 +3,10 @@ import { useState, useEffect, useRef } from "react"
 import type React from "react"
 
 import { Send, MessageCircle, User, Bot, Loader2 } from "lucide-react"
-import { useGetChatCompletionMutation } from "@/lib/services/chatbot-api"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
 import {useGetUserByIdQuery} from "@/lib/services/user-api";
+import {useGetCompletionMutation} from "@/lib/services/chatbot-api";
 
 interface Message {
     question: string
@@ -18,7 +18,6 @@ const STORAGE_KEY = "chat-history"
 const ChatboxModal: React.FC = () => {
     const [input, setInput] = useState("")
     const [chatHistory, setChatHistory] = useState<Message[]>([])
-    const [getCompletion, { data, isLoading, error }] = useGetChatCompletionMutation()
     const userId = useSelector((state: RootState) => state.user?.id);
 
     const {
@@ -27,6 +26,7 @@ const ChatboxModal: React.FC = () => {
         error: userError,
     } = useGetUserByIdQuery(userId)
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const [getCompletion, { data, isLoading, error }] = useGetCompletionMutation();
 
     // Auto scroll to bottom when new messages arrive
     const scrollToBottom = () => {
@@ -47,17 +47,17 @@ const ChatboxModal: React.FC = () => {
 
     // Update chat history when new answer arrives
     useEffect(() => {
-        if (!isLoading && data && data.choices?.[0]?.message?.content) {
-            const answer = data.choices[0].message.content
+        if (!isLoading && data && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const answer = data.candidates[0].content.parts[0].text
             setChatHistory((prev) => {
                 const updated = [...prev]
-                // Update the answer for the last question
                 updated[updated.length - 1].answer = answer
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
                 return updated
             })
         }
     }, [data, isLoading])
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()

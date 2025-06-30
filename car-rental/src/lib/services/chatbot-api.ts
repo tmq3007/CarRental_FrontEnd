@@ -1,36 +1,26 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+// lib/services/gemini-api.ts
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-export const deepSeekApi = createApi({
-    reducerPath: 'deepSeekApi',
+export const geminiApi = createApi({
+    reducerPath: "geminiApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: 'https://openrouter.ai/api/v1/',
+        baseUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro",
         prepareHeaders: (headers) => {
-            headers.set('Authorization', `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`);
-            headers.set('Content-Type', 'application/json');
-            // @ts-ignore
-            headers.set('HTTP-Referer', process.env.NEXT_PUBLIC_SITE_URL.toString());
-            // @ts-ignore
-            headers.set('X-Title', process.env.NEXT_PUBLIC_SITE_NAME);
-            return headers;
+            headers.set("Content-Type", "application/json")
+            return headers
         },
     }),
     endpoints: (builder) => ({
-        getChatCompletion: builder.mutation({
-            query: (message) => ({
-                url: 'chat/completions',
-                method: 'POST',
+        getCompletion: builder.mutation({
+            query: (prompt: string) => ({
+                url: `/generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
+                method: "POST",
                 body: {
-                    model: 'deepseek/deepseek-r1:free',
-                    messages: [
-                        {
-                            role: 'user',
-                            content: message,
-                        },
-                    ],
+                    contents: [{ parts: [{ text: prompt }] }],
                 },
             }),
         }),
     }),
-});
+})
 
-export const { useGetChatCompletionMutation } = deepSeekApi;
+export const { useGetCompletionMutation } = geminiApi

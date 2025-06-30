@@ -91,6 +91,7 @@ export default function Header() {
                 toast.success('Logged out successfully!', { id: toastId, duration: 2000 });
             });
             dispatch(resetUser());
+            router.push("/signin");
         } catch (error) {
             console.error("Logout failed:", error);
             dispatch(resetUser());
@@ -257,7 +258,7 @@ export default function Header() {
                                         <Dialog>
                                             <form>
                                                 <DialogTrigger asChild>
-                                                    <Link href="/">Logout</Link>
+                                                    <Link href="">Logout</Link>
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-[425px]">
                                                     <DialogHeader>

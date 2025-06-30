@@ -5,13 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="new master">
-      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/callbacl.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/forgot-password/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/signin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/signin/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/signup/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/signup/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/store.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +20,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -93,6 +99,7 @@
       <updated>1751212457569</updated>
       <workItem from="1751212459252" duration="2219000" />
       <workItem from="1751215654332" duration="4403000" />
+      <workItem from="1751250689442" duration="6057000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
