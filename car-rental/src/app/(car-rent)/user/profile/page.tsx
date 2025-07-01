@@ -21,7 +21,6 @@ import LoadingPage from "@/components/common/loading"
 import NoResult from "@/components/common/no-result"
 
 export default function ProfilePage() {
-    // @ts-ignore
     const userId = useSelector((state: RootState) => state.user?.id)
 
     const { data: user, isLoading: userLoading, error: userError, refetch: refetchUser } = useGetUserByIdQuery(userId)
@@ -54,7 +53,6 @@ export default function ProfilePage() {
             dob: userData.dob ? new Date(userData.dob).toISOString().split("T")[0] : "",
         }
     }
-
     useEffect(() => {
         if (user) {
             setPersonalInfo(extractUserProfileFromData(user.data))
@@ -109,7 +107,6 @@ export default function ProfilePage() {
                 dob: personalInfo.dob,
                 email: personalInfo.email,
             }
-
             const response = await updateProfile({ id: userId, dto: updateData }).unwrap()
 
             shadToast({

@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="new master">
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update signin signup reset password page">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/forgot-password/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/signin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/signin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(auth)/signup/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(auth)/signup/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/lib/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/store.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -100,6 +99,10 @@
       <workItem from="1751212459252" duration="2219000" />
       <workItem from="1751215654332" duration="4403000" />
       <workItem from="1751250689442" duration="6057000" />
+      <workItem from="1751288114526" duration="344000" />
+      <workItem from="1751307829661" duration="29000" />
+      <workItem from="1751308424593" duration="1806000" />
+      <workItem from="1751341149548" duration="18056000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
@@ -109,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751213564889</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="update signin signup reset password page">
+      <option name="closed" value="true" />
+      <created>1751288448257</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751288448257</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -117,6 +128,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new master" />
-    <option name="LAST_COMMIT_MESSAGE" value="new master" />
+    <MESSAGE value="update signin signup reset password page" />
+    <option name="LAST_COMMIT_MESSAGE" value="update signin signup reset password page" />
   </component>
 </project>

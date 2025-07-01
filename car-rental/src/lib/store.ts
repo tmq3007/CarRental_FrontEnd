@@ -10,7 +10,7 @@ import { bookingApi } from "./services/booking-api";
 import {vnpayApi} from "@/lib/services/vnp-api";
 import {dashboardApi} from "@/lib/services/dashboard-api";
 import {walletApi} from "@/lib/services/wallet-api";
-import {geminiApi} from "@/lib/services/chatbot-api";
+import {chatbotApi   } from "@/lib/services/chatbot-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -33,7 +33,7 @@ export type PaginationResponse<T> = {
 }
 const baseReducer = combineReducers({
     [userApi.reducerPath]: userApi.reducer,
-    [geminiApi.reducerPath]: geminiApi.reducer,
+    [chatbotApi.reducerPath]: chatbotApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
@@ -65,7 +65,7 @@ export const store = () => {
                 },
             }).concat(
                 userApi.middleware,
-                geminiApi.middleware,
+                chatbotApi.middleware,
                 authApi.middleware,
                 addressApi.middleware,
                 carApi.middleware,

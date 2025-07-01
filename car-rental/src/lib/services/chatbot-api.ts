@@ -1,26 +1,19 @@
-// lib/services/gemini-api.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+// services/chatbotApi.ts
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {baseQuery} from "@/lib/services/config/baseQuery";
 
-export const geminiApi = createApi({
-    reducerPath: "geminiApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro",
-        prepareHeaders: (headers) => {
-            headers.set("Content-Type", "application/json")
-            return headers
-        },
-    }),
+export const chatbotApi = createApi({
+    reducerPath: 'chatbotApi',
+    baseQuery:  baseQuery,
     endpoints: (builder) => ({
-        getCompletion: builder.mutation({
-            query: (prompt: string) => ({
-                url: `/generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
-                method: "POST",
-                body: {
-                    contents: [{ parts: [{ text: prompt }] }],
-                },
+        askChatbot: builder.mutation<{ answer: string, from: string }, { question: string }>({
+            query: ({ question }) => ({
+                url: 'chatbot/ask',
+                method: 'POST',
+                body: { question },
             }),
         }),
     }),
-})
+});
 
-export const { useGetCompletionMutation } = geminiApi
+export const { useAskChatbotMutation } = chatbotApi;
