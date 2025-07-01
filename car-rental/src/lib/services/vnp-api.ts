@@ -1,37 +1,28 @@
-// lib/services/vnpayApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+    import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export interface VnpayPaymentRequest {
-    vnp_Amount: number;
-    vnp_OrderInfo: string;
-    vnp_TxnRef: string;
-    vnp_IpAddr: string;
-    vnp_Locale?: string;
-    vnp_ReturnUrl: string;
-    vnp_Version?: string;
-    vnp_Command?: string;
-    vnp_OrderType?: string;
-    vnp_CurrCode?: string;
-}
+    interface VnpayPaymentRequest {
+        OrderType: string;
+        Amount: number;
+        OrderDescription: string;
+        Name: string;
+    }
 
-export interface VnpayPaymentResponse {
-    url?: string;
-    code: string;
-    message?: string;
-}
+    interface VnpayPaymentResponse {
+        paymentUrl: string;
+    }
 
-export const vnpayApi = createApi({
-    reducerPath: 'vnpayApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5227/api' }),
-    endpoints: (builder) => ({
-        createPayment: builder.mutation<VnpayPaymentResponse, VnpayPaymentRequest>({
-            query: (params) => ({
-                url: '/vnpay/createpayment',
-                method: 'GET', // Giữ GET vì backend sử dụng GET
-                params,
+    export const vnpayApi = createApi({
+        reducerPath: 'vnpayApi',
+        baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5227/api' }),
+        endpoints: (builder) => ({
+            createPayment: builder.mutation<VnpayPaymentResponse, VnpayPaymentRequest>({
+                query: (body) => ({
+                    url: '/Payment/CreatePaymentUrlVnpay',
+                    method: 'POST',
+                    body,
+                }),
             }),
         }),
-    }),
-});
+    });
 
-export const { useCreatePaymentMutation } = vnpayApi;
+    export const { useCreatePaymentMutation } = vnpayApi;
