@@ -3,16 +3,20 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import {useState} from "react";
 
 interface TopupModalProps {
     isOpen: boolean
     topupAmount: string
     onClose: () => void
     onAmountChange: (amount: string) => void
-    onConfirm: () => void
+    onConfirm: (paymentMethod: string) => void  // Updated to accept payment method
 }
 
 export function TopupModal({ isOpen, topupAmount, onClose, onAmountChange, onConfirm }: TopupModalProps) {
+    const [paymentMethod, setPaymentMethod] = useState("vnpay") // Default to wallet
     const isValidAmount = topupAmount && Number.parseInt(topupAmount) > 0
 
     return (
@@ -43,14 +47,19 @@ export function TopupModal({ isOpen, topupAmount, onClose, onAmountChange, onCon
                                 10,000,000
                             </Button>
                         </div>
+
                     </div>
                 </div>
                 <DialogFooter className="flex gap-2">
                     <Button variant="outline" onClick={onClose} className="flex-1">
                         Cancel
                     </Button>
-                    <Button onClick={onConfirm} disabled={!isValidAmount} className="flex-1">
-                        OK
+                    <Button
+                        onClick={() => onConfirm(paymentMethod)}
+                        disabled={!isValidAmount}
+                        className="flex-1"
+                    >
+                          Proceed to Payment
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -1,7 +1,7 @@
 // src/lib/services/booking/booking-api.ts
 
 import { createApi } from "@reduxjs/toolkit/query/react";
-import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
 
 export interface BookingVO {
@@ -86,7 +86,7 @@ export interface BookingDetailVO {
     basePrice?: number;
     deposit?: number;
     paymentType?: string;
- }
+}
 
 export interface BookingEditDTO {
     driverFullName?: string | null;
@@ -120,6 +120,35 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+            query: ({ accountId }) => ({
+                url: `/booking/${accountId}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
+        cancelBooking: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/cancel`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
+            query: ({ bookingNumber }) => ({
+                url: `/booking/${bookingNumber}/confirm-pickup`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        returnCar: build.mutation<ApiResponse<string>, { bookingId: string }>({
+            query: ({ bookingId }) => ({
+                url: `/booking/${bookingId}/return`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+
         getBookingDetail: build.query<ApiResponse<BookingDetailVO>, string>({
             query: (bookingNumber) => ({
                 url: `/booking/detail/${bookingNumber}`,
@@ -127,7 +156,6 @@ export const bookingApi = createApi({
             }),
             providesTags: (result, error, bookingNumber) => [{ type: "Booking", id: bookingNumber }],
         }),
-
         updateBooking: build.mutation<ApiResponse<BookingDetailVO>, { bookingNumber: string; bookingDto: BookingEditDTO }>({
             query: ({ bookingNumber, bookingDto }) => ({
                 url: `/booking/edit/${bookingNumber}`,
@@ -143,7 +171,11 @@ export const bookingApi = createApi({
 });
 
 export const {
-    useGetBookingsQuery ,
+    useGetBookingsQuery,
+    useGetBookingsByAccountIdQuery,
+    useCancelBookingMutation,
+    useConfirmPickupMutation,
+    useReturnCarMutation,
     useGetBookingDetailQuery,
     useUpdateBookingMutation
-    } = bookingApi;
+} = bookingApi;
