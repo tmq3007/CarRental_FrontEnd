@@ -1,6 +1,7 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
-import {ApiResponse} from "@/lib/store";
+import {ApiResponse, PaginationMetadata, PaginationResponse} from "@/lib/store";
+import {CarVO_Detail} from "@/lib/services/car-api";
 
 export interface DashboardStatsVO {
     totalRevenue: number;
@@ -43,6 +44,70 @@ export interface TopPayingCustomerVO {
     preferredVehicle: string,
 }
 
+export interface AccountVO {
+    id: string // Guid Id
+    email: string // string Email
+    isActive: boolean // bool IsActive
+    isEmailVerified: boolean // bool IsEmailVerified
+    createdAt: string // DateTime CreatedAt
+    updatedAt?: string // DateTime? UpdatedAt
+    roleId: number // int RoleId
+    // Remove all virtual properties and stats
+}
+
+export interface AccountFilters {
+    sortBy: string
+    sortDirection: "asc" | "desc"
+    status?: string
+    role?: string
+    emailVerified?: string
+    search?: string
+}
+
+export interface CarVO_Full {
+    id: string;
+    brand: string;
+    model: string;
+    color: string;
+    basePrice: number;
+    deposit: number;
+    numberOfSeats: number;
+    productionYear: number;
+    mileage?: number;
+    fuelConsumption?: number;
+    isGasoline?: boolean;
+    isAutomatic?: boolean;
+    termOfUse?: string;
+    additionalFunction?: string;
+    description?: string;
+    licensePlate?: string;
+    houseNumberStreet?: string;
+    ward?: string;
+    district?: string;
+    cityProvince?: string;
+    carImageFront?: string | null;
+    carImageBack?: string | null;
+    carImageLeft?: string | null;
+    carImageRight?: string | null;
+    insuranceUri?: string | null;
+    insuranceUriIsVerified?: boolean;
+    registrationPaperUri?: string | null;
+    registrationPaperUriIsVerified?: boolean;
+    certificateOfInspectionUri?: string | null;
+    certificateOfInspectionUriIsVerified?: boolean;
+    status: string;
+    accountId: string;
+    updatedAt: string;
+    createdAt: string;
+}
+
+export interface CarUnverifiedFilters {
+    sortBy: string
+    sortDirection: "asc" | "desc"
+    brand?: string
+    search?: string
+}
+
 export const dashboardApi = createApi({
     reducerPath: "dashboardApi",
     baseQuery: baseQueryWithAuthCheck,
@@ -76,6 +141,58 @@ export const dashboardApi = createApi({
                 method: "GET",
             }),
         }),
+
+        getAccounts: build.query<ApiResponse<{data: AccountVO[], pagination: PaginationMetadata}>, {pageNumber?: number; pageSize?: number; filters?: AccountFilters}>({
+            query: ({pageNumber = 1, pageSize = 10, filters = {}}) => {
+                const params = new URLSearchParams({
+                    pageNumber: pageNumber.toString(),
+                    pageSize: pageSize.toString(),
+                    ...(filters.sortBy && {sortBy: filters.sortBy}),
+                    ...(filters.sortDirection && {sortDirection: filters.sortDirection}),
+                    ...(filters.status && {status: filters.status}),
+                    ...(filters.role && {role: filters.role}),
+                    ...(filters.emailVerified !== undefined && {emailVerified: filters.emailVerified.toString()}),
+                    ...(filters.search && {search: filters.search}),
+                });
+                return {
+                    url: `/Dashboard/accounts/paginated?${params}`,
+                    method: "GET",
+                };
+            },
+        }),
+
+        getCars: build.query<ApiResponse<{data: CarVO_Full[], pagination: PaginationMetadata}>, {pageNumber?: number; pageSize?: number; filters?: CarUnverifiedFilters }>({
+            query: ({ pageNumber = 1, pageSize = 10, filters = {} }) => {
+                const params = new URLSearchParams({
+                    pageNumber: pageNumber.toString(),
+                    pageSize: pageSize.toString(),
+                    ...(filters.sortBy && { sortBy: filters.sortBy }),
+                    ...(filters.sortDirection && { sortDirection: filters.sortDirection }),
+                    ...(filters.brand && { brand: filters.brand }),
+                    ...(filters.search && { search: filters.search }),
+                });
+                return {
+                    url: `/Dashboard/cars/unverified/paginated?${params}`,
+                    method: "GET",
+                };
+            },
+        }),
+
+        toggleAccountStatus: build.mutation<ApiResponse<string>, { accountId: string}>({
+            query: ({ accountId }) => ({
+                url: `/Dashboard/accounts/toggle-status/${accountId}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ['DashBoard']
+        }),
+
+        verifyCar: build.mutation<ApiResponse<string>, { carId: string }>({
+            query: ({ carId }) => ({
+                url: `/Dashboard/cars/toggle-verification/${carId}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ['DashBoard']
+        }),
     })
 });
 
@@ -83,5 +200,9 @@ export const {
     useGetDashboardStatsQuery,
     useGetMonthlyRevenueQuery,
     useGetTopBookedVehiclesQuery,
-    useGetTopPayingCustomersQuery
+    useGetTopPayingCustomersQuery,
+    useGetAccountsQuery,
+    useGetCarsQuery,
+    useToggleAccountStatusMutation,
+    useVerifyCarMutation,
 } = dashboardApi;
