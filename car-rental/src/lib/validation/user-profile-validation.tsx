@@ -47,8 +47,10 @@ export const validateEmail = (value: string): string | undefined => {
 
 // Validates national ID (required, max 20 chars)
 export const validateNationalId = (value: string): string | undefined => {
-    if (!value.trim()) return "National ID is required"
-    if (value.length > 20) return "National ID must be less than 20 characters"
+    const trimmedValue = value.trim()
+    if (!trimmedValue) return "National ID is required"
+    if (!/^\d+$/.test(trimmedValue)) return "National ID must contain only numbers"
+    if (trimmedValue.length !== 12) return "National ID must be exactly 12 digits"
     return undefined
 }
 
