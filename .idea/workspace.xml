@@ -4,14 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="new master">
-      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" afterDir="false" />
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="Create admin account management page">
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/admin/account/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/admin/car-verification/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/components/admin/account/account-management.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/callbacl.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/admin/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/admin/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/api/logout/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/api/logout/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/admin-dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/admin-dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/car-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/car-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +35,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
-    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;
+    &quot;accountId&quot;: &quot;1e1f0f83-5c37-458f-b4d4-cbf291271718&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -42,6 +47,9 @@
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="2zBlgH7qpLosepbIztUPkVuunYU" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -52,13 +60,13 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;quan/user-profile&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/admin/admin-dashboard&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\Document\\Projects\\FE\\car-rental\\node_modules\\typescript\\lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\besit\\WebstormProjects\\CarRental_FrontEnd\\car-rental\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -79,11 +87,11 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157" />
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="" />
@@ -93,6 +101,9 @@
       <updated>1751212457569</updated>
       <workItem from="1751212459252" duration="2219000" />
       <workItem from="1751215654332" duration="4403000" />
+      <workItem from="1751856798030" duration="2799000" />
+      <workItem from="1751896855511" duration="6620000" />
+      <workItem from="1751946979799" duration="12018000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
@@ -110,6 +121,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new master" />
-    <option name="LAST_COMMIT_MESSAGE" value="new master" />
+    <MESSAGE value="Create admin account management page" />
+    <option name="LAST_COMMIT_MESSAGE" value="Create admin account management page" />
   </component>
 </project>

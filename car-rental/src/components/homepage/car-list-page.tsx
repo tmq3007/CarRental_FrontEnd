@@ -22,7 +22,7 @@ interface CarListPageProps {
 
 export default function CarListPage({ accountId }: CarListPageProps) {
     const router = useRouter();
-     const [currentPage, setCurrentPage] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [filters, setFilters] = useState<CarFilters>({
         sortBy: "id",
@@ -106,9 +106,9 @@ export default function CarListPage({ accountId }: CarListPageProps) {
 
     const renderPaginationButtons = () => {
         if (!cars) return null
-        const { pageNumber, totalPages } = { 
-            pageNumber: pagiantion?.pageNumber ?? 1, 
-            totalPages: pagiantion?.totalPages ?? 1 
+        const {pageNumber, totalPages} = {
+            pageNumber: pagiantion?.pageNumber ?? 1,
+            totalPages: pagiantion?.totalPages ?? 1
         }
         const buttons = []
 
@@ -169,9 +169,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     }
 
     if (loading || !cars?.data?.data) {
-        return <LoadingPage />
+        return <LoadingPage/>
     }
-    
 
 
     return (
@@ -180,8 +179,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 <div className="animate-in fade-in duration-500">
                     <Breadcrumb
                         items={[
-                            { label: "Home", path: "/home" },
-                            { label: "My Car", path: "my-car" },
+                            {label: "Home", path: "/home"},
+                            {label: "My Car", path: "my-car"},
                         ]}
                     />
                 </div>
@@ -192,12 +191,14 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                         List of Cars {pagiantion?.totalRecords ? `(${pagiantion?.totalRecords} total)` : ""}
                     </h1>
                     <div className="flex gap-4">
-                        <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                        <Button
+                            className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
                             Add car
                         </Button>
                         <Select defaultValue="id-desc" onValueChange={handleSortChange}>
-                            <SelectTrigger className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
-                                <SelectValue />
+                            <SelectTrigger
+                                className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
+                                <SelectValue/>
                             </SelectTrigger>
                             <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
                                 <SelectItem value="id-desc" className="hover:bg-blue-50 transition-colors duration-150">
@@ -206,16 +207,20 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                 <SelectItem value="id-asc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Oldest to Newest
                                 </SelectItem>
-                                <SelectItem value="basePrice-desc" className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="basePrice-desc"
+                                            className="hover:bg-blue-50 transition-colors duration-150">
                                     Price: High to Low
                                 </SelectItem>
-                                <SelectItem value="basePrice-asc" className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="basePrice-asc"
+                                            className="hover:bg-blue-50 transition-colors duration-150">
                                     Price: Low to High
                                 </SelectItem>
-                                <SelectItem value="brand-asc" className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="brand-asc"
+                                            className="hover:bg-blue-50 transition-colors duration-150">
                                     Brand: A to Z
                                 </SelectItem>
-                                <SelectItem value="brand-desc" className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="brand-desc"
+                                            className="hover:bg-blue-50 transition-colors duration-150">
                                     Brand: Z to A
                                 </SelectItem>
                             </SelectContent>
@@ -226,17 +231,19 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Error State */}
                 {error && (
                     <div className="text-red-600 text-center py-12 animate-in fade-in duration-500">
-                        <NoResult />
+                        <NoResult/>
                     </div>
                 )}
 
                 {/* Car Cards */}
                 {cars?.data?.data && (
-                    <div className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
+                    <div
+                        className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
                         {cars.data.data.data.length === 0 ? (
                             <div className="text-center py-12 animate-in fade-in duration-500">
                                 <p className="text-gray-500 mb-4">Not Found Any Car</p>
-                                <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                                <Button
+                                    className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
                                     Add Your First Car!
                                 </Button>
                             </div>
@@ -245,7 +252,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                 <Card
                                     key={car.id}
                                     className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom duration-500"
-                                    style={{ animationDelay: `${index * 100}ms` }}
+                                    style={{animationDelay: `${index * 100}ms`}}
                                 >
                                     <CardContent className="p-6">
                                         <div className="flex gap-6">
@@ -255,11 +262,12 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 size="icon"
                                                 className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
                                             >
-                                                <ChevronLeft className="h-4 w-4" />
+                                                <ChevronLeft className="h-4 w-4"/>
                                             </Button>
 
                                             {/* Car Image */}
-                                            <div className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group">
+                                            <div
+                                                className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group">
                                                 {car.carImageFront ? (
                                                     <img
                                                         src={car.carImageFront || "/placeholder.svg"}
@@ -269,18 +277,25 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center">
                                                         <div className="w-full h-full relative">
-                                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                                <div className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"></div>
-                                                                <div className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"></div>
+                                                            <div
+                                                                className="absolute inset-0 flex items-center justify-center">
+                                                                <div
+                                                                    className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"></div>
+                                                                <div
+                                                                    className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 )}
                                                 {/* Dots indicator */}
-                                                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                                                    <div className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"></div>
-                                                    <div className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
-                                                    <div className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
+                                                <div
+                                                    className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                                                    <div
+                                                        className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"></div>
+                                                    <div
+                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
+                                                    <div
+                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
                                                 </div>
                                             </div>
 
@@ -290,7 +305,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 size="icon"
                                                 className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
                                             >
-                                                <ChevronRight className="h-4 w-4" />
+                                                <ChevronRight className="h-4 w-4"/>
                                             </Button>
 
                                             {/* Car Details */}
@@ -300,7 +315,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 </h3>
 
                                                 <div className="grid grid-cols-2 gap-4 text-sm">
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Ratings:</span>
                                                         <div className="flex items-center gap-1 mt-1">
                                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -313,29 +329,36 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                         </div>
                                                     </div>
 
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">No. of rides:</span>
                                                         <div className="mt-1 font-semibold text-blue-600">0</div>
                                                     </div>
 
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Price:</span>
-                                                        <div className="mt-1 font-semibold text-green-600">{formatPrice(car.basePrice)}</div>
+                                                        <div
+                                                            className="mt-1 font-semibold text-green-600">{formatPrice(car.basePrice)}</div>
                                                     </div>
 
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Locations:</span>
-                                                        <div className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                                        <div
+                                                            className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200">
                                                             {formatLocation(car)}
                                                         </div>
                                                     </div>
 
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Seats:</span>
                                                         <div className="mt-1">{car.numberOfSeats} seats</div>
                                                     </div>
 
-                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                    <div
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Status:</span>
                                                         <div className="mt-1">
                                                             <Badge {...getStatusBadgeProps(car.status)}>{car.status}</Badge>
@@ -381,13 +404,15 @@ export default function CarListPage({ accountId }: CarListPageProps) {
 
                 {/* Pagination */}
                 {pagiantion?.totalPages && pagiantion.totalPages > 1 && (
-                    <div className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
+                    <div
+                        className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
                         <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
 
                         <div className="flex items-center gap-2">
                             <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                                <SelectTrigger className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
-                                    <SelectValue />
+                                <SelectTrigger
+                                    className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
+                                    <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
                                     <SelectItem value="5" className="hover:bg-blue-50 transition-colors duration-150">
