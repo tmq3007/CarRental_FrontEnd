@@ -1,6 +1,8 @@
 import "@/app/globals.css"
 import {Inter} from "next/font/google"
 import {Props} from "@/components/provider/StoreProvider";
+import {AppSidebar} from "@/components/admin/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 const inter = Inter({subsets: ["latin"]})
 
@@ -18,7 +20,12 @@ export default function RootLayout({children}: Props) {
         <>
             <div>
                 <div>
+                    <SidebarProvider defaultOpen={true}>
+                    <AppSidebar />
+                        <div className="flex min-h-screen w-full">
                     {children}
+                        </div>
+                    </SidebarProvider>
                 </div>
             </div>
         </>
