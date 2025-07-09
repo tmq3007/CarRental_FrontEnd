@@ -193,6 +193,31 @@ export const dashboardApi = createApi({
             }),
             invalidatesTags: ['DashBoard']
         }),
+
+        getCarsByAccountId: build.query<ApiResponse<{data: CarVO_Full[], pagination: PaginationMetadata}>, {
+            accountId: string ,
+            pageNumber?: number,
+            pageSize?: number,
+            filters?: CarUnverifiedFilters
+        }>({
+            query: ({ accountId, pageNumber = 1, pageSize = 10, filters = {} }) => {
+                const params = new URLSearchParams({
+                    pageNumber: pageNumber.toString(),
+                    pageSize: pageSize.toString(),
+                    ...(filters.sortBy && { sortBy: filters.sortBy }),
+                    ...(filters.sortDirection && { sortDirection: filters.sortDirection }),
+                    ...(filters.brand && { brand: filters.brand }),
+                    ...(filters.search && { search: filters.search }),
+                });
+                return {
+                    url: `/Dashboard/cars/account/${accountId}/paginated?${params}`,
+                    method: "GET",
+                };
+            },
+            providesTags: (result, error, { accountId }) =>
+                result ? [{ type: 'DashBoard', id: `ACCOUNT_CARS_${accountId}` }] : ['DashBoard'],
+        }),
+
     })
 });
 
@@ -205,4 +230,5 @@ export const {
     useGetCarsQuery,
     useToggleAccountStatusMutation,
     useVerifyCarMutation,
+    useGetCarsByAccountIdQuery,
 } = dashboardApi;
