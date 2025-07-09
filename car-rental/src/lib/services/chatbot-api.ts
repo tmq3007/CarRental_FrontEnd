@@ -1,36 +1,19 @@
+// services/chatbotApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {baseQuery} from "@/lib/services/config/baseQuery";
 
-export const deepSeekApi = createApi({
-    reducerPath: 'deepSeekApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://openrouter.ai/api/v1/',
-        prepareHeaders: (headers) => {
-            headers.set('Authorization', `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`);
-            headers.set('Content-Type', 'application/json');
-            // @ts-ignore
-            headers.set('HTTP-Referer', process.env.NEXT_PUBLIC_SITE_URL.toString());
-            // @ts-ignore
-            headers.set('X-Title', process.env.NEXT_PUBLIC_SITE_NAME);
-            return headers;
-        },
-    }),
+export const chatbotApi = createApi({
+    reducerPath: 'chatbotApi',
+    baseQuery:  baseQuery,
     endpoints: (builder) => ({
-        getChatCompletion: builder.mutation({
-            query: (message) => ({
-                url: 'chat/completions',
+        askChatbot: builder.mutation<{ answer: string, from: string }, { question: string }>({
+            query: ({ question }) => ({
+                url: 'chatbot/ask',
                 method: 'POST',
-                body: {
-                    model: 'deepseek/deepseek-r1:free',
-                    messages: [
-                        {
-                            role: 'user',
-                            content: message,
-                        },
-                    ],
-                },
+                body: { question },
             }),
         }),
     }),
 });
 
-export const { useGetChatCompletionMutation } = deepSeekApi;
+export const { useAskChatbotMutation } = chatbotApi;

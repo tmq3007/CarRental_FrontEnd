@@ -2,7 +2,13 @@
 
 import React, {useState} from "react"
 import {toast} from "sonner"
-import {CarUnverifiedFilters, CarVO_Full, useGetCarsQuery, useVerifyCarMutation} from "@/lib/services/dashboard-api";
+import {
+    CarUnverifiedFilters,
+    CarVO_Full,
+    useGetCarsByAccountIdQuery,
+    useGetCarsQuery,
+    useVerifyCarMutation
+} from "@/lib/services/dashboard-api";
 import {Badge} from "@/components/ui/badge";
 import {
     AlertTriangle,
@@ -24,7 +30,12 @@ import {Button} from "@/components/ui/button";
 import LoadingPage from "@/components/common/loading";
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 
-export default function CarVerification() {
+
+interface CarsListPageProps {
+    accountId?: string
+}
+
+export default function CarsListPage({ accountId }: CarsListPageProps) {
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [filters, setFilters] = useState<CarUnverifiedFilters>({
@@ -38,12 +49,14 @@ export default function CarVerification() {
         data: cars,
         error,
         isLoading: loading,
-    } = useGetCarsQuery({
+    } = useGetCarsByAccountIdQuery({
+        accountId:  accountId|| "",
         pageNumber: currentPage,
         pageSize,
         filters,
     })
-
+console.log(cars)
+    console.log(accountId)
     const pagination = cars?.data?.pagination;
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
@@ -250,18 +263,12 @@ export default function CarVerification() {
                         {/* Header */}
                         <div className="flex justify-between items-center">
                             <div>
-                                <h1 className="text-3xl font-bold">Car Verification</h1>
+                                <h1 className="text-3xl font-bold">Cars List</h1>
                                 <p className="text-gray-600 mt-1">
-                                    Review and verify car listings awaiting approval
-                                    {pagination?.totalRecords && ` (${pagination.totalRecords} pending)`}
+                                    Car List Of Account Id : {accountId}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-                                    <AlertTriangle className="h-4 w-4 mr-1" />
-                                    Pending Verification
-                                </Badge>
-                            </div>
+
                         </div>
 
                         {/* Filters and Search */}
@@ -316,8 +323,7 @@ export default function CarVerification() {
                             {cars?.data.data.length === 0 ? (
                                 <div className="text-center py-12">
                                     <Car className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500 mb-4">No cars pending verification</p>
-                                    <p className="text-sm text-gray-400">All cars have been reviewed</p>
+                                    <p className="text-gray-500 mb-4">No cars added</p>
                                 </div>
                             ) : (
                                 cars?.data.data.map((car, index) => (
@@ -341,8 +347,16 @@ export default function CarVerification() {
                                                         )}
                                                     </div>
                                                     <div className="absolute -top-2 -right-2">
-                                                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 text-xs">
-                                                            Pending
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={
+                                                                car.status === 'stopped' ? 'bg-yellow-100 text-yellow-800' :
+                                                                    car.status === 'verified' ? 'bg-green-100 text-green-800' :
+                                                                        car.status === 'not_verified' ? 'bg-red-100 text-red-800' :
+                                                                            'bg-gray-100 text-gray-800'
+                                                            }
+                                                        >
+                                                            {car.status || 'UNKNOWN'}
                                                         </Badge>
                                                     </div>
                                                 </div>
@@ -450,19 +464,6 @@ export default function CarVerification() {
                                                         <span className="sm:hidden">View</span>
                                                     </Button>
 
-                                                    <Button
-                                                        onClick={() => handleCarAction("approve", car.id)}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="flex-1 md:flex-none text-green-600 border-green-600 hover:bg-green-50"
-                                                        disabled={isVerifying === car.id}
-                                                    >
-                                                        <Check className="h-4 w-4 mr-1" />
-                                                        <span className="hidden sm:inline">
-                              {isVerifying === car.id ? "Approving..." : "Approve"}
-                            </span>
-                                                        <span className="sm:hidden">{isVerifying === car.id ? "..." : "Approve"}</span>
-                                                    </Button>
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -541,8 +542,17 @@ export default function CarVerification() {
                                     </h3>
                                     <p className="text-gray-600">{selectedCar.licensePlate}</p>
                                     <div className="flex items-center gap-2 mt-2">
-                                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-                                            Pending Verification
+
+                                        <Badge
+                                            variant="outline"
+                                            className={
+                                                selectedCar.status === 'stopped' ? 'bg-yellow-100 text-yellow-800' :
+                                                    selectedCar.status === 'verified' ? 'bg-green-100 text-green-800' :
+                                                        selectedCar.status === 'not_verified' ? 'bg-red-100 text-red-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                            }
+                                        >
+                                            {selectedCar.status || 'UNKNOWN'}
                                         </Badge>
                                     </div>
                                 </div>
@@ -831,20 +841,7 @@ export default function CarVerification() {
                             <div
                                 className="flex justify-between items-center pt-4 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg">
                                 <div className="flex gap-3">
-                                    <Button
-                                        onClick={() => handleCarAction("approve", selectedCar.id)}
-                                        className="bg-green-600 hover:bg-green-700 text-white"
-                                        disabled={isVerifying === selectedCar.id}
-                                    >
-                                        {isVerifying === selectedCar.id ? (
-                                            "Approving..."
-                                        ) : (
-                                            <>
-                                                <Check className="h-4 w-4 mr-1"/>
-                                                Approve Car
-                                            </>
-                                        )}
-                                    </Button>
+
                                 </div>
                                 <Button onClick={() => setIsViewDialogOpen(false)} variant="outline">
                                     Close

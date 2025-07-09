@@ -30,6 +30,7 @@ import LoadingPage from "@/components/common/loading";
 import NoResult from "@/components/common/no-result";
 import {toast} from "sonner";
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function AccountManagement() {
     const [currentPage, setCurrentPage] = useState(1)
@@ -469,35 +470,51 @@ export default function AccountManagement() {
                                                         <span className="sm:hidden">View</span>
                                                     </Button>
 
+                                                    {Account.roleId === 3 ? (
+                                                        <Link href={`/admin/cars?accountId=${Account.id}`}>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="flex-1 md:flex-none text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105"
+                                                            >
+                                                                <Eye className="h-4 w-4 mr-1" />
+                                                                <span className="hidden sm:inline">View Cars List</span>
+                                                                <span className="sm:hidden">View Cars List</span>
+                                                            </Button>
+                                                        </Link>
+                                                    ) : null}
+
+
                                                     <Button
                                                         onClick={() => handleAccountAction("changeUserStatus", Account.id)}
                                                         variant="outline"
                                                         size="sm"
                                                         className="flex-1 md:flex-none transition-all duration-200 hover:shadow-md hover:scale-105 bg-transparent"
-                                                        disabled={isUpdating === Account.id}
+                                                        disabled={isUpdating === Account.id || Account.roleId === 1} // 👈 Chặn nếu là roleId 1
                                                     >
                                                         {Account.isActive ? (
                                                             <>
                                                                 <UserX className="h-4 w-4 text-red-500" />
                                                                 <span className="hidden sm:inline ml-1">
-                                    {isUpdating === Account.id ? "Deactivating..." : "Deactivate"}
-                                  </span>
+        {isUpdating === Account.id ? "Deactivating..." : "Deactivate"}
+      </span>
                                                                 <span className="sm:hidden ml-1">
-                                    {isUpdating === Account.id ? "..." : "Deactivate"}
-                                  </span>
+        {isUpdating === Account.id ? "..." : "Deactivate"}
+      </span>
                                                             </>
                                                         ) : (
                                                             <>
                                                                 <UserCheck className="h-4 w-4 text-green-500" />
                                                                 <span className="hidden sm:inline ml-1">
-                                    {isUpdating === Account.id ? "Activating..." : "Activate"}
-                                  </span>
+        {isUpdating === Account.id ? "Activating..." : "Activate"}
+      </span>
                                                                 <span className="sm:hidden ml-1">
-                                    {isUpdating === Account.id ? "..." : "Activate"}
-                                  </span>
+        {isUpdating === Account.id ? "..." : "Activate"}
+      </span>
                                                             </>
                                                         )}
                                                     </Button>
+
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -696,7 +713,7 @@ export default function AccountManagement() {
                                         onClick={() => handleAccountAction("changeUserStatus", selectedCustomer.id)}
                                         variant={selectedCustomer.isActive ? "destructive" : "default"}
                                         size="sm"
-                                        disabled={isUpdating === selectedCustomer.id}
+                                        disabled={isUpdating === selectedCustomer.id || selectedCustomer.roleId === 1} // 👈 check roleId
                                     >
                                         {isUpdating === selectedCustomer.id ? (
                                             "Processing..."
@@ -712,6 +729,7 @@ export default function AccountManagement() {
                                             </>
                                         )}
                                     </Button>
+
                                 </div>
                                 <Button onClick={() => setIsViewDialogOpen(false)} variant="outline" size="sm">
                                     Close

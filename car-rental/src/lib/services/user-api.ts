@@ -57,41 +57,24 @@ export const userApi = createApi({
         }),
         updateUserProfile: builder.mutation<ApiResponse<UserProfile>, { id: string; dto: UserUpdateDTO }>({
             query: ({ id, dto }) => {
-                // Check if we have a file upload
-                const hasFile = dto.drivingLicenseUri instanceof File
-
-                if (hasFile) {
-                    // Create FormData for file upload
-                    const formData = new FormData()
-
-                    // Add all fields to FormData
-                    if (dto.fullName) formData.append("FullName", dto.fullName)
-                    if (dto.dob) formData.append("Dob", dto.dob)
-                    if (dto.phoneNumber) formData.append("PhoneNumber", dto.phoneNumber)
-                    if (dto.nationalId) formData.append("NationalId", dto.nationalId)
-                    if (dto.houseNumberStreet) formData.append("HouseNumberStreet", dto.houseNumberStreet)
-                    if (dto.ward) formData.append("Ward", dto.ward)
-                    if (dto.district) formData.append("District", dto.district)
-                    if (dto.cityProvince) formData.append("CityProvince", dto.cityProvince)
-                    if (dto.email) formData.append("Email", dto.email)
-
-                    // Add file
-                    if (dto.drivingLicenseUri instanceof File) {
+                const formData = new FormData()
+                // Add all fields to FormData
+                if (dto.fullName) formData.append("fullName", dto.fullName)
+                if (dto.dob) formData.append("dob", dto.dob)
+                if (dto.phoneNumber) formData.append("phoneNumber", dto.phoneNumber)
+                if (dto.nationalId) formData.append("nationalId", dto.nationalId)
+                if (dto.houseNumberStreet) formData.append("houseNumberStreet", dto.houseNumberStreet)
+                if (dto.ward) formData.append("ward", dto.ward)
+                if (dto.district) formData.append("district", dto.district)
+                if (dto.cityProvince) formData.append("cityProvince", dto.cityProvince)
+                if (dto.email) formData.append("email", dto.email)
+                if (dto.drivingLicenseUri instanceof File) {
                         formData.append("DrivingLicenseUri", dto.drivingLicenseUri)
                     }
-
-                    return {
+                return {
                         url: `User/profile/${id}`,
                         method: "PUT",
                         body: formData,
-                    }
-                } else {
-                    // Send as JSON when no file
-                    return {
-                        url: `User/profile/${id}`,
-                        method: "PUT",
-                        body: dto,
-                    }
                 }
             },
         }),
