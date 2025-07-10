@@ -43,83 +43,38 @@ import {useRef} from "react";
 import {toast} from "sonner";
 import {resetUser} from "@/lib/slice/userSlice";
 import {useDispatch} from "react-redux";
-import {useRouter} from "next/navigation";
-
-// Menu items data
-const data = {
-    navMain: [
-        {
-            title: "Main",
-            items: [
-                {
-                    title: "Dashboard",
-                    url: "#",
-                    icon: Home,
-                    isActive: true,
-                },
-                {
-                    title: "Fleet Management",
-                    url: "#",
-                    icon: Car,
-                },
-                {
-                    title: "Bookings",
-                    url: "#",
-                    icon: Calendar,
-                },
-                {
-                    title: "Customers",
-                    url: "#",
-                    icon: Users,
-                },
-            ],
-        },
-        {
-            title: "Analytics & Reports",
-            items: [
-                {
-                    title: "Analytics",
-                    url: "#",
-                    icon: BarChart3,
-                },
-                {
-                    title: "Payments",
-                    url: "#",
-                    icon: CreditCard,
-                },
-                {
-                    title: "Reports",
-                    url: "#",
-                    icon: FileText,
-                },
-            ],
-        },
-        {
-            title: "Management",
-            items: [
-                {
-                    title: "Locations",
-                    url: "#",
-                    icon: MapPin,
-                },
-                {
-                    title: "Notifications",
-                    url: "#",
-                    icon: Bell,
-                },
-                {
-                    title: "Settings",
-                    url: "#",
-                    icon: Settings,
-                },
-            ],
-        },
-    ],
-}
-
-
+import {usePathname, useRouter} from "next/navigation";
 
 export function AppSidebar() {
+    const pathname = usePathname()
+
+    const data = {
+        navMain: [
+            {
+                title: "Main",
+                items: [
+                    {
+                        title: "Dashboard",
+                        url: "/admin",
+                        icon: Home,
+                        isActive: pathname === "/admin/dashboard" || pathname === "/admin",
+                    },
+                    {
+                        title: "Accounts",
+                        url: "/admin/account",
+                        icon: Users,
+                        isActive: pathname === "/admin/account",
+                    },
+                    {
+                        title: "Car-Verification",
+                        url: "/admin/car-verification",
+                        icon: Car,
+                        isActive: pathname === "/admin/car-verification",
+                    },
+                ],
+            },
+        ],
+    }
 
     const ignoreScrollRef = useRef(false)
     const dispatch = useDispatch();

@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="new master">
-      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" afterDir="false" />
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update chatbot">
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/admin/cars/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/callbacl.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/payment/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/wallet/topup-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/vnp-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/add-car/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/add-car/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/account/account-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/account/account-management.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,12 +28,19 @@
     &quot;assignee&quot;: &quot;tmq3007&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
-    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/tmq3007/CarRental_FrontEnd.git",
+    "accountId": "33827791-fa45-4f7d-a589-f2cee0ce75b5"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -42,6 +50,9 @@
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="2zBlgH7qpLosepbIztUPkVuunYU" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -84,6 +95,7 @@
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="" />
@@ -93,6 +105,10 @@
       <updated>1751212457569</updated>
       <workItem from="1751212459252" duration="2219000" />
       <workItem from="1751215654332" duration="4403000" />
+      <workItem from="1751856798030" duration="2799000" />
+      <workItem from="1751896855511" duration="6620000" />
+      <workItem from="1751946979799" duration="12018000" />
+      <workItem from="1752031596271" duration="18802000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
@@ -102,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751213564889</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="update chatbot">
+      <option name="closed" value="true" />
+      <created>1751973718679</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751973718679</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -110,6 +134,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new master" />
-    <option name="LAST_COMMIT_MESSAGE" value="new master" />
+    <MESSAGE value="Create admin account management page" />
+    <MESSAGE value="update chatbot" />
+    <option name="LAST_COMMIT_MESSAGE" value="update chatbot" />
   </component>
 </project>

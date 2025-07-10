@@ -1,0 +1,84 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"8d0c08dd-54e3-4519-8d94-13bad2fda496\" name=\"Changes\" comment=\"update signin signup reset password page\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/car-rental/src/lib/store.ts\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/car-rental/src/lib/store.ts\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"master\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;tmq3007&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,\r\n    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;\r\n  }\r\n}</component>\r\n  <component name=\"KubernetesApiPersistence\">{}</component>\r\n  <component name=\"KubernetesApiProvider\">{\r\n  &quot;isMigrated&quot;: true\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2zBlgH7qpLosepbIztUPkVuunYU\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;quan/user-profile&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;ts.external.directory.path&quot;: &quot;D:\\\\Document\\\\Projects\\\\FE\\\\car-rental\\\\node_modules\\\\typescript\\\\lib&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ReactDesignerToolWindowState\">\r\n    <option name=\"myId2Visible\">\r\n      <map>\r\n        <entry key=\"com.intellij.reactbuddy.reactComponents\" value=\"false\" />\r\n        <entry key=\"com.intellij.reactbuddy.reactInspector\" value=\"false\" />\r\n        <entry key=\"com.intellij.reactbuddy.storybook\" value=\"false\" />\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"D:\\Document\\Projects\\FE\\car-rental\\src\\app\\(car-rent)\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"8d0c08dd-54e3-4519-8d94-13bad2fda496\" name=\"Changes\" comment=\"\" />\r\n      <created>1751212457569</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1751212457569</updated>\r\n      <workItem from=\"1751212459252\" duration=\"2219000\" />\r\n      <workItem from=\"1751215654332\" duration=\"4403000\" />\r\n      <workItem from=\"1751250689442\" duration=\"6057000\" />\r\n      <workItem from=\"1751288114526\" duration=\"344000\" />\r\n      <workItem from=\"1751307829661\" duration=\"29000\" />\r\n      <workItem from=\"1751308424593\" duration=\"1806000\" />\r\n      <workItem from=\"1751341149548\" duration=\"18056000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"new master\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751213564889</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751213564889</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"update signin signup reset password page\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751288448257</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751288448257</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"new master\" />\r\n    <MESSAGE value=\"update signin signup reset password page\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"update signin signup reset password page\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision d06ffb705ee5eaa2609d6f52f6e5dcf9629feef5)
++++ b/.idea/workspace.xml	(date 1751973683463)
+@@ -4,14 +4,9 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update signin signup reset password page">
++    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update chatbot">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/profile/page.tsx" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox-modal.tsx" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/chat-bot/chatbox.tsx" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/chatbot-api.ts" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/user-api.ts" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/store.ts" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/validation/user-profile-validation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/validation/user-profile-validation.tsx" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -32,6 +27,13 @@
+     &quot;assignee&quot;: &quot;tmq3007&quot;
+   }
+ }</component>
++  <component name="GithubProjectSettings">
++    <option name="branchProtectionPatterns">
++      <list>
++        <option value="master" />
++      </list>
++    </option>
++  </component>
+   <component name="GithubPullRequestsUISettings">{
+   &quot;selectedUrlAndAccountId&quot;: {
+     &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
+@@ -102,7 +104,14 @@
+       <workItem from="1751288114526" duration="344000" />
+       <workItem from="1751307829661" duration="29000" />
+       <workItem from="1751308424593" duration="1806000" />
+-      <workItem from="1751341149548" duration="18056000" />
++      <workItem from="1751341149548" duration="18910000" />
++      <workItem from="1751467362877" duration="621000" />
++      <workItem from="1751530170543" duration="98000" />
++      <workItem from="1751531505051" duration="424000" />
++      <workItem from="1751700734071" duration="685000" />
++      <workItem from="1751851829249" duration="194000" />
++      <workItem from="1751875306233" duration="599000" />
++      <workItem from="1751967082067" duration="2463000" />
+     </task>
+     <task id="LOCAL-00001" summary="new master">
+       <option name="closed" value="true" />
+@@ -120,7 +129,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1751288448257</updated>
+     </task>
+-    <option name="localTasksCounter" value="3" />
++    <task id="LOCAL-00003" summary="update chatbot">
++      <option name="closed" value="true" />
++      <created>1751392594532</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1751392594532</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -129,6 +146,7 @@
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="new master" />
+     <MESSAGE value="update signin signup reset password page" />
+-    <option name="LAST_COMMIT_MESSAGE" value="update signin signup reset password page" />
++    <MESSAGE value="update chatbot" />
++    <option name="LAST_COMMIT_MESSAGE" value="update chatbot" />
+   </component>
+ </project>
+\ No newline at end of file

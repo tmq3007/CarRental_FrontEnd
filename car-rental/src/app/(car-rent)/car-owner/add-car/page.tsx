@@ -123,7 +123,7 @@ export default function AddCarPage() {
         <div className="min-h-screen bg-gray-50 p-4">
 
             <div className="mx-auto">
-                <Breadcrumb items={[{ label: "Home", path: "/" }, { label: "Profile" }]} />
+                <Breadcrumb items={[{ label: "Home", path: "/" }, { label: "Add A Car" }]} />
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-6">

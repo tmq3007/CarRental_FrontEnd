@@ -1,7 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { userApi } from "@/lib/services/user-api";
-import { deepSeekApi } from "@/lib/services/chatbot-api";
 import { authApi } from "@/lib/services/auth-api";
 import userReducer from "@/lib/slice/userSlice";
 import storage from "@/lib/ssr-safe-storage";
@@ -11,6 +10,7 @@ import { bookingApi } from "./services/booking-api";
 import {vnpayApi} from "@/lib/services/vnp-api";
 import {dashboardApi} from "@/lib/services/dashboard-api";
 import {walletApi} from "@/lib/services/wallet-api";
+import {chatbotApi   } from "@/lib/services/chatbot-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -33,7 +33,7 @@ export type PaginationResponse<T> = {
 }
 const baseReducer = combineReducers({
     [userApi.reducerPath]: userApi.reducer,
-    [deepSeekApi.reducerPath]: deepSeekApi.reducer,
+    [chatbotApi.reducerPath]: chatbotApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
     [carApi.reducerPath]: carApi.reducer,
@@ -65,7 +65,7 @@ export const store = () => {
                 },
             }).concat(
                 userApi.middleware,
-                deepSeekApi.middleware,
+                chatbotApi.middleware,
                 authApi.middleware,
                 addressApi.middleware,
                 carApi.middleware,

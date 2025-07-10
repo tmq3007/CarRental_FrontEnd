@@ -30,6 +30,7 @@ export default function Header() {
 
     const email = useSelector((state: RootState) => state.user?.email);
     const username = useSelector((state: RootState) => state.user?.full_name);
+    const role = useSelector((state: RootState) => state.user?.role);
 
     // Debounced scroll handler to prevent rapid state changes
     const handleScroll = useCallback(() => {
@@ -91,6 +92,7 @@ export default function Header() {
                 toast.success('Logged out successfully!', { id: toastId, duration: 2000 });
             });
             dispatch(resetUser());
+            router.push("/signin");
         } catch (error) {
             console.error("Logout failed:", error);
             dispatch(resetUser());
@@ -216,19 +218,11 @@ export default function Header() {
                                             handleDropdownItemClick("My Profile")
                                         }}
                                     >
-                                        <Link href="user/profile">
+                                        <Link href="/user/profile">
                                             My Profile
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleDropdownItemClick("My Bookings")
-                                        }}
-                                    >
-                                        <Link href="/user/booking"> My Bookings </Link>
-                                    </DropdownMenuItem>
+
                                     <DropdownMenuItem
                                         className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
                                         onClick={(e) => {
@@ -236,17 +230,42 @@ export default function Header() {
                                             handleDropdownItemClick("My Wallet")
                                         }}
                                     >
-                                        <Link href="/user/profile">My Wallet</Link>
+                                        <Link href="/user/wallet">My Wallet</Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleDropdownItemClick("Settings")
-                                        }}
-                                    >
-                                        <Link href="/user/profile">Settings</Link>
-                                    </DropdownMenuItem>
+                                    {role === "car_owner" ? (
+                                        <>
+                                            <DropdownMenuItem
+                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
+                                                onClick={() => handleDropdownItemClick("My Cars")}
+                                            >
+                                                <Link href="/car-owner/my-car">My Cars</Link>
+                                            </DropdownMenuItem>
+
+
+
+
+                                            <DropdownMenuItem
+                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
+                                                onClick={() => handleDropdownItemClick("Add A Car")}
+                                            >
+                                                <Link href="/car-owner/add-car">Add A Car</Link>
+                                            </DropdownMenuItem>
+                                        </>
+
+
+                                    ) : (
+                                        <>
+                                            <DropdownMenuItem
+                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
+                                                onClick={() => handleDropdownItemClick("My Bookings")}
+                                            >
+                                                <Link href="/user/booking">My Bookings</Link>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+
+
+
                                     <DropdownMenuItem
                                         className="text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
                                         onClick={(e) => {
@@ -257,7 +276,7 @@ export default function Header() {
                                         <Dialog>
                                             <form>
                                                 <DialogTrigger asChild>
-                                                    <Link href="/">Logout</Link>
+                                                    <Link href="">Logout</Link>
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-[425px]">
                                                     <DialogHeader>
