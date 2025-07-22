@@ -285,8 +285,8 @@ export default function CarVerification() {
                                     <SelectItem value="createdAt-asc">Oldest First</SelectItem>
                                     <SelectItem value="brand-asc">Brand A-Z</SelectItem>
                                     <SelectItem value="brand-desc">Brand Z-A</SelectItem>
-                                    <SelectItem value="basePrice-asc">Price: Low to High</SelectItem>
-                                    <SelectItem value="basePrice-desc">Price: High to Low</SelectItem>
+                                    <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                                    <SelectItem value="price-desc">Price: High to Low</SelectItem>
                                 </SelectContent>
                             </Select>
 
@@ -472,7 +472,7 @@ export default function CarVerification() {
                         </div>
 
                         {/* Pagination */}
-                        {pagination?.totalPages && pagination.totalPages > 1 && (
+                        {pagination  && pagination.totalPages > 1 && (
                             <div className="flex justify-between items-center mt-8">
                                 <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
                                 <div className="flex items-center gap-2">
@@ -493,13 +493,11 @@ export default function CarVerification() {
                         )}
 
                         {/* Pagination Info */}
-                        {cars?.data && (
+                        {cars?.data && pagination && (
                             <div className="text-center mt-4 text-sm text-gray-600">
-                                Showing {pagination?.pageNumber ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0} to{" "}
-                                {pagination?.pageNumber
-                                    ? Math.min(pagination.pageNumber * pagination.pageSize, pagination.totalRecords)
-                                    : 0}{" "}
-                                of {pagination?.totalRecords ?? 0} cars
+                                Showing {cars.data.data.length ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0} to{" "}
+                                {cars.data.data.length ? Math.min(pagination.pageNumber * pagination.pageSize, pagination.totalRecords) : 0}{" "}
+                                of {pagination.totalRecords} cars
                             </div>
                         )}
                     </div>

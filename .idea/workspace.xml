@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update chatbot">
-      <change afterPath="$PROJECT_DIR$/car-rental/src/app/admin/cars/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" afterDir="false" />
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update admin: uẻ's car">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/add-car/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/add-car/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/account/account-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/account/account-management.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/layouts/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,12 +31,12 @@
       </list>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/tmq3007/CarRental_FrontEnd.git",
-    "accountId": "33827791-fa45-4f7d-a589-f2cee0ce75b5"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
+    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -108,7 +104,10 @@
       <workItem from="1751856798030" duration="2799000" />
       <workItem from="1751896855511" duration="6620000" />
       <workItem from="1751946979799" duration="12018000" />
-      <workItem from="1752031596271" duration="18802000" />
+      <workItem from="1752031596271" duration="20045000" />
+      <workItem from="1752076483212" duration="40000" />
+      <workItem from="1752331965580" duration="1876000" />
+      <workItem from="1752601297291" duration="6316000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
@@ -126,7 +125,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751973718679</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="update admin: uẻ's car">
+      <option name="closed" value="true" />
+      <created>1752054221926</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1752054221926</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,6 +143,7 @@
     <MESSAGE value="new master" />
     <MESSAGE value="Create admin account management page" />
     <MESSAGE value="update chatbot" />
-    <option name="LAST_COMMIT_MESSAGE" value="update chatbot" />
+    <MESSAGE value="update admin: uẻ's car" />
+    <option name="LAST_COMMIT_MESSAGE" value="update admin: uẻ's car" />
   </component>
 </project>
