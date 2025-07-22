@@ -4,13 +4,18 @@ import EditCarDetails from "@/components/homepage/edit-car-details"
 import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store"
+import { createSelector } from '@reduxjs/toolkit';
 
 export default function EditCarPage() {
     const params = useParams()
     const carIdFromParams = params?.carId as string
+    const selectCarId = createSelector(
+        (state: RootState) => state.car,
+        (car): string | undefined => car?.id
+    );
 
 
-    const carIdFromStore = useSelector((state: RootState) => state.car?.id)
+    const carIdFromStore = useSelector(selectCarId);
     const carId = carIdFromParams || carIdFromStore || ""
 
     if (isNaN(Number(carId))) {
