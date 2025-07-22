@@ -22,9 +22,9 @@ interface FilterPanelProps {
   isFullView: boolean
   onToggleFullView: () => void
   location: {
-    province: string
-    district: string
-    ward: string
+    province?: string
+    district?: string
+    ward?: string
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined
@@ -157,9 +157,9 @@ function CompactViewContent({
   toggleArrayFilter: (filterType: string, value: string) => void
   rentalDays: number
   location: {
-    province: string
-    district: string
-    ward: string
+    province?: string
+    district?: string
+    ward?: string
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined
@@ -216,9 +216,9 @@ function FullViewContent({
   toggleArrayFilter: (filterType: string, value: string) => void
   rentalDays: number
   location: {
-    province: string
-    district: string
-    ward: string
+    province?: string
+    district?: string
+    ward?: string
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined

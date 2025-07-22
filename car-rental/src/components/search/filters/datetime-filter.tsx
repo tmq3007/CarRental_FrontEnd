@@ -9,9 +9,9 @@ interface LocationAndTimeFilterProps {
   onPickupTimeChange: (date: Date | undefined) => void; 
   onDropoffTimeChange: (date: Date | undefined) => void; 
   location: {
-    province: string;
-    district: string;
-    ward: string;
+    province?: string;
+    district?: string;
+    ward?: string;
   };
   onLocationChange: (field: string, value: string) => void;
   compact?: boolean;

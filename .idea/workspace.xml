@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update admin: uẻ's car">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/car-verification/car-verification-management.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/admin/cars/car-management.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/dashboard-api.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;tmq3007&quot;
+  }
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
+    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2zBlgH7qpLosepbIztUPkVuunYU" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;quan/user-profile&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Document\\Projects\\FE\\car-rental\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.intellij.reactbuddy.reactComponents" value="false" />
+        <entry key="com.intellij.reactbuddy.reactInspector" value="false" />
+        <entry key="com.intellij.reactbuddy.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Document\Projects\FE\car-rental\src\app\(car-rent)" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="" />
+      <created>1751212457569</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751212457569</updated>
+      <workItem from="1751212459252" duration="2219000" />
+      <workItem from="1751215654332" duration="4403000" />
+      <workItem from="1751856798030" duration="2799000" />
+      <workItem from="1751896855511" duration="6620000" />
+      <workItem from="1751946979799" duration="12018000" />
+      <workItem from="1752031596271" duration="20045000" />
+      <workItem from="1752076483212" duration="40000" />
+      <workItem from="1752331965580" duration="1876000" />
+      <workItem from="1752601297291" duration="6316000" />
+    </task>
+    <task id="LOCAL-00001" summary="new master">
+      <option name="closed" value="true" />
+      <created>1751213564889</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1751213564889</updated>
+    </task>
+    <task id="LOCAL-00002" summary="update chatbot">
+      <option name="closed" value="true" />
+      <created>1751973718679</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751973718679</updated>
+    </task>
+    <task id="LOCAL-00003" summary="update admin: uẻ's car">
+      <option name="closed" value="true" />
+      <created>1752054221926</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1752054221926</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="new master" />
+    <MESSAGE value="Create admin account management page" />
+    <MESSAGE value="update chatbot" />
+    <MESSAGE value="update admin: uẻ's car" />
+    <option name="LAST_COMMIT_MESSAGE" value="update admin: uẻ's car" />
+  </component>
+</project>
