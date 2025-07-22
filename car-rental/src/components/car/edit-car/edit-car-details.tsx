@@ -1,8 +1,6 @@
 "use client"
-
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,10 +11,23 @@ import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react"
 import Link from "next/link"
 
-export default function EditCarDetails() {
+export default function EditCarDetails({ carId }: { carId: string }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [status, setStatus] = useState("Available")
     const [showOtherTermsInput, setShowOtherTermsInput] = useState(false)
+    const [carData, setCarData] = useState<any>(null)
+    const [formData, setFormData] = useState({
+        mileage: "",
+        fuelConsumption: "",
+        houseNumberStreet: "",
+        description: "",
+        basePrice: "",
+        requiredDeposit: "",
+        otherTerms: "",
+        cityProvince: "",
+        district: "",
+        ward: "",
+    })
 
     const documents = [
         { id: 1, name: "Registration paper", status: "Verified", link: "File1.PDF" },
@@ -30,6 +41,36 @@ export default function EditCarDetails() {
         { id: 3, alt: "Car image 3" },
     ]
 
+    // Fetch initial car data from server (mocked for now)
+    useEffect(() => {
+        const fetchCarData = async () => {
+            try {
+                const response = await fetch(`http://localhost:5227/api/Car/edit-car/${carId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setCarData(data);
+                    // Pre-fill form with server data where applicable
+                    setFormData({
+                        mileage: data.mileage?.toString() || "",
+                        fuelConsumption: data.fuelConsumption?.toString() || "",
+                        houseNumberStreet: data.houseNumberStreet || "",
+                        description: data.description || "",
+                        basePrice: data.basePrice?.toString() || "",
+                        requiredDeposit: data.deposit?.toString() || "",
+                        otherTerms: "",
+                        cityProvince: data.cityProvince || "",
+                        district: data.district || "",
+                        ward: data.ward || "",
+                    });
+                    setStatus(data.status || "Available");
+                }
+            } catch (error) {
+                console.error("Failed to fetch car data:", error);
+            }
+        };
+        fetchCarData();
+    }, [carId]);
+
     const nextImage = () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length)
     }
@@ -42,12 +83,64 @@ export default function EditCarDetails() {
         setShowOtherTermsInput(e.target.checked)
     }
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
+    const handleSelectChange = (name: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
+    const handleSave = async () => {
+        if (!carData) return;
+
+        const payload = {
+            ...carData, // Keep all original data
+            mileage: formData.mileage || carData.mileage,
+            fuelConsumption: formData.fuelConsumption || carData.fuelConsumption,
+            houseNumberStreet: formData.houseNumberStreet || carData.houseNumberStreet,
+            description: formData.description || carData.description,
+            basePrice: formData.basePrice || carData.basePrice,
+            deposit: formData.requiredDeposit || carData.deposit,
+            cityProvince: formData.cityProvince || carData.cityProvince,
+            district: formData.district || carData.district,
+            ward: formData.ward || carData.ward,
+            termOfUse: carData.termOfUse + (formData.otherTerms ? `, ${formData.otherTerms}` : ""), // Append other terms
+            status: status, // Update status from select
+            updatedAt: new Date().toISOString(), // Update timestamp
+            // Keep other fields like images, documents, etc. from carData
+        };
+
+        try {
+            const response = await fetch(`http://localhost:5227/api/Car/edit-car/${carId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                alert("Car details updated successfully!");
+            } else {
+                alert("Failed to update car details.");
+            }
+        } catch (error) {
+            console.error("Error updating car details:", error);
+            alert("An error occurred while saving.");
+        }
+    }
+
+    if (!carData) return <div>Loading...</div>;
+
     return (
         <div className="min-h-screen bg-gray-50 p-4">
             <div className="max-w-6xl mx-auto">
                 {/* Breadcrumb */}
                 <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-                    <Link href="/" className="text-blue-600 hover:underline transition-colors duration-200">
+                    <Link href="/car-rental/public" className="text-blue-600 hover:underline transition-colors duration-200">
                         Home
                     </Link>
                     <span>{">"}</span>
@@ -67,7 +160,6 @@ export default function EditCarDetails() {
                         <Card className="overflow-hidden">
                             <CardContent className="p-0">
                                 <div className="relative aspect-[4/3] bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                                    {/* Image container with smooth transition */}
                                     <div
                                         className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
                                         style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -87,7 +179,6 @@ export default function EditCarDetails() {
                                         ))}
                                     </div>
 
-                                    {/* Navigation arrows with smooth hover effects */}
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -108,7 +199,6 @@ export default function EditCarDetails() {
                             </CardContent>
                         </Card>
 
-                        {/* Image dots indicator with smooth transitions */}
                         <div className="flex justify-center space-x-2">
                             {images.map((_, index) => (
                                 <button
@@ -126,8 +216,8 @@ export default function EditCarDetails() {
                     <div className="space-y-6">
                         <div className="flex items-start justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-4">Nissan Navara El 2017</h2>
-                                <Button className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105 transform">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-4">{carData.brand} {carData.model}</h2>
+                                <Button className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105">
                                     Confirm deposit
                                 </Button>
                             </div>
@@ -154,12 +244,12 @@ export default function EditCarDetails() {
 
                             <div className="flex items-center space-x-2">
                                 <span className="font-medium text-gray-700">Price:</span>
-                                <span className="text-gray-900 font-semibold">900k/day</span>
+                                <span className="text-gray-900 font-semibold">{carData.basePrice}k/day</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
                                 <span className="font-medium text-gray-700">Locations:</span>
-                                <span className="text-gray-900">Cau Giay, Hanoi</span>
+                                <span className="text-gray-900">{carData.cityProvince}, {carData.district}</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -179,7 +269,6 @@ export default function EditCarDetails() {
                     </div>
                 </div>
 
-                {/* Tabs Section with enhanced styling */}
                 <div className="mt-8">
                     <Tabs defaultValue="basic" className="w-full">
                         <TabsList className="grid w-full grid-cols-3 max-w-md bg-gray-100 p-1 rounded-lg">
@@ -218,7 +307,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="license-plate">License plate:</Label>
                                             <Input
                                                 id="license-plate"
-                                                placeholder="Enter license plate"
+                                                value={carData.licensePlate}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -228,7 +317,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="color">Color:</Label>
                                             <Input
                                                 id="color"
-                                                placeholder="Enter color"
+                                                value={carData.color}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -238,7 +327,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="brand">Brand name:</Label>
                                             <Input
                                                 id="brand"
-                                                placeholder="Enter brand name"
+                                                value={carData.brand}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -248,7 +337,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="model">Model:</Label>
                                             <Input
                                                 id="model"
-                                                placeholder="Enter model"
+                                                value={carData.model}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -258,7 +347,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="production-year">Production year:</Label>
                                             <Input
                                                 id="production-year"
-                                                placeholder="Enter production year"
+                                                value={carData.productionYear}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -268,7 +357,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="seats">No. of seats:</Label>
                                             <Input
                                                 id="seats"
-                                                placeholder="Enter number of seats"
+                                                value={carData.numberOfSeats}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -278,7 +367,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="transmission">Transmission:</Label>
                                             <Input
                                                 id="transmission"
-                                                placeholder="Enter transmission type"
+                                                value={carData.isAutomatic ? "Automatic" : "Manual"}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -288,7 +377,7 @@ export default function EditCarDetails() {
                                             <Label htmlFor="fuel">Fuel:</Label>
                                             <Input
                                                 id="fuel"
-                                                placeholder="Enter fuel type"
+                                                value={carData.isGasoline ? "Gasoline" : "Diesel"}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -297,7 +386,6 @@ export default function EditCarDetails() {
                                 </CardContent>
                             </Card>
 
-                            {/* Documents Section - only show in Basic Information tab */}
                             <Card className="mt-8 transition-all duration-300 hover:shadow-lg">
                                 <CardHeader>
                                     <CardTitle>Documents:</CardTitle>
@@ -351,12 +439,14 @@ export default function EditCarDetails() {
                         <TabsContent value="details" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
                             <Card className="transition-all duration-300 hover:shadow-lg">
                                 <CardContent className="p-6 space-y-6">
-                                    {/* Mileage and Fuel Consumption */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="mileage">Mileage: *</Label>
                                             <Input
                                                 id="mileage"
+                                                name="mileage"
+                                                value={formData.mileage}
+                                                onChange={handleInputChange}
                                                 placeholder="Enter mileage"
                                                 className="transition-all duration-200 focus:scale-105"
                                             />
@@ -366,6 +456,9 @@ export default function EditCarDetails() {
                                             <div className="flex items-center space-x-2">
                                                 <Input
                                                     id="fuel-consumption"
+                                                    name="fuelConsumption"
+                                                    value={formData.fuelConsumption}
+                                                    onChange={handleInputChange}
                                                     placeholder="Enter consumption"
                                                     className="flex-1 transition-all duration-200 focus:scale-105"
                                                 />
@@ -374,15 +467,14 @@ export default function EditCarDetails() {
                                         </div>
                                     </div>
 
-                                    {/* Address Section */}
                                     <div className="space-y-4">
                                         <Label className="text-base font-medium">Address: *</Label>
 
-                                        {/* Search Address */}
                                         <div className="relative">
                                             <Input
                                                 placeholder="Search for an address"
                                                 className="pr-10 transition-all duration-200 focus:scale-105"
+                                                disabled
                                             />
                                             <Button
                                                 variant="ghost"
@@ -393,9 +485,8 @@ export default function EditCarDetails() {
                                             </Button>
                                         </div>
 
-                                        {/* Location Dropdowns */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <Select>
+                                            <Select value={formData.cityProvince} onValueChange={(value) => handleSelectChange("cityProvince", value)}>
                                                 <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
                                                     <SelectValue placeholder="City/Province" />
                                                 </SelectTrigger>
@@ -406,7 +497,7 @@ export default function EditCarDetails() {
                                                 </SelectContent>
                                             </Select>
 
-                                            <Select>
+                                            <Select value={formData.district} onValueChange={(value) => handleSelectChange("district", value)}>
                                                 <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
                                                     <SelectValue placeholder="District" />
                                                 </SelectTrigger>
@@ -417,7 +508,7 @@ export default function EditCarDetails() {
                                                 </SelectContent>
                                             </Select>
 
-                                            <Select>
+                                            <Select value={formData.ward} onValueChange={(value) => handleSelectChange("ward", value)}>
                                                 <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
                                                     <SelectValue placeholder="Ward" />
                                                 </SelectTrigger>
@@ -429,21 +520,27 @@ export default function EditCarDetails() {
                                             </Select>
                                         </div>
 
-                                        {/* House Number and Street */}
-                                        <Input placeholder="House number, Street" className="transition-all duration-200 focus:scale-105" />
+                                        <Input
+                                            name="houseNumberStreet"
+                                            value={formData.houseNumberStreet}
+                                            onChange={handleInputChange}
+                                            placeholder="House number, Street"
+                                            className="transition-all duration-200 focus:scale-105"
+                                        />
                                     </div>
 
-                                    {/* Description */}
                                     <div className="space-y-2">
                                         <Label htmlFor="description">Description:</Label>
                                         <textarea
                                             id="description"
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
                                             placeholder="Description of your vehicle"
                                             className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 focus:scale-105"
                                         />
                                     </div>
 
-                                    {/* Additional Functions */}
                                     <div className="space-y-4">
                                         <Label className="text-base font-medium">Additional functions:</Label>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -475,11 +572,9 @@ export default function EditCarDetails() {
                                         </div>
                                     </div>
 
-                                    {/* Images Section */}
                                     <div className="space-y-4">
                                         <Label className="text-base font-medium">Images: *</Label>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Front Image */}
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Front</Label>
                                                 <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
@@ -499,7 +594,6 @@ export default function EditCarDetails() {
                                                 </div>
                                             </div>
 
-                                            {/* Back Image */}
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Back</Label>
                                                 <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
@@ -519,7 +613,6 @@ export default function EditCarDetails() {
                                                 </div>
                                             </div>
 
-                                            {/* Left Image - Drag and Drop */}
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Left</Label>
                                                 <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center space-y-2 hover:border-gray-400 hover:bg-gray-100 transition-all duration-300 cursor-pointer group">
@@ -537,7 +630,6 @@ export default function EditCarDetails() {
                                                 </div>
                                             </div>
 
-                                            {/* Right Image */}
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Right</Label>
                                                 <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
@@ -565,12 +657,11 @@ export default function EditCarDetails() {
                                         </p>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     <div className="flex justify-end space-x-4 pt-6">
                                         <Button variant="outline" className="transition-all duration-200 hover:scale-105">
                                             Discard
                                         </Button>
-                                        <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:scale-105">
+                                        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:scale-105">
                                             Save
                                         </Button>
                                     </div>
@@ -581,14 +672,15 @@ export default function EditCarDetails() {
                         <TabsContent value="pricing" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
                             <Card className="transition-all duration-300 hover:shadow-lg">
                                 <CardContent className="p-6 space-y-6">
-                                    {/* Base Price */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="base-price">Base price per day: *</Label>
                                             <div className="flex items-center space-x-2">
                                                 <Input
                                                     id="base-price"
-                                                    defaultValue="900,000"
+                                                    name="basePrice"
+                                                    value={formData.basePrice}
+                                                    onChange={handleInputChange}
                                                     className="flex-1 transition-all duration-200 focus:scale-105"
                                                 />
                                                 <span className="text-sm text-gray-600 font-medium">VND/Day</span>
@@ -600,7 +692,9 @@ export default function EditCarDetails() {
                                             <div className="flex items-center space-x-2">
                                                 <Input
                                                     id="required-deposit"
-                                                    defaultValue="15,000,000"
+                                                    name="requiredDeposit"
+                                                    value={formData.requiredDeposit}
+                                                    onChange={handleInputChange}
                                                     className="flex-1 transition-all duration-200 focus:scale-105"
                                                 />
                                                 <span className="text-sm text-gray-600 font-medium">VND</span>
@@ -608,7 +702,6 @@ export default function EditCarDetails() {
                                         </div>
                                     </div>
 
-                                    {/* Terms of Use */}
                                     <div className="space-y-4">
                                         <Label className="text-base font-medium">Terms of use</Label>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -660,6 +753,9 @@ export default function EditCarDetails() {
                                         {showOtherTermsInput && (
                                             <div className="mt-2">
                                                 <Input
+                                                    name="otherTerms"
+                                                    value={formData.otherTerms}
+                                                    onChange={handleInputChange}
                                                     placeholder="Please specify other terms"
                                                     className="transition-all duration-200 focus:scale-105"
                                                 />
@@ -667,12 +763,11 @@ export default function EditCarDetails() {
                                         )}
                                     </div>
 
-                                    {/* Action Buttons */}
                                     <div className="flex justify-end space-x-4 pt-6">
                                         <Button variant="outline" className="transition-all duration-200 hover:scale-105">
                                             Discard
                                         </Button>
-                                        <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:scale-105">
+                                        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:scale-105">
                                             Save
                                         </Button>
                                     </div>

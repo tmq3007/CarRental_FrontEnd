@@ -11,6 +11,7 @@ import {vnpayApi} from "@/lib/services/vnp-api";
 import {dashboardApi} from "@/lib/services/dashboard-api";
 import {walletApi} from "@/lib/services/wallet-api";
 import {chatbotApi   } from "@/lib/services/chatbot-api";
+import carReducer from "@/lib/slice/carSlice";
 
 export type ApiResponse<T> = {
     code: number;
@@ -42,6 +43,7 @@ const baseReducer = combineReducers({
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [walletApi.reducerPath]: walletApi.reducer,
     user: userReducer,
+    car: carReducer,
 })
 
 export const persistConfig = {
