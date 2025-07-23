@@ -147,12 +147,21 @@ export default function BookingHeader({
                                 View Car Details
                             </Button>
                         </Link>
-                        <Button variant="outline" className="border-gray-300 text-sm px-3 py-1 h-8">
-                            Confirm Pick-up
-                        </Button>
-                        <Button variant="destructive" className="text-sm px-3 py-1 h-8">
-                            Cancel Booking
-                        </Button>
+                        {bookingStatus === "in_progress" ? (
+                            <Button variant="default" className="bg-yellow-500 hover:bg-yellow-600 text-sm px-3 py-1 h-8 w-full">
+                                Return Car
+                            </Button>
+                        ) : (
+                            <>
+                                <Button variant="outline" className="border-gray-300 text-sm px-3 py-1 h-8 w-full">
+                                    Confirm Pick-up
+                                </Button>
+                                <Button variant="destructive" className="text-sm px-3 py-1 h-8 w-full">
+                                    Cancel Booking
+                                </Button>
+                            </>
+                        )}
+
                     </div>
                 </div>
             </div>

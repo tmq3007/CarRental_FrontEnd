@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -11,10 +11,15 @@ import { RootState } from "@/lib/store";
 export default function VnpayCallbackPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const [topupMoney, { isLoading: isToppingUp }] = useTopupMoneyMutation();
+    const [topupMoney] = useTopupMoneyMutation();
     const ACCOUNT_ID = useSelector((state: RootState) => state.user?.id);
+    const calledRef = useRef(false); // ✅ Đảm bảo chỉ gọi 1 lần
 
     useEffect(() => {
+        if (!ACCOUNT_ID || calledRef.current) return;
+
+        calledRef.current = true;
+
         const handlePayment = async () => {
             const vnp_ResponseCode = searchParams.get('vnp_ResponseCode');
             const vnp_Amount = searchParams.get('vnp_Amount');
@@ -22,13 +27,13 @@ export default function VnpayCallbackPage() {
 
             if (!vnp_ResponseCode) {
                 toast.error('Wrong transaction information');
-                router.push('/wallet');
+                setTimeout(() => router.push('/wallet'), 3000);
                 return;
             }
 
             if (vnp_ResponseCode === '00') {
                 try {
-                    const result = await topupMoney({
+                    await topupMoney({
                         accountId: ACCOUNT_ID,
                         dto: { amount, message: "Top-up to wallet" },
                     }).unwrap();
@@ -41,14 +46,13 @@ export default function VnpayCallbackPage() {
                 toast.error('Payment was cancelled or failed');
             }
 
-            // Redirect to wallet page after 3 seconds
             setTimeout(() => {
                 router.push('/user/wallet');
             }, 3000);
         };
 
         handlePayment();
-    }, [searchParams, router, topupMoney, ACCOUNT_ID]);
+    }, [ACCOUNT_ID, router, topupMoney, searchParams]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -58,7 +62,7 @@ export default function VnpayCallbackPage() {
                         ? 'Payment Successful!'
                         : 'Payment Failed'}
                 </h2>
-                <p>You will be redirected to your wallet shortly...</p>
+                <p>You will be redirected to your wallet in a few seconds...</p>
             </div>
         </div>
     );
