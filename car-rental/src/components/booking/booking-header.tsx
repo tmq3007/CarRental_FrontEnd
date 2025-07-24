@@ -4,23 +4,12 @@ import { ChevronLeft, ChevronRight, Calendar, MapPin, CreditCard, Hash, CheckCir
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
+import { formatCurrency } from "@/lib/hook/useFormatCurrency"
+import { BookingDetailVO } from "@/lib/services/booking-api"
 
 interface BookingHeaderProps {
   title: string
-  carName: string
-  carId: string
-  fromDate: string
-  toDate: string
-  numberOfDays: number
-  basePrice?: string
-  total?: string
-  deposit?: string
-  bookingNo?: string
-  bookingStatus?: string
-  carImageFront?: string
-  carImageBack?: string
-  carImageLeft?: string
-  carImageRight?: string
+  bookingData: BookingDetailVO
   handleConfirmPickup: () => void
   handleCancelBooking: () => void
   handleReturnCar: () => void
@@ -28,32 +17,25 @@ interface BookingHeaderProps {
 
 export default function BookingHeader({
   title = "Booking Details",
-  carName = "Nissan Navara El 2017",
-  fromDate = "13/02/2022 - 12:00 PM",
-  toDate = "23/02/2022 - 14:00 PM",
-  numberOfDays = 10,
-  basePrice = "500,000",
-  total = "5,000,000",
-  deposit = "1,000,000",
-  bookingNo = "012345",
-  bookingStatus = "confirmed",
-  carImageFront,
-  carImageBack,
-  carImageLeft,
-  carImageRight,
+  bookingData,
   handleConfirmPickup,
   handleCancelBooking,
   handleReturnCar,
 }: BookingHeaderProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-
   const carImages = [
-    { src: carImageFront, alt: "Front view" },
-    { src: carImageBack, alt: "Back view" },
-    { src: carImageLeft, alt: "Left side view" },
-    { src: carImageRight, alt: "Right side view" },
+    { src: bookingData.carImageFront, alt: "Front view" },
+    { src: bookingData.carImageBack, alt: "Back view" },
+    { src: bookingData.carImageLeft, alt: "Left side view" },
+    { src: bookingData.carImageRight, alt: "Right side view" },
   ]
-
+  function calculateNumberOfDays(startDate?: string, endDate?: string): number {
+    if (!startDate || !endDate) return 0
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const diffTime = Math.abs(end.getTime() - start.getTime())
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+  }
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex === carImages.length - 1 ? 0 : prevIndex + 1))
   }
@@ -110,7 +92,7 @@ export default function BookingHeader({
               >
                 <ChevronRight className="w-5 h-5 text-gray-700" />
               </button>
-              <div className="absolute top-4 right-4">{getStatusBadge(bookingStatus || "confirmed")}</div>
+              <div className="absolute top-4 right-4">{getStatusBadge(bookingData.status || "confirmed")}</div>
             </div>
 
             <div className="flex justify-center space-x-2">
@@ -118,9 +100,8 @@ export default function BookingHeader({
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                    index === currentImageIndex ? "bg-green-500" : "bg-gray-300 hover:bg-gray-400"
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentImageIndex ? "bg-green-500" : "bg-gray-300 hover:bg-gray-400"
+                    }`}
                   aria-label={`View image ${index + 1}`}
                 />
               ))}
@@ -130,10 +111,10 @@ export default function BookingHeader({
           {/* Car Details and Actions Section */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{carName}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{bookingData.carName}</h2>
               <div className="flex items-center space-x-2 text-gray-600">
                 <Hash className="w-4 h-4" />
-                <span className="font-medium">{bookingNo}</span>
+                <span className="font-medium">{bookingData.bookingNumber}</span>
               </div>
             </div>
 
@@ -143,7 +124,7 @@ export default function BookingHeader({
                   <Calendar className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Pickup</p>
-                    <p className="text-sm text-gray-600">{fromDate}</p>
+                    <p className="text-sm text-gray-600">{bookingData.pickUpTime}</p>
                   </div>
                 </div>
 
@@ -151,7 +132,7 @@ export default function BookingHeader({
                   <Calendar className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Return</p>
-                    <p className="text-sm text-gray-600">{toDate}</p>
+                    <p className="text-sm text-gray-600">{bookingData.dropOffTime}</p>
                   </div>
                 </div>
               </div>
@@ -162,7 +143,7 @@ export default function BookingHeader({
                   <div>
                     <p className="text-sm font-medium text-gray-900">Duration</p>
                     <p className="text-sm text-gray-600">
-                      {numberOfDays} day{numberOfDays > 1 ? "s" : ""}
+                      {calculateNumberOfDays(bookingData.pickUpTime, bookingData.dropOffTime)} day
                     </p>
                   </div>
                 </div>
@@ -171,7 +152,7 @@ export default function BookingHeader({
                   <CreditCard className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Total Cost</p>
-                    <p className="text-lg font-bold text-green-600">{total} VND</p>
+                    <p className="text-lg font-bold text-green-600">{formatCurrency((bookingData.basePrice ?? -1))}</p>
                   </div>
                 </div>
               </div>
@@ -180,12 +161,8 @@ export default function BookingHeader({
             <div className="bg-green-50 rounded-lg p-4 border border-green-200">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Base Price:</span>
-                  <p className="font-semibold text-gray-900">{basePrice} VND</p>
-                </div>
-                <div>
                   <span className="text-gray-600">Deposit:</span>
-                  <p className="font-semibold text-gray-900">{deposit} VND</p>
+                  <p className="font-semibold text-gray-900">{formatCurrency(bookingData.deposit ?? -1)}</p>
                 </div>
               </div>
             </div>
@@ -198,7 +175,7 @@ export default function BookingHeader({
               </Button>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {bookingStatus === "confirmed" && (
+                {bookingData.status === "confirmed" && (
                   <>
                     <Button
                       onClick={handleConfirmPickup}
@@ -217,7 +194,7 @@ export default function BookingHeader({
                   </>
                 )}
 
-                {bookingStatus === "pending_deposit" && (
+                {bookingData.status === "pending_deposit" && (
                   <Button
                     onClick={handleCancelBooking}
                     variant="outline"
@@ -227,7 +204,7 @@ export default function BookingHeader({
                   </Button>
                 )}
 
-                {bookingStatus === "in_progress" && (
+                {bookingData.status === "in_progress" && (
                   <Button onClick={handleReturnCar} className="bg-blue-600 hover:bg-blue-700 text-white sm:col-span-2">
                     Return Car
                   </Button>

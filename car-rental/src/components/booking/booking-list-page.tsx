@@ -251,7 +251,6 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
           const pickupDate = new Date(booking.pickUpTime ?? "")
           const returnDate = new Date(booking.dropOffTime ?? "")
           const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
-          const total = booking.basePrice ?? -1 * numberOfDays
 
           return (
             <Card
@@ -290,7 +289,7 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
                   </div>
                   <div className="flex items-center text-gray-600">
                     <CreditCard className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="font-semibold text-gray-900">{total.toLocaleString()} VND</span>
+                    <span className="font-semibold text-gray-900">{booking.basePrice}</span>
                   </div>
                 </div>
 

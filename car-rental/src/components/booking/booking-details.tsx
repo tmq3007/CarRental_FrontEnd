@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Car } from "lucide-react"
 import { toast } from "sonner"
+import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 
 export default function BookingDetails({ bookingId }: { bookingId: string }) {
     const [activeTab, setActiveTab] = useState("booking-information")
@@ -115,8 +116,7 @@ export default function BookingDetails({ bookingId }: { bookingId: string }) {
 
     const handleReturnCar = async () => {
         const numberOfDays = calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime)
-        const total = (bookingDetail.basePrice ?? 0) * numberOfDays
-        const refundAmount = (bookingDetail.deposit ?? 0) - total
+        const remainAmount = (bookingDetail.basePrice ?? -1) - (bookingDetail.deposit ?? 0)
 
         toast.custom(
             (t) => (
@@ -131,15 +131,13 @@ export default function BookingDetails({ bookingId }: { bookingId: string }) {
                             <h3 className="text-sm font-medium text-gray-900">Return Car</h3>
                             <div className="mt-2 text-sm text-gray-600 space-y-1">
                                 <p>
-                                    Total cost: <span className="font-medium">{total.toLocaleString()} VND</span>
+                                    Total cost: <span className="font-medium">{formatCurrency(bookingDetail.basePrice ?? 0)}</span>
                                 </p>
                                 <p>
-                                    Deposit: <span className="font-medium">{(bookingDetail.deposit ?? 0).toLocaleString()} VND</span>
+                                    Deposited: <span className="font-medium">{formatCurrency(bookingDetail.deposit ?? 0)}</span>
                                 </p>
-                                <p className={`font-medium ${refundAmount > 0 ? "text-green-600" : "text-red-600"}`}>
-                                    {refundAmount > 0
-                                        ? `Refund: ${refundAmount.toLocaleString()} VND`
-                                        : `Additional charge: ${Math.abs(refundAmount).toLocaleString()} VND`}
+                                <p className={`font-medium text-red-600`}>
+                                    Remaining Deposit: {formatCurrency(remainAmount)}
                                 </p>
                             </div>
                             <div className="mt-3 flex space-x-2">
@@ -182,22 +180,7 @@ export default function BookingDetails({ bookingId }: { bookingId: string }) {
 
             <BookingHeader
                 title="Booking Details"
-                carName={bookingDetail.carName}
-                carId={bookingDetail.carId}
-                fromDate={formatDate(bookingDetail.pickUpTime)}
-                toDate={formatDate(bookingDetail.dropOffTime)}
-                numberOfDays={calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime)}
-                bookingNo={bookingDetail.bookingNumber}
-                bookingStatus={bookingDetail.status}
-                basePrice={String(bookingDetail.basePrice)}
-                deposit={String(bookingDetail.deposit)}
-                total={String(
-                    Number(bookingDetail.basePrice) * calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime),
-                )}
-                carImageFront={bookingDetail.carImageFront}
-                carImageBack={bookingDetail.carImageBack}
-                carImageLeft={bookingDetail.carImageLeft}
-                carImageRight={bookingDetail.carImageRight}
+                bookingData={bookingDetail}
                 handleConfirmPickup={handleConfirmPickup}
                 handleCancelBooking={handleCancelBooking}
                 handleReturnCar={handleReturnCar}
