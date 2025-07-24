@@ -6,6 +6,9 @@ import { Star, Bookmark, Car, Fuel, Cog, Ruler, Box, ChevronLeft, ChevronRight }
 import { Card, CardFooter, CardHeader } from "@/components/ui/card"
 import { useState, useRef } from "react"
 import { CarSearchVO } from "@/lib/services/car-api"
+import { Router } from "next/router"
+import { useRouter } from "next/navigation"
+import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 
 
 interface CarRentalGridCardProps {
@@ -19,6 +22,7 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const rentButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
   const viewButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
+  const router = useRouter();
 
   const handleMouseEnter = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -98,9 +102,8 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
             <button
               key={i}
               onClick={() => goToImage(i)}
-              className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${
-                i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
-              }`}
+              className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
+                }`}
             />
           ))}
         </div>
@@ -140,9 +143,9 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
 
         {/* Price Section */}
         <div className="w-1/3 p-3 flex flex-col justify-center items-center border-l">
-          <p className="text-xs text-gray-500">Rented for 5 days</p>
-          <p className="text-gray-500 line-through text-sm">${car.basePrice * 1.2}</p>
-          <p className="text-green-600 text-2xl font-bold">${car.basePrice}</p>
+          <p className="text-xs text-gray-500">Per day</p>
+          <p className="text-gray-500 line-through text-sm">{formatCurrency(car.basePrice * 1.2)}</p>
+          <p className="text-green-600 text-2xl font-bold">{formatCurrency(car.basePrice)}</p>
         </div>
       </div>
 
@@ -152,6 +155,9 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
             ref={rentButtonRef}
             className="relative overflow-hidden bg-black text-white w-full py-2 px-4 rounded-full font-medium transition-colors duration-700 group"
             onMouseEnter={(e) => handleMouseEnter(e, rentButtonRef, setRentButtonPos)}
+            onClick={() => {
+              router.push(`/booking?carId=${car.id}`);
+            }}
           >
             <span className="relative z-10">RENT NOW</span>
             <div

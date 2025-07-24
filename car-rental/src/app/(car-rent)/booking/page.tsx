@@ -1,22 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { CarSelectionStep } from "@/components/rent-a-car/car-selection-step";
 import { BookingSummaryStep } from "@/components/rent-a-car/booking-summary-step";
-import { CheckoutStep } from "@/components/rent-a-car/checkout-step";
+import { CheckoutStep, CheckoutStepHandle } from "@/components/rent-a-car/checkout-step";
 import { ConfirmationStep } from "@/components/rent-a-car/confirmation-step";
-import { BookingPanel } from "@/components/rent-a-car/booking-panel";
+import { BookingPanel, OccupiedDateRange } from "@/components/rent-a-car/booking-panel";
 import { OrderSummary } from "@/components/rent-a-car/order-summary";
 import { Location } from "@/components/common/address-input";
 import { RootState } from "@/lib/store";
 import Stepper from "@/components/rent-a-car/stepper";
-import { useGetBookingCarAndUserQuery } from "@/lib/services/booking-api";
+import { BookingVO, useGetBookingCarAndUserQuery } from "@/lib/services/booking-api";
 
 interface Step {
   id: number;
@@ -24,8 +23,9 @@ interface Step {
   description: string;
   component: React.ReactNode;
 }
+
 export interface BookingState {
-  carId?: string;
+  carId: string;
   driverId?: string;
   pickupDate?: Date;
   returnDate?: Date;
@@ -45,25 +45,23 @@ export interface BookingState {
 }
 export default function CarRentalBooking() {
   const searchParams = useSearchParams();
-  // const carId = searchParams.get("carId");
-  const carId = "DD63B6FF-0559-4084-B392-02EF2AC777C5"; // For testing purposes, replace with actual carId from searchParams
-
-  const locationProvince = searchParams.get("locationProvince") || "";
-  const pickupTime = searchParams.get("pickupTime");
-  const dropoffTime = searchParams.get("dropoffTime");
+  const carId = searchParams.get("carId"); // For testing purposes
+  const reduxSearchData = useSelector((state: RootState) => state.search);
   const userId = useSelector((state: RootState) => state.user.id);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
+  const [bookingVO, setBookingVO] = useState<BookingVO | null>(null);
+  const checkoutStepRef = useRef<CheckoutStepHandle>(null);
+
   // Fetch booking data
-  const { data: bookingResponse, isLoading, error ,isFetching} = useGetBookingCarAndUserQuery(carId ?? "", {
+  const { data: bookingResponse, isLoading, error, isFetching } = useGetBookingCarAndUserQuery(carId ?? "", {
     skip: !carId,
   });
 
   const car = bookingResponse?.data.car;
   const user = bookingResponse?.data.user;
-  console.log(bookingResponse, "bookingResponse");
-  console.log(car, "car");
-  console.log(user, "user");
+  const carCallendar = bookingResponse?.data.carCallendar;
 
   const parseQueryDate = (time: string | null): Date | undefined => {
     if (!time) return undefined;
@@ -75,13 +73,26 @@ export default function CarRentalBooking() {
     }
   };
 
+  // Initialize bookingState with Redux search state, falling back to searchParams
   const [bookingState, setBookingState] = useState<BookingState>({
-    carId: carId ?? undefined,
+    carId: carId ?? "",
     driverId: userId ?? undefined,
-    pickupDate: parseQueryDate(pickupTime),
-    returnDate: parseQueryDate(dropoffTime),
-    pickupLocation: { province: locationProvince, district: "", ward: "" },
-    dropoffLocation: { province: locationProvince, district: "", ward: "" },
+    pickupDate: reduxSearchData.pickupTime
+      ? new Date(reduxSearchData.pickupTime)
+      : parseQueryDate(searchParams.get("pickupTime")),
+    returnDate: reduxSearchData.dropoffTime
+      ? new Date(reduxSearchData.dropoffTime)
+      : parseQueryDate(searchParams.get("dropoffTime")),
+    pickupLocation: {
+      province: reduxSearchData.location.province || searchParams.get("locationProvince") || "",
+      district: reduxSearchData.location.district || "",
+      ward: reduxSearchData.location.ward || "",
+    },
+    dropoffLocation: {
+      province: reduxSearchData.location.province || searchParams.get("locationProvince") || "",
+      district: reduxSearchData.location.district || "",
+      ward: reduxSearchData.location.ward || "",
+    },
     rentalDays: undefined,
     paymentType: undefined,
     deposit: car?.deposit,
@@ -103,8 +114,8 @@ export default function CarRentalBooking() {
     if (car && user) {
       setBookingState((prev) => ({
         ...prev,
-        carId: carId ?? undefined,
-        driverId: userId ?? undefined,
+        carId: carId ?? "",
+        driverId: userId ?? "",
         deposit: car.deposit,
         driverFullName: prev.driverFullName || user.fullName,
         driverDob: prev.driverDob || (user.dob ? new Date(user.dob) : undefined),
@@ -136,8 +147,6 @@ export default function CarRentalBooking() {
       setBookingState((prev) => ({ ...prev, rentalDays }));
     }
   }, [rentalDays]);
-
-
 
   const handlePickupDateChange = (date: Date | undefined) => {
     setBookingState((prev) => ({ ...prev, pickupDate: date }));
@@ -177,7 +186,10 @@ export default function CarRentalBooking() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = (bookingVO?: BookingVO) => {
+    if (bookingVO) {
+      setBookingVO(bookingVO);
+    }
     if (currentStep < steps.length) {
       setDirection(1);
       setCurrentStep(currentStep + 1);
@@ -244,9 +256,12 @@ export default function CarRentalBooking() {
       description: "Payment & confirmation",
       component: (
         <CheckoutStep
-          onUpdatePaymentDetails={(details: { paymentType?: string; deposit?: number }) =>
-            setBookingState((prev) => ({ ...prev, ...details }))
-          }
+          ref={checkoutStepRef}
+          onUpdatePaymentDetails={(details) => {
+            setBookingState((prev) => ({ ...prev, ...details }));
+          }}
+          car={car}
+          bookingState={bookingState}
           paymentDetails={{ paymentType: bookingState.paymentType, deposit: bookingState.deposit }}
           onNextStep={nextStep}
         />
@@ -256,11 +271,15 @@ export default function CarRentalBooking() {
       id: 4,
       title: "Confirmation",
       description: "Booking complete",
-      component: <ConfirmationStep bookingData={bookingState} />,
+      component: bookingVO ? (
+        <ConfirmationStep bookingData={bookingVO} />
+      ) : (
+        <div>Booking data not available</div>
+      ),
     },
   ];
 
-  if ( isLoading || isFetching) {
+  if (isLoading || isFetching) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
   }
 
@@ -268,11 +287,7 @@ export default function CarRentalBooking() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         Error: Unable to load car or user details. Please try again.
-        error: {typeof error === "string"
-          ? error
-          : error
-          ? JSON.stringify(error)
-          : "Unknown error"}
+        error: {typeof error === "string" ? error : error ? JSON.stringify(error) : "Unknown error"}
         <br />
       </div>
     );
@@ -316,6 +331,7 @@ export default function CarRentalBooking() {
           {showBookingPanel && (
             <div className="lg:col-span-4">
               <BookingPanel
+                car={car}
                 onNextStep={nextStep}
                 pickupDate={bookingState.pickupDate}
                 returnDate={bookingState.returnDate}
@@ -325,40 +341,26 @@ export default function CarRentalBooking() {
                 onUpdateReturnDate={handleReturnDateChange}
                 onUpdatePickupLocation={handlePickupLocationChange}
                 onUpdateDropoffLocation={handleDropoffLocationChange}
+                occupiedDates={carCallendar} // Pass occupied dates
               />
             </div>
           )}
           {showOrderSummary && (
             <div className="lg:col-span-4">
               <OrderSummary
+                car={car}
                 currentStep={currentStep}
+                bookingState={bookingState}
                 onNextStep={nextStep}
-                // Pass additional props if neede
-                // bookingState={bookingState}
+                validateForm={() => checkoutStepRef.current?.validateForm() ?? false}
               />
             </div>
           )}
         </div>
         {!showBookingPanel && !showOrderSummary && (
           <div className="flex justify-between mt-8 max-w-4xl mx-auto">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="flex items-center bg-white"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
-            </Button>
             <div className="flex space-x-2">
-              {currentStep === steps.length ? (
-                <Button className="bg-green-600 hover:bg-green-700">Book Another Car</Button>
-              ) : (
-                <Button onClick={nextStep} className="flex items-center bg-indigo-600 hover:bg-indigo-700">
-                  Next
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              )}
+              <Button className="bg-green-600 hover:bg-green-700">Book Another Car</Button>
             </div>
           </div>
         )}

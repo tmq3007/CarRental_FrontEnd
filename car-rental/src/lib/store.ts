@@ -3,6 +3,7 @@ import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } fro
 import { userApi } from "@/lib/services/user-api";
 import { authApi } from "@/lib/services/auth-api";
 import userReducer from "@/lib/slice/userSlice";
+import searchReducer from "@/lib/slice/searchSlice";
 import storage from "@/lib/ssr-safe-storage";
 import { addressApi } from "@/lib/services/local-api/address-api";
 import { carApi } from "@/lib/services/car-api";
@@ -42,13 +43,14 @@ const baseReducer = combineReducers({
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [walletApi.reducerPath]: walletApi.reducer,
     user: userReducer,
+    search: searchReducer,
 })
 
 export const persistConfig = {
     key: 'car-rental',
     storage,
     // Những reducer được đăng ký trong whitelist sẽ được lưu trữ trong local storage
-    whitelist: ['user']
+    whitelist: ['user', 'search'],
 }
 
 const persistedReducer = persistReducer(persistConfig, baseReducer);
