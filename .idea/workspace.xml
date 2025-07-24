@@ -9,7 +9,13 @@
       <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/about-us/page.tsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/contact/page.tsx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/learn-more/page.tsx" afterDir="false" />
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update route">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/booking/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/booking/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/car/edit-car/edit-car-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/car/edit-car/edit-car-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/booking-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/booking-api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/components/booking/booking-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/booking/booking-header.tsx" afterDir="false" />
@@ -28,7 +34,19 @@
       </list>
     </option>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -37,17 +55,10 @@
     &quot;assignee&quot;: &quot;tmq3007&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="master" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
-    &quot;accountId&quot;: &quot;33827791-fa45-4f7d-a589-f2cee0ce75b5&quot;
+    &quot;accountId&quot;: &quot;5d3213b0-b74f-4b95-9e69-88c22d949371&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -73,7 +84,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;quan/user-profile&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;view-my-car&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -81,6 +92,7 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;D:\\Document\\Projects\\FE\\car-rental\\node_modules\\typescript\\lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Intellij Project\\CarRental_FrontEnd\\car-rental\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -95,7 +107,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Document\Projects\FE\car-rental\src\app\(car-rent)" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car\edit-car\[carId]" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car\[carId]" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\components\car\edit-car" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -128,6 +144,9 @@
       <workItem from="1752675030038" duration="755000" />
       <workItem from="1752945211643" duration="5109000" />
       <workItem from="1753279589147" duration="10437000" />
+      <workItem from="1752601297291" duration="6316000" />
+      <workItem from="1753333886896" duration="9514000" />
+      <workItem from="1753357312030" duration="8268000" />
     </task>
     <task id="LOCAL-00001" summary="new master">
       <option name="closed" value="true" />
@@ -162,10 +181,30 @@
       <updated>1752608274120</updated>
     </task>
     <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00004" summary="update route">
+      <option name="closed" value="true" />
+      <created>1753334057456</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1753334057456</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new master" />
@@ -174,5 +213,7 @@
     <MESSAGE value="update admin: uẻ's car" />
     <MESSAGE value="filter car admin" />
     <option name="LAST_COMMIT_MESSAGE" value="filter car admin" />
+    <MESSAGE value="update route" />
+    <option name="LAST_COMMIT_MESSAGE" value="update route" />
   </component>
 </project>
