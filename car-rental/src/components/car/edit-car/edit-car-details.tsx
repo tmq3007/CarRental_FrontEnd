@@ -10,12 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-export default function EditCarDetails({ carId }: { carId: string }) {
+export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: any }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [status, setStatus] = useState("Available")
     const [showOtherTermsInput, setShowOtherTermsInput] = useState(false)
-    const [carData, setCarData] = useState<any>(null)
+    const [carData, setCarData] = useState<any>(initialData)
     const [formData, setFormData] = useState({
         mileage: "",
         fuelConsumption: "",
@@ -29,47 +30,39 @@ export default function EditCarDetails({ carId }: { carId: string }) {
         ward: "",
     })
 
+    // Mock documents and images (replace with real data if available from API)
     const documents = [
-        { id: 1, name: "Registration paper", status: "Verified", link: "File1.PDF" },
-        { id: 2, name: "Certificate of inspection", status: "Verified", link: "File2.PDF" },
-        { id: 3, name: "Insurance", status: "Not available", link: null },
+        { id: 1, name: "Registration paper", status: "Verified", link: initialData?.registrationPaperLink || "File1.PDF" },
+        { id: 2, name: "Certificate of inspection", status: "Verified", link: initialData?.inspectionCertLink || "File2.PDF" },
+        { id: 3, name: "Insurance", status: "Not available", link: initialData?.insuranceLink || null },
     ]
 
     const images = [
-        { id: 1, alt: "Car image 1" },
-        { id: 2, alt: "Car image 2" },
-        { id: 3, alt: "Car image 3" },
+        { id: 1, alt: "Car image front", src: initialData?.carImageFront || "" },
+        { id: 2, alt: "Car image back", src: initialData?.carImageBack || "" },
+        { id: 3, alt: "Car image left", src: initialData?.carImageLeft || "" },
+        { id: 4, alt: "Car image right", src: initialData?.carImageRight || "" },
     ]
 
-    // Fetch initial car data from server (mocked for now)
+    // Pre-fill form with initial data
     useEffect(() => {
-        const fetchCarData = async () => {
-            try {
-                const response = await fetch(`http://localhost:5227/api/Car/edit-car/${carId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setCarData(data);
-                    // Pre-fill form with server data where applicable
-                    setFormData({
-                        mileage: data.mileage?.toString() || "",
-                        fuelConsumption: data.fuelConsumption?.toString() || "",
-                        houseNumberStreet: data.houseNumberStreet || "",
-                        description: data.description || "",
-                        basePrice: data.basePrice?.toString() || "",
-                        requiredDeposit: data.deposit?.toString() || "",
-                        otherTerms: "",
-                        cityProvince: data.cityProvince || "",
-                        district: data.district || "",
-                        ward: data.ward || "",
-                    });
-                    setStatus(data.status || "Available");
-                }
-            } catch (error) {
-                console.error("Failed to fetch car data:", error);
-            }
-        };
-        fetchCarData();
-    }, [carId]);
+        if (initialData) {
+            setCarData(initialData)
+            setFormData({
+                mileage: initialData.mileage?.toString() || "",
+                fuelConsumption: initialData.fuelConsumption?.toString() || "",
+                houseNumberStreet: initialData.houseNumberStreet || "",
+                description: initialData.description || "",
+                basePrice: initialData.basePrice?.toString() || "",
+                requiredDeposit: initialData.deposit?.toString() || "",
+                otherTerms: initialData.otherTerms || "",
+                cityProvince: initialData.cityProvince || "",
+                district: initialData.district || "",
+                ward: initialData.ward || "",
+            })
+            setStatus(initialData.status || "Available")
+        }
+    }, [initialData])
 
     const nextImage = () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length)
@@ -84,19 +77,20 @@ export default function EditCarDetails({ carId }: { carId: string }) {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const { name, value } = e.target
+        setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
     const handleSelectChange = (name: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
+    const router = useRouter()
     const handleSave = async () => {
-        if (!carData) return;
+        if (!carData) return
 
         const payload = {
-            ...carData, // Keep all original data
+            ...carData,
             mileage: formData.mileage || carData.mileage,
             fuelConsumption: formData.fuelConsumption || carData.fuelConsumption,
             houseNumberStreet: formData.houseNumberStreet || carData.houseNumberStreet,
@@ -106,11 +100,10 @@ export default function EditCarDetails({ carId }: { carId: string }) {
             cityProvince: formData.cityProvince || carData.cityProvince,
             district: formData.district || carData.district,
             ward: formData.ward || carData.ward,
-            termOfUse: carData.termOfUse + (formData.otherTerms ? `, ${formData.otherTerms}` : ""), // Append other terms
-            status: status, // Update status from select
-            updatedAt: new Date().toISOString(), // Update timestamp
-            // Keep other fields like images, documents, etc. from carData
-        };
+            termOfUse: carData.termOfUse + (formData.otherTerms ? `, ${formData.otherTerms}` : ""),
+            status: status,
+            updatedAt: new Date().toISOString(),
+        }
 
         try {
             const response = await fetch(`http://localhost:5227/api/Car/edit-car/${carId}`, {
@@ -120,38 +113,38 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                     "Accept": "application/json",
                 },
                 body: JSON.stringify(payload),
-            });
+            })
 
             if (response.ok) {
-                alert("Car details updated successfully!");
+                alert("Car details updated successfully!")
+                router.push(`/car-owner/my-car`)
             } else {
-                alert("Failed to update car details.");
+                const errorData = await response.json()
+                alert(`Failed to update car details: ${errorData.message || response.statusText}`)
             }
         } catch (error) {
-            console.error("Error updating car details:", error);
-            alert("An error occurred while saving.");
+            console.error("Error updating car details:", error)
+            alert("An error occurred while saving.")
         }
     }
 
-    if (!carData) return <div>Loading...</div>;
+    if (!carData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
             <div className="max-w-6xl mx-auto">
-                {/* Breadcrumb */}
                 <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
                     <Link href="/car-rental/public" className="text-blue-600 hover:underline transition-colors duration-200">
                         Home
                     </Link>
                     <span>{">"}</span>
-                    <Link href="/my-car" className="text-blue-600 hover:underline transition-colors duration-200">
+                    <Link href="/car-owner/my-car" className="text-blue-600 hover:underline transition-colors duration-200">
                         My car
                     </Link>
                     <span>{">"}</span>
                     <span>Edit details</span>
                 </nav>
 
-                {/* Page Title */}
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">Edit car details</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -166,15 +159,23 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                     >
                                         {images.map((image, index) => (
                                             <div key={image.id} className="w-full h-full flex-shrink-0 flex items-center justify-center">
-                                                <div className="w-full h-full relative">
-                                                    <div className="absolute inset-0 border border-gray-400"></div>
-                                                    <div className="absolute top-0 left-0 w-full h-full">
-                                                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                                            <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                            <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                        </svg>
+                                                {image.src ? (
+                                                    <img
+                                                        src={image.src}
+                                                        alt={image.alt}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full relative">
+                                                        <div className="absolute inset-0 border border-gray-400"></div>
+                                                        <div className="absolute top-0 left-0 w-full h-full">
+                                                            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                                <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
+                                                                <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
+                                                            </svg>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -239,17 +240,17 @@ export default function EditCarDetails({ carId }: { carId: string }) {
 
                             <div className="flex items-center space-x-2">
                                 <span className="font-medium text-gray-700">No. of rides:</span>
-                                <span className="text-gray-900">0</span>
+                                <span className="text-gray-900">{carData.numberOfRides || 0}</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
                                 <span className="font-medium text-gray-700">Price:</span>
-                                <span className="text-gray-900 font-semibold">{carData.basePrice}k/day</span>
+                                <span className="text-gray-900 font-semibold">{carData.basePrice ? `${carData.basePrice}k/day` : "N/A"}</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
                                 <span className="font-medium text-gray-700">Locations:</span>
-                                <span className="text-gray-900">{carData.cityProvince}, {carData.district}</span>
+                                <span className="text-gray-900">{[carData.ward, carData.district, carData.cityProvince].filter(Boolean).join(", ") || "N/A"}</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -307,7 +308,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="license-plate">License plate:</Label>
                                             <Input
                                                 id="license-plate"
-                                                value={carData.licensePlate}
+                                                value={carData.licensePlate || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -317,7 +318,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="color">Color:</Label>
                                             <Input
                                                 id="color"
-                                                value={carData.color}
+                                                value={carData.color || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -327,7 +328,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="brand">Brand name:</Label>
                                             <Input
                                                 id="brand"
-                                                value={carData.brand}
+                                                value={carData.brand || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -337,7 +338,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="model">Model:</Label>
                                             <Input
                                                 id="model"
-                                                value={carData.model}
+                                                value={carData.model || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -347,7 +348,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="production-year">Production year:</Label>
                                             <Input
                                                 id="production-year"
-                                                value={carData.productionYear}
+                                                value={carData.productionYear?.toString() || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -357,7 +358,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                             <Label htmlFor="seats">No. of seats:</Label>
                                             <Input
                                                 id="seats"
-                                                value={carData.numberOfSeats}
+                                                value={carData.numberOfSeats?.toString() || ""}
                                                 className="transition-all duration-200 bg-gray-50"
                                                 disabled
                                             />
@@ -473,6 +474,7 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                         <div className="relative">
                                             <Input
                                                 placeholder="Search for an address"
+                                                value={formData.houseNumberStreet}
                                                 className="pr-10 transition-all duration-200 focus:scale-105"
                                                 disabled
                                             />
@@ -549,8 +551,8 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                                 { id: "gps", label: "GPS" },
                                                 { id: "camera", label: "Camera" },
                                                 { id: "sunroof", label: "Sun roof" },
-                                                { id: "childlock", label: "Child lock", defaultChecked: true },
-                                                { id: "childseat", label: "Child seat", defaultChecked: true },
+                                                { id: "childlock", label: "Child lock", defaultChecked: initialData?.childLock || false },
+                                                { id: "childseat", label: "Child seat", defaultChecked: initialData?.childSeat || false },
                                                 { id: "dvd", label: "DVD" },
                                                 { id: "usb", label: "USB" },
                                             ].map((item) => (
@@ -561,8 +563,10 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                                     <input
                                                         type="checkbox"
                                                         id={item.id}
+                                                        name={item.id}
                                                         className="rounded transition-all duration-200 hover:scale-110"
                                                         defaultChecked={item.defaultChecked}
+                                                        onChange={handleInputChange}
                                                     />
                                                     <Label htmlFor={item.id} className="text-sm cursor-pointer">
                                                         {item.label}
@@ -575,79 +579,34 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                     <div className="space-y-4">
                                         <Label className="text-base font-medium">Images: *</Label>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Front</Label>
-                                                <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                                            <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                            <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                        </svg>
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Back</Label>
-                                                <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                                            <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                            <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                        </svg>
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Left</Label>
-                                                <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center space-y-2 hover:border-gray-400 hover:bg-gray-100 transition-all duration-300 cursor-pointer group">
-                                                    <Upload className="h-8 w-8 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
-                                                    <div className="text-center">
-                                                        <p className="text-sm text-gray-600">Drag and drop</p>
-                                                        <p className="text-sm text-gray-600">OR</p>
+                                            {["Front", "Back", "Left", "Right"].map((side, index) => (
+                                                <div key={index} className="space-y-2">
+                                                    <Label className="text-sm font-medium">{side}</Label>
+                                                    <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
+                                                        {images[index].src ? (
+                                                            <img
+                                                                src={images[index].src}
+                                                                alt={images[index].alt}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                                    <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
+                                                                    <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
+                                                                </svg>
+                                                            </div>
+                                                        )}
                                                         <Button
-                                                            variant="link"
-                                                            className="text-blue-600 p-0 h-auto hover:text-blue-800 transition-colors duration-200"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
                                                         >
-                                                            choose files
+                                                            <X className="h-4 w-4" />
                                                         </Button>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Right</Label>
-                                                <div className="relative aspect-[4/3] border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center hover:border-gray-400 transition-all duration-200 group">
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                                            <line x1="0" y1="0" x2="100" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                            <line x1="100" y1="0" x2="0" y2="100" stroke="#9CA3AF" strokeWidth="0.5" />
-                                                        </svg>
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
+                                            ))}
                                         </div>
 
                                         <p className="text-sm text-gray-600">
@@ -709,8 +668,10 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                                 <input
                                                     type="checkbox"
                                                     id="no-smoking"
+                                                    name="no-smoking"
                                                     className="rounded transition-all duration-200 hover:scale-110"
-                                                    defaultChecked
+                                                    defaultChecked={initialData?.termOfUse?.includes("No smoking") || false}
+                                                    onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-smoking" className="text-sm cursor-pointer">
                                                     No smoking
@@ -720,7 +681,10 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                                 <input
                                                     type="checkbox"
                                                     id="no-food"
+                                                    name="no-food"
                                                     className="rounded transition-all duration-200 hover:scale-110"
+                                                    defaultChecked={initialData?.termOfUse?.includes("No food") || false}
+                                                    onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-food" className="text-sm cursor-pointer">
                                                     No food in cars
@@ -730,8 +694,10 @@ export default function EditCarDetails({ carId }: { carId: string }) {
                                                 <input
                                                     type="checkbox"
                                                     id="no-pet"
+                                                    name="no-pet"
                                                     className="rounded transition-all duration-200 hover:scale-110"
-                                                    defaultChecked
+                                                    defaultChecked={initialData?.termOfUse?.includes("No pet") || false}
+                                                    onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-pet" className="text-sm cursor-pointer">
                                                     No pet

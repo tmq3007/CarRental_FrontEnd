@@ -10,18 +10,17 @@ import { type CarFilters, type CarVO_ViewACar, useGetCarsQuery } from "@/lib/ser
 import CarListSkeleton from "@/components/skeleton/car-list-skeleton"
 import NoResult from "@/components/common/no-result"
 import Breadcrumb from "@/components/common/breadcum"
-import {useSelector} from "react-redux";
-import {RootState} from "@/lib/store";
-import {CarDetailsPage} from "@/components/car/car-detail/car-details-page";
- import {useRouter} from "next/navigation";
-import LoadingPage from "@/components/common/loading";
+import { useSelector } from "react-redux"
+import { RootState } from "@/lib/store"
+import { useRouter } from "next/navigation"
+import LoadingPage from "@/components/common/loading"
 
 interface CarListPageProps {
     accountId: string
 }
 
 export default function CarListPage({ accountId }: CarListPageProps) {
-    const router = useRouter();
+    const router = useRouter()
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [filters, setFilters] = useState<CarFilters>({
@@ -31,8 +30,9 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     const [isTransitioning, setIsTransitioning] = useState(false)
 
     const handleViewDetails = (carId: string) => {
-        router.push(`/user/my-car/${carId}`);
-    };
+        router.push(`/car-owner/my-car/edit-car/${carId}`) // Thay đổi route sang edit-car/{id}
+    }
+
     const {
         data: cars,
         error,
@@ -43,7 +43,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         pageSize,
         filters,
     })
-    const pagiantion = cars?.data?.data?.pagination
+    const pagination = cars?.data?.data?.pagination
+
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
         const [sortBy, sortDirection] = value.split("-")
@@ -105,10 +106,10 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     }
 
     const renderPaginationButtons = () => {
-        if (!cars) return null
-        const {pageNumber, totalPages} = {
-            pageNumber: pagiantion?.pageNumber ?? 1,
-            totalPages: pagiantion?.totalPages ?? 1
+        if (!pagination) return null
+        const { pageNumber, totalPages } = {
+            pageNumber: pagination.pageNumber ?? 1,
+            totalPages: pagination.totalPages ?? 1,
         }
         const buttons = []
 
@@ -118,7 +119,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber - 1)}
-                disabled={!pagiantion?.hasPreviousPage}
+                disabled={!pagination.hasPreviousPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {"<<<"}
@@ -147,8 +148,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         if (endPage < totalPages) {
             buttons.push(
                 <span key="ellipsis" className="mx-2 text-gray-400">
-          ...
-        </span>,
+                    ...
+                </span>,
             )
         }
 
@@ -158,7 +159,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber + 1)}
-                disabled={!pagiantion?.hasNextPage}
+                disabled={!pagination.hasNextPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {">>>"}
@@ -169,9 +170,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     }
 
     if (loading || !cars?.data?.data) {
-        return <LoadingPage/>
+        return <LoadingPage />
     }
-
 
     return (
         <div className="min-h-screen bg-gray-50 p-6 transition-colors duration-300">
@@ -179,8 +179,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 <div className="animate-in fade-in duration-500">
                     <Breadcrumb
                         items={[
-                            {label: "Home", path: "/home"},
-                            {label: "My Car", path: "my-car"},
+                            { label: "Home", path: "/home" },
+                            { label: "My Car", path: "/car-owner/my-car" }, // Đường dẫn chính xác
                         ]}
                     />
                 </div>
@@ -188,17 +188,19 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6 animate-in slide-in-from-top duration-500">
                     <h1 className="text-2xl font-bold transition-all duration-300">
-                        List of Cars {pagiantion?.totalRecords ? `(${pagiantion?.totalRecords} total)` : ""}
+                        List of Cars {pagination?.totalRecords ? `(${pagination.totalRecords} total)` : ""}
                     </h1>
                     <div className="flex gap-4">
                         <Button
-                            className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                            className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"
+                        >
                             Add car
                         </Button>
                         <Select defaultValue="id-desc" onValueChange={handleSortChange}>
                             <SelectTrigger
-                                className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
-                                <SelectValue/>
+                                className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500"
+                            >
+                                <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
                                 <SelectItem value="id-desc" className="hover:bg-blue-50 transition-colors duration-150">
@@ -207,20 +209,16 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                 <SelectItem value="id-asc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Oldest to Newest
                                 </SelectItem>
-                                <SelectItem value="basePrice-desc"
-                                            className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="basePrice-desc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Price: High to Low
                                 </SelectItem>
-                                <SelectItem value="basePrice-asc"
-                                            className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="basePrice-asc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Price: Low to High
                                 </SelectItem>
-                                <SelectItem value="brand-asc"
-                                            className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="brand-asc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Brand: A to Z
                                 </SelectItem>
-                                <SelectItem value="brand-desc"
-                                            className="hover:bg-blue-50 transition-colors duration-150">
+                                <SelectItem value="brand-desc" className="hover:bg-blue-50 transition-colors duration-150">
                                     Brand: Z to A
                                 </SelectItem>
                             </SelectContent>
@@ -231,28 +229,30 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Error State */}
                 {error && (
                     <div className="text-red-600 text-center py-12 animate-in fade-in duration-500">
-                        <NoResult/>
+                        <NoResult />
                     </div>
                 )}
 
                 {/* Car Cards */}
                 {cars?.data?.data && (
                     <div
-                        className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
-                        {cars.data.data.data.length === 0 ? (
+                        className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}
+                    >
+                        {cars.data.data?.length === 0 ? (
                             <div className="text-center py-12 animate-in fade-in duration-500">
                                 <p className="text-gray-500 mb-4">Not Found Any Car</p>
                                 <Button
-                                    className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                                    className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"
+                                >
                                     Add Your First Car!
                                 </Button>
                             </div>
                         ) : (
-                            cars.data.data.data.map((car: CarVO_ViewACar, index: number) => (
+                            cars.data.data?.map((car: CarVO_ViewACar, index: number) => (
                                 <Card
                                     key={car.id}
                                     className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom duration-500"
-                                    style={{animationDelay: `${index * 100}ms`}}
+                                    style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     <CardContent className="p-6">
                                         <div className="flex gap-6">
@@ -262,12 +262,13 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 size="icon"
                                                 className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
                                             >
-                                                <ChevronLeft className="h-4 w-4"/>
+                                                <ChevronLeft className="h-4 w-4" />
                                             </Button>
 
                                             {/* Car Image */}
                                             <div
-                                                className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group">
+                                                className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group"
+                                            >
                                                 {car.carImageFront ? (
                                                     <img
                                                         src={car.carImageFront || "/placeholder.svg"}
@@ -278,24 +279,31 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                     <div className="absolute inset-0 flex items-center justify-center">
                                                         <div className="w-full h-full relative">
                                                             <div
-                                                                className="absolute inset-0 flex items-center justify-center">
+                                                                className="absolute inset-0 flex items-center justify-center"
+                                                            >
                                                                 <div
-                                                                    className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"></div>
+                                                                    className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"
+                                                                ></div>
                                                                 <div
-                                                                    className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"></div>
+                                                                    className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"
+                                                                ></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 )}
                                                 {/* Dots indicator */}
                                                 <div
-                                                    className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                                                    className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1"
+                                                >
                                                     <div
-                                                        className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"></div>
+                                                        className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"
+                                                    ></div>
                                                     <div
-                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
+                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"
+                                                    ></div>
                                                     <div
-                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
+                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"
+                                                    ></div>
                                                 </div>
                                             </div>
 
@@ -305,7 +313,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                 size="icon"
                                                 className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
                                             >
-                                                <ChevronRight className="h-4 w-4"/>
+                                                <ChevronRight className="h-4 w-4" />
                                             </Button>
 
                                             {/* Car Details */}
@@ -316,7 +324,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
 
                                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">Ratings:</span>
                                                         <div className="flex items-center gap-1 mt-1">
                                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -330,38 +339,49 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                     </div>
 
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">No. of rides:</span>
                                                         <div className="mt-1 font-semibold text-blue-600">0</div>
                                                     </div>
 
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">Price:</span>
                                                         <div
-                                                            className="mt-1 font-semibold text-green-600">{formatPrice(car.basePrice)}</div>
+                                                            className="mt-1 font-semibold text-green-600"
+                                                        >
+                                                            {formatPrice(car.basePrice)}
+                                                        </div>
                                                     </div>
 
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">Locations:</span>
                                                         <div
-                                                            className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                                            className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                                                        >
                                                             {formatLocation(car)}
                                                         </div>
                                                     </div>
 
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">Seats:</span>
                                                         <div className="mt-1">{car.numberOfSeats} seats</div>
                                                     </div>
 
                                                     <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
+                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
+                                                    >
                                                         <span className="font-medium">Status:</span>
                                                         <div className="mt-1">
-                                                            <Badge {...getStatusBadgeProps(car.status)}>{car.status}</Badge>
+                                                            <Badge {...getStatusBadgeProps(car.status)}>
+                                                                {car.status}
+                                                            </Badge>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -403,16 +423,18 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 )}
 
                 {/* Pagination */}
-                {pagiantion?.totalPages && pagiantion.totalPages > 1 && (
+                {pagination?.totalPages && pagination.totalPages > 1 && (
                     <div
-                        className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
+                        className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500"
+                    >
                         <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
 
                         <div className="flex items-center gap-2">
                             <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
                                 <SelectTrigger
-                                    className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
-                                    <SelectValue/>
+                                    className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500"
+                                >
+                                    <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
                                     <SelectItem value="5" className="hover:bg-blue-50 transition-colors duration-150">
@@ -437,9 +459,14 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Pagination Info */}
                 {cars?.data && (
                     <div className="text-center mt-4 text-sm text-gray-600 animate-in fade-in duration-500">
-                        Showing {(pagiantion?.pageNumber ? (pagiantion.pageNumber - 1) * pagiantion.pageSize + 1 : 0)} to{" "}
-                        {pagiantion?.pageNumber ? Math.min((pagiantion.pageNumber ?? 0) * (pagiantion.pageSize ?? 0), pagiantion.totalRecords ?? 0) : 0} of {pagiantion?.totalRecords ?? 0}{" "}
-                        cars
+                        Showing {pagination?.pageNumber
+                        ? (pagination.pageNumber - 1) * pagination.pageSize + 1
+                        : 0}{" "}
+                        to{" "}
+                        {pagination?.pageNumber
+                            ? Math.min((pagination.pageNumber ?? 0) * (pagination.pageSize ?? 0), pagination.totalRecords ?? 0)
+                            : 0}{" "}
+                        of {pagination?.totalRecords ?? 0} cars
                     </div>
                 )}
             </div>

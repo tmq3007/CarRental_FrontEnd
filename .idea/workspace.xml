@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/car-rental/src/lib/slice/carSlice.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/edit-car/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/car-owner/edit-car/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/app/car-rent/car-owner/edit-car/page.tsx" beforeDir="false" />
@@ -25,6 +24,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -33,13 +37,6 @@
     &quot;assignee&quot;: &quot;tmq3007&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="master" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/tmq3007/CarRental_FrontEnd.git&quot;,
@@ -62,22 +59,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "view-my-car",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "D:\\Intellij Project\\CarRental_FrontEnd\\car-rental\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;view-my-car&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Intellij Project\\CarRental_FrontEnd\\car-rental\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactDesignerToolWindowState">
     <option name="myId2Visible">
       <map>
@@ -89,9 +86,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\components\car\edit-car" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car\edit-car\[carId]" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car" />
       <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner" />
-      <recent name="D:\Document\Projects\FE\car-rental\src\app\(car-rent)" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\app\(car-rent)\car-owner\my-car\[carId]" />
+      <recent name="D:\Intellij Project\CarRental_FrontEnd\car-rental\src\components\car\edit-car" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -149,6 +148,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new master" />
