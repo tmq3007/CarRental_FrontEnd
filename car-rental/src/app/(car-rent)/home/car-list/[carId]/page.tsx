@@ -12,9 +12,11 @@ import NoResult from "@/components/common/no-result";
 import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
 import { useRouter } from "next/navigation";
 
-export default async function MyCarDetailsPage({ params }: { params: Promise< {carId: string }> }) {
-    console.log("params.carId:", params); // Debug log
-    const { data: carDetail, isLoading, error } = useGetCarDetailQuery((await params).carId);
+
+export default  function MyCarDetailsPage({ params }: { params: { carId: string } }) {
+    const carId = params.carId;
+
+    const { data: carDetail, isLoading, error } = useGetCarDetailQuery( carId);
     const route =  useRouter();
     console.log("carDetail", carDetail)
 
