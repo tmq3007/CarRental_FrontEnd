@@ -118,8 +118,8 @@ export default function BookingDetails({ bookingId }: { bookingId: string }) {
         <div className="max-w-5xl mx-auto mb-5 mt-5">
             {/* Breadcrumb */}
             <Breadcrumb items={[{ label: "Home", path: "/" },
-            { label: "My Booking", path: "/booking" },
-            { label: `${bookingDetail.bookingNumber}` }]} />
+                { label: "My Booking", path: "/booking" },
+                { label: `${bookingDetail.bookingNumber}` }]} />
 
             <BookingHeader
                 title="Booking Details"
