@@ -258,7 +258,7 @@ const cars = data?.data.data || [];
                             cars.map((car: CarVO_ViewACar, index: number) => (
                                 <Card
                                     key={car.id}
-                                    className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom duration-500"
+                                    className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     <CardContent className="p-6">

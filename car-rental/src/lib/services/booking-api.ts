@@ -34,7 +34,9 @@ export interface BookingDetailVO {
     pickUpTime?: string;
     dropOffTime?: string;
     accountEmail?: string;
-
+    pickUpLocation?: string;
+    dropOffLocation?: string;
+    
     // Renter's information
     renterFullName?: string;
     renterDob?: string;
