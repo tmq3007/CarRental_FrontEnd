@@ -1,77 +1,103 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { CalendarDays, Clock, Search, MapPin } from "lucide-react"
-import Image from "next/image"
-import AddressInput from "../common/address-input"
-import { DateTimePicker } from "../common/date-time-picker"
-import { useRouter } from "next/navigation"
-import CountUp from "@/blocks/TextAnimations/CountUp/CountUp"
-import SplitText from "@/blocks/TextAnimations/SplitText/SplitText"
-
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button } from '@/components/ui/button';
+import { CalendarDays, Clock, Search, MapPin } from 'lucide-react';
+import Image from 'next/image';
+import AddressInput from '../common/address-input';
+import { DateTimePicker } from '../common/date-time-picker';
+import { useRouter } from 'next/navigation';
+import CountUp from '@/blocks/TextAnimations/CountUp/CountUp';
+import SplitText from '@/blocks/TextAnimations/SplitText/SplitText';
+import { setSearchData } from '@/lib/slice/searchSlice';
+import { RootState } from '@/lib/store';
 
 interface SearchFormData {
   location: {
     province: string;
     district: string;
     ward: string;
-  },
-  pickupDateTime: Date | undefined
-  dropoffDateTime: Date | undefined
+  };
+  pickupDateTime: Date | undefined;
+  dropoffDateTime: Date | undefined;
 }
 
 export default function HeroSearchSection() {
-  const defaultDate = new Date();
-  const [searchData, setSearchData] = useState<SearchFormData>({
-    location: {
-      province: "",
-      district: "",
-      ward: ""
-    },
-    pickupDateTime: defaultDate,
-    dropoffDateTime: defaultDate,
-  })
-
+  const dispatch = useDispatch();
   const router = useRouter();
+  const reduxSearchData = useSelector((state: RootState) => state.search);
+
+  // Initialize local state with persisted Redux state
+  const [searchData, setSearchDataState] = useState<SearchFormData>(() => ({
+    location: {
+      province: reduxSearchData.location.province || '',
+      district: reduxSearchData.location.district || '',
+      ward: reduxSearchData.location.ward || '',
+    },
+    pickupDateTime: reduxSearchData.pickupTime ? new Date(reduxSearchData.pickupTime) : undefined,
+    dropoffDateTime: reduxSearchData.dropoffTime ? new Date(reduxSearchData.dropoffTime) : undefined,
+  }));
+
+  // Sync local state with Redux state if it changes (e.g., due to rehydration)
+  useEffect(() => {
+    setSearchDataState({
+      location: {
+        province: reduxSearchData.location.province || '',
+        district: reduxSearchData.location.district || '',
+        ward: reduxSearchData.location.ward || '',
+      },
+      pickupDateTime: reduxSearchData.pickupTime ? new Date(reduxSearchData.pickupTime) : undefined,
+      dropoffDateTime: reduxSearchData.dropoffTime ? new Date(reduxSearchData.dropoffTime) : undefined,
+    });
+  }, [reduxSearchData]);
 
   const handleSearch = () => {
-    const { province, district, ward } = searchData.location
-
+    const { province, district, ward } = searchData.location;
+  
+    // Update Redux store
+    dispatch(
+      setSearchData({
+        location: { province, district, ward },
+        pickupTime: searchData.pickupDateTime ? searchData.pickupDateTime.toISOString() : null,
+        dropoffTime: searchData.dropoffDateTime ? searchData.dropoffDateTime.toISOString() : null,
+      })
+    );
+  
     const queryParams = new URLSearchParams({
       locationProvince: province,
-      locationDistrict:district,
-      locationWard:ward,
-      pickupTime: searchData.pickupDateTime?.toISOString() || "",
-      dropoffTime: searchData.dropoffDateTime?.toISOString() || "",
-    }).toString()
-
-    router.push(`/search?${queryParams}`)
-  }
+      locationDistrict: district,
+      locationWard: ward,
+      ...(searchData.pickupDateTime && { pickupTime: searchData.pickupDateTime.toISOString() }),
+      ...(searchData.dropoffDateTime && { dropoffTime: searchData.dropoffDateTime.toISOString() }),
+    }).toString();
+  
+    router.push(`/search?${queryParams}`);
+  };
 
   const handleLocationChange = (field: string, value: string) => {
-    setSearchData((prev) => ({
+    setSearchDataState((prev) => ({
       ...prev,
       location: {
         ...prev.location,
         [field]: value,
       },
-    }))
-  }
-
+    }));
+  };
+  
   const handlePickupDateTimeChange = (date: Date | undefined) => {
-    setSearchData((prev) => ({
+    setSearchDataState((prev) => ({
       ...prev,
       pickupDateTime: date,
-    }))
-  }
-
+    }));
+  };
+  
   const handleDropoffDateTimeChange = (date: Date | undefined) => {
-    setSearchData((prev) => ({
+    setSearchDataState((prev) => ({
       ...prev,
       dropoffDateTime: date,
-    }))
-  }
+    }));
+  };
 
   return (
     <section className="relative pt-4 sm:pt-8 m:pt-12 px-4 sm:px-8 md:px-14 flex items-center justify-center overflow-hidden">
@@ -120,7 +146,6 @@ export default function HeroSearchSection() {
               rootMargin="-100px"
               textAlign="center"
             />
-            
           </h1>
 
           {/* Social Proof */}
@@ -136,14 +161,17 @@ export default function HeroSearchSection() {
               ))}
             </div>
             <div className="text-white mt-2 xs:mt-0">
-              <span className="font-semibold text-sm sm:text-base"><CountUp
-                from={0}
-                to={33000}
-                separator=","
-                direction="up"
-                duration={1}
-                className="count-up-text"
-              /> People Booked</span>
+              <span className="font-semibold text-sm sm:text-base">
+                <CountUp
+                  from={0}
+                  to={33000}
+                  separator=","
+                  direction="up"
+                  duration={1}
+                  className="count-up-text"
+                />{' '}
+                People Booked
+              </span>
               <br />
               <span className="text-xs sm:text-sm opacity-90">Dream Place</span>
             </div>
@@ -152,11 +180,15 @@ export default function HeroSearchSection() {
 
         {/* Search Form */}
         <div className="flex items-center justify-center w-full">
-          <div className="max-w-3xl mb-8 sm:mb-12 md:mb-16" style={{ minWidth: "60%" }}>
+          <div className="max-w-3xl mb-8 sm:mb-12 md:mb-16" style={{ minWidth: '60%' }}>
             {/* Form Header */}
             <div className="text-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Find Your Perfect Ride</h2>
-              <p className="text-white/80 text-sm sm:text-base">Choose your destination and dates to get started</p>
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
+                Find Your Perfect Ride
+              </h2>
+              <p className="text-white/80 text-sm sm:text-base">
+                Choose your destination and dates to get started
+              </p>
             </div>
 
             {/* Main Form Container */}
@@ -171,11 +203,19 @@ export default function HeroSearchSection() {
                         <MapPin className="w-5 h-5 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">Pickup Location</h3>
-                        <p className="text-xs text-gray-500">Where do you want to pick up?</p>
+                        <h3 className="font-semibold text-gray-900 text-sm">
+                          Pickup Location
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          Where do you want to pick up?
+                        </p>
                       </div>
                     </div>
-                    <AddressInput location={searchData.location} onLocationChange={handleLocationChange} orientation="horizontal" />
+                    <AddressInput
+                      location={searchData.location}
+                      onLocationChange={handleLocationChange}
+                      orientation="horizontal"
+                    />
                   </div>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-4">
@@ -186,8 +226,12 @@ export default function HeroSearchSection() {
                           <CalendarDays className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 text-sm">Pickup Time</h3>
-                          <p className="text-xs text-gray-500">When do you need it?</p>
+                          <h3 className="font-semibold text-gray-900 text-sm">
+                            Pickup Time
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            When do you need it?
+                          </p>
                         </div>
                       </div>
                       <DateTimePicker
@@ -205,8 +249,12 @@ export default function HeroSearchSection() {
                           <Clock className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 text-sm">Return Time</h3>
-                          <p className="text-xs text-gray-500">When will you return?</p>
+                          <h3 className="font-semibold text-gray-900 text-sm">
+                            Return Time
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            When will you return?
+                          </p>
                         </div>
                       </div>
                       <DateTimePicker
@@ -218,7 +266,6 @@ export default function HeroSearchSection() {
                     </div>
                   </div>
                 </div>
-
               </div>
 
               {/* Search Button */}
@@ -257,5 +304,5 @@ export default function HeroSearchSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
