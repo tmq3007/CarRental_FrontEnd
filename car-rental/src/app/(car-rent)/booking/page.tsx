@@ -16,6 +16,7 @@ import { Location } from "@/components/common/address-input";
 import { RootState } from "@/lib/store";
 import Stepper from "@/components/rent-a-car/stepper";
 import { BookingVO, useGetBookingCarAndUserQuery } from "@/lib/services/booking-api";
+import LoadingPage from "@/components/common/loading";
 
 interface Step {
   id: number;
@@ -280,7 +281,7 @@ export default function CarRentalBooking() {
   ];
 
   if (isLoading || isFetching) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+    return <LoadingPage />;
   }
 
   if (error || !carId || !userId) {
