@@ -12,7 +12,6 @@ import NoResult from "@/components/common/no-result"
 import Breadcrumb from "@/components/common/breadcum"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
-import {CarDetailsPage} from "@/components/car/car-detail/car-details-page";
  import {useRouter} from "next/navigation";
 import LoadingPage from "@/components/common/loading";
 
@@ -34,7 +33,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         router.push(`/user/my-car/${carId}`);
     };
     const {
-        data: cars,
+        data,
         error,
         isLoading: loading,
     } = useGetCarsQuery({
@@ -43,7 +42,16 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         pageSize,
         filters,
     })
-    const pagiantion = cars?.data?.data?.pagination
+const cars = data?.data.data || [];
+  const pagination = data?.data.pagination || {
+    pageNumber: 1,
+    pageSize: 10,
+    totalRecords: 0,
+    totalPages: 1,
+    hasPreviousPage: false,
+    hasNextPage: false,
+  };
+
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
         const [sortBy, sortDirection] = value.split("-")
@@ -107,8 +115,8 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     const renderPaginationButtons = () => {
         if (!cars) return null
         const {pageNumber, totalPages} = {
-            pageNumber: pagiantion?.pageNumber ?? 1,
-            totalPages: pagiantion?.totalPages ?? 1
+            pageNumber: pagination?.pageNumber ?? 1,
+            totalPages: pagination?.totalPages ?? 1
         }
         const buttons = []
 
@@ -118,7 +126,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber - 1)}
-                disabled={!pagiantion?.hasPreviousPage}
+                disabled={!pagination?.hasPreviousPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {"<<<"}
@@ -158,7 +166,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handlePageChange(pageNumber + 1)}
-                disabled={!pagiantion?.hasNextPage}
+                disabled={!pagination?.hasNextPage}
                 className="transition-all duration-200 hover:bg-gray-100 disabled:opacity-50"
             >
                 {">>>"}
@@ -168,7 +176,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         return buttons
     }
 
-    if (loading || !cars?.data?.data) {
+    if (loading || !cars) {
         return <LoadingPage/>
     }
 
@@ -188,7 +196,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6 animate-in slide-in-from-top duration-500">
                     <h1 className="text-2xl font-bold transition-all duration-300">
-                        List of Cars {pagiantion?.totalRecords ? `(${pagiantion?.totalRecords} total)` : ""}
+                        List of Cars {pagination?.totalRecords ? `(${pagination?.totalRecords} total)` : ""}
                     </h1>
                     <div className="flex gap-4">
                         <Button
@@ -236,10 +244,10 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 )}
 
                 {/* Car Cards */}
-                {cars?.data?.data && (
+                {cars && (
                     <div
                         className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
-                        {cars.data.data.data.length === 0 ? (
+                        {cars.length === 0 ? (
                             <div className="text-center py-12 animate-in fade-in duration-500">
                                 <p className="text-gray-500 mb-4">Not Found Any Car</p>
                                 <Button
@@ -248,7 +256,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                 </Button>
                             </div>
                         ) : (
-                            cars.data.data.data.map((car: CarVO_ViewACar, index: number) => (
+                            cars.map((car: CarVO_ViewACar, index: number) => (
                                 <Card
                                     key={car.id}
                                     className="bg-white transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-in fade-in slide-in-from-bottom duration-500"
@@ -403,7 +411,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 )}
 
                 {/* Pagination */}
-                {pagiantion?.totalPages && pagiantion.totalPages > 1 && (
+                {pagination?.totalPages && pagination.totalPages > 1 && (
                     <div
                         className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
                         <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
@@ -435,10 +443,10 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                 )}
 
                 {/* Pagination Info */}
-                {cars?.data && (
+                {cars && (
                     <div className="text-center mt-4 text-sm text-gray-600 animate-in fade-in duration-500">
-                        Showing {(pagiantion?.pageNumber ? (pagiantion.pageNumber - 1) * pagiantion.pageSize + 1 : 0)} to{" "}
-                        {pagiantion?.pageNumber ? Math.min((pagiantion.pageNumber ?? 0) * (pagiantion.pageSize ?? 0), pagiantion.totalRecords ?? 0) : 0} of {pagiantion?.totalRecords ?? 0}{" "}
+                        Showing {(pagination?.pageNumber ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0)} to{" "}
+                        {pagination?.pageNumber ? Math.min((pagination.pageNumber ?? 0) * (pagination.pageSize ?? 0), pagination.totalRecords ?? 0) : 0} of {pagination?.totalRecords ?? 0}{" "}
                         cars
                     </div>
                 )}

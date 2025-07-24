@@ -7,6 +7,7 @@ import {
   useCancelBookingMutation,
   useConfirmPickupMutation,
   BookingDetailVO,
+  BookingVO,
 } from "@/lib/services/booking-api"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,7 @@ import { Pagination } from "@/components/wallet/pagination"
 import { Search, Filter, Calendar, Car, CreditCard, MapPin } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
+import { useRouter } from "next/navigation"
 
 interface BookingListPageProps {
   onViewDetails: (bookingId: string) => void
@@ -28,6 +30,7 @@ interface BookingListPageProps {
 
 export default function BookingListPage({ onViewDetails }: BookingListPageProps) {
   const userId = useSelector((state: RootState) => state.user?.id)
+  const route = useRouter();
   const [cancelBooking] = useCancelBookingMutation()
   const [confirmPickup] = useConfirmPickupMutation()
   const [returnCar] = useReturnCarMutation()
@@ -50,8 +53,8 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
       )
     }
     return [...filteredBookings].sort((a, b) => {
-      const dateA = new Date(a.pickUpTime ?? "").getTime()
-      const dateB = new Date(b.pickUpTime ?? "").getTime()
+      const dateA = new Date(a.pickupDate ?? "").getTime()
+      const dateB = new Date(b.returnDate ?? "").getTime()
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB
     })
   }, [bookings, sortOrder, searchTerm])
@@ -59,7 +62,7 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
   const totalPages = Math.ceil(sortedBookings.length / itemsPerPage)
   const paginatedBookings = sortedBookings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-  const handleConfirmPickup = async (booking: BookingDetailVO) => {
+  const handleConfirmPickup = async (booking: BookingVO) => {
     const confirmPromise = confirmPickup({ bookingNumber: booking.bookingNumber }).unwrap()
 
     toast.promise(confirmPromise, {
@@ -69,7 +72,7 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
     })
   }
 
-  const handleCancelBooking = async (booking: BookingDetailVO) => {
+  const handleCancelBooking = async (booking: BookingVO) => {
     toast.custom(
       (t) => (
         <div className="bg-white border border-red-200 rounded-lg shadow-lg p-4 max-w-md">
@@ -120,9 +123,9 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
     )
   }
 
-  const handleReturnCar = async (booking: BookingDetailVO) => {
-    const pickupDate = new Date(booking.pickUpTime ?? "")
-    const returnDate = new Date(booking.dropOffTime ?? "")
+  const handleReturnCar = async (booking: BookingVO) => {
+    const pickupDate = new Date(booking.pickupDate ?? "")
+    const returnDate = new Date(booking.returnDate ?? "")
     const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
     const total = booking.basePrice ?? -1 * numberOfDays
     const refundAmount = booking.deposit ?? -1 - total
@@ -247,9 +250,9 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
 
       {/* Bookings Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {paginatedBookings.map((booking: BookingDetailVO) => {
-          const pickupDate = new Date(booking.pickUpTime ?? "")
-          const returnDate = new Date(booking.dropOffTime ?? "")
+        {paginatedBookings.map((booking: BookingVO) => {
+          const pickupDate = new Date(booking.pickupDate ?? "")
+          const returnDate = new Date(booking.returnDate ?? "")
           const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
           return (
@@ -295,7 +298,7 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
 
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
-                    onClick={() => onViewDetails(booking.bookingNumber)}
+                    onClick={() => route}
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
                     size="sm"
                   >
