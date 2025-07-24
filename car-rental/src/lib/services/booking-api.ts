@@ -145,7 +145,7 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
-        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+        getBookingsByAccountId: build.query<ApiResponse<BookingDetailVO[]>, { accountId: string }>({
             query: ({ accountId }) => ({
                 url: `/booking/${accountId}`,
                 method: "GET",
