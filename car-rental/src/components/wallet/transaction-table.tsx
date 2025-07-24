@@ -31,7 +31,7 @@ export function TransactionTable({ transactions, startIndex }: TransactionTableP
       </span>
         )
     }
-
+console.log("trasn", transactions)
     return (
         <div className="overflow-x-auto">
             <Table>
@@ -43,6 +43,7 @@ export function TransactionTable({ transactions, startIndex }: TransactionTableP
                         <TableHead>Date/Time</TableHead>
                         <TableHead>Booking No.</TableHead>
                         <TableHead>Car Name</TableHead>
+                        <TableHead>Message</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -51,9 +52,10 @@ export function TransactionTable({ transactions, startIndex }: TransactionTableP
                             <TableCell>{startIndex + index + 1}</TableCell>
                             <TableCell>{formatTransactionAmount(transaction)}</TableCell>
                             <TableCell>{transaction.type}</TableCell>
-                            <TableCell>{transaction.formattedDateTime}</TableCell>
+                            <TableCell>{transaction.formattedDateTime.split(" ")[0]}</TableCell>
                             <TableCell>{transaction.bookingNumber || "N/A"}</TableCell>
                             <TableCell>{transaction.carName || "N/A"}</TableCell>
+                            <TableCell>{transaction.message || "N/A"}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
