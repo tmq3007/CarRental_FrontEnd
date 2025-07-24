@@ -7,7 +7,7 @@ import {RootState} from "@/lib/store";
 import NoResult from "@/components/common/no-result";
 
 export default function CarsPage() {
-     const mockAccountId = useSelector((state: RootState) => state.user?.id)
+    const mockAccountId = useSelector((state: RootState) => state.user?.id)
     const role = useSelector((state: RootState) => state.user?.role)
     if (role === "car_owner") {
         if (!mockAccountId) {
@@ -24,8 +24,5 @@ export default function CarsPage() {
     }else{
         return <NoResult />
     }
-
-
-
 
 }

@@ -20,6 +20,10 @@ export interface BookingVO {
     paymentType: string;
     createdAt: string;
     status: string;
+    carImageFront?: string;
+    carImageBack?: string;
+    carImageLeft?: string;
+    carImageRight?: string;
 }
 
 export interface BookingDetailVO {
@@ -30,7 +34,9 @@ export interface BookingDetailVO {
     pickUpTime?: string;
     dropOffTime?: string;
     accountEmail?: string;
-
+    pickUpLocation?: string;
+    dropOffLocation?: string;
+    
     // Renter's information
     renterFullName?: string;
     renterDob?: string;
@@ -132,6 +138,11 @@ export interface PaginatedBookingResponse {
     totalCount: number;
 }
 
+export interface FeedbackResponseDTO {
+    success: boolean;
+    message: string;
+}
+
 export const bookingApi = createApi({
     reducerPath: "bookingApi",
     baseQuery: baseQueryWithAuthCheck,
@@ -145,7 +156,7 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
-        getBookingsByAccountId: build.query<ApiResponse<BookingDetailVO[]>, { accountId: string }>({
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
             query: ({ accountId }) => ({
                 url: `/booking/${accountId}`,
                 method: "GET",
@@ -207,6 +218,23 @@ export const bookingApi = createApi({
             }),
             invalidatesTags: ["Booking"],
         }),
+
+        rateCar: build.mutation<
+            ApiResponse<FeedbackResponseDTO>,
+            { bookingNumber: string; rating: number; comment: string }
+        >({
+            query: ({ bookingNumber, rating, comment }) => ({
+                url: '/feedback/submit',
+                method: 'POST',
+                body: {
+                    BookingNumber: bookingNumber,
+                    Rating: rating,
+                    Comment: comment,
+                },
+            }),
+            invalidatesTags: ['Booking'],
+        }),
+
     }),
 });
 
@@ -218,6 +246,7 @@ export const {
     useReturnCarMutation,
     useGetBookingDetailQuery,
     useUpdateBookingMutation,
+    useRateCarMutation,
     useGetBookingCarAndUserQuery,
     useCreateBookingMutation,
 } = bookingApi;
