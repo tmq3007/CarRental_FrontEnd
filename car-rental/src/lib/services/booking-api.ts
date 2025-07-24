@@ -3,6 +3,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
 import { ApiResponse } from "@/lib/store";
+import { CarVO_Detail } from "./car-api";
+import { UserProfile } from "./user-api";
+import { Location } from "./local-api/address-api";
+import { OccupiedDateRange } from "@/components/rent-a-car/booking-panel";
 
 export interface BookingVO {
     carName: string;
@@ -87,7 +91,11 @@ export interface BookingDetailVO {
     deposit?: number;
     paymentType?: string;
 }
-
+export interface BookingCarAndUserResponse {
+    car: CarVO_Detail;
+    user: UserProfile;
+    carCallendar: OccupiedDateRange[];
+}
 export interface BookingEditDTO {
     driverFullName?: string | null;
     driverDob?: string | null; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
@@ -99,6 +107,24 @@ export interface BookingEditDTO {
     driverWard?: string | null;
     driverDistrict?: string | null;
     driverCityProvince?: string | null;
+}
+
+export interface CreateBookingDTO {
+    carId: string;
+    pickupDate: string; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
+    dropoffDate: string; // DateOnly in C# maps to string in TS (YYYY-MM-DD format)
+    pickupLocation: Location;
+    dropoffLocation: Location;
+    paymentType: string;
+    deposit: number;
+    driverFullName?: string | null;
+    driverDob?: string | null; // DateOnly in C# maps to string in TS
+    driverEmail?: string | null;
+    driverPhoneNumber?: string | null;
+    driverNationalId?: string | null;
+    driverHouseNumberStreet?: string | null;
+    driverLocation?: Location;
+    isRenterSameAsDriver?: boolean;
 }
 
 export interface PaginatedBookingResponse {
@@ -124,7 +150,7 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
-        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
+        getBookingsByAccountId: build.query<ApiResponse<BookingDetailVO[]>, { accountId: string }>({
             query: ({ accountId }) => ({
                 url: `/booking/${accountId}`,
                 method: "GET",
@@ -171,6 +197,21 @@ export const bookingApi = createApi({
                 "Booking",
             ],
         }),
+        getBookingCarAndUser: build.query<ApiResponse<BookingCarAndUserResponse>, string>({
+            query: (carId) => ({
+                url: `/booking/booking-informations/${carId}`,
+                method: "GET",
+            }),
+            providesTags: (result, error, carId) => [{ type: "Booking", id: carId }],
+        }),
+        createBooking: build.mutation<ApiResponse<BookingVO>, CreateBookingDTO>({
+            query: (bookingCreateDto) => ({
+                url: `/booking/create`,
+                method: "POST",
+                body: bookingCreateDto,
+            }),
+            invalidatesTags: ["Booking"],
+        }),
 
         rateCar: build.mutation<
             ApiResponse<FeedbackResponseDTO>,
@@ -200,4 +241,7 @@ export const {
     useGetBookingDetailQuery,
     useUpdateBookingMutation,
     useRateCarMutation,
+    useUpdateBookingMutation,
+    useGetBookingCarAndUserQuery,
+    useCreateBookingMutation,
 } = bookingApi;

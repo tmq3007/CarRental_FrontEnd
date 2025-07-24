@@ -1,22 +1,26 @@
-"use client"
+"use client";
 
-import type * as React from "react"
-import { CalendarIcon, Clock, Zap } from "lucide-react"
-import { format, addDays, addWeeks, startOfWeek, addMonths } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
-import { TimePickerInput } from "../ui/time-picker-input"
+import type * as React from "react";
+import { CalendarIcon, Clock, Zap } from "lucide-react";
+import { format, addDays, addWeeks, startOfWeek, addMonths, isWithinInterval, isSameDay, isBefore, isAfter } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { TimePickerInput } from "../ui/time-picker-input";
+import { OccupiedDateRange } from "../rent-a-car/booking-panel";
 
 interface DateTimePickerProps {
-  value?: Date
-  onChange: (date: Date | undefined) => void
-  label?: string
-  placeholder?: string
-  icon?: React.ReactNode
+  value?: Date;
+  onChange: (date: Date | undefined) => void;
+  label?: string;
+  placeholder?: string;
+  icon?: React.ReactNode;
+  occupiedDates?: OccupiedDateRange[];
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 export function DateTimePicker({
@@ -25,33 +29,55 @@ export function DateTimePicker({
   label,
   placeholder = "Select date & time",
   icon,
+  occupiedDates = [],
+  minDate,
+  maxDate,
 }: DateTimePickerProps) {
+  const isDateDisabled = (date: Date) => {
+    if (minDate && isBefore(date, minDate) && !isSameDay(date, minDate)) {
+      return true;
+    }
+    if (maxDate && isAfter(date, maxDate) && !isSameDay(date, maxDate)) {
+      return true;
+    }
+    return occupiedDates.some(
+      (range) =>
+        isWithinInterval(date, { start: range.start, end: range.end }) ||
+        isSameDay(date, range.start) ||
+        isSameDay(date, range.end)
+    );
+  };
+
   function handleDateSelect(date: Date | undefined) {
-    if (date) {
+    if (date && !isDateDisabled(date)) {
       if (value) {
-        const newDate = new Date(date)
-        newDate.setHours(value.getHours())
-        newDate.setMinutes(value.getMinutes())
-        onChange(newDate)
+        const newDate = new Date(date);
+        newDate.setHours(value.getHours());
+        newDate.setMinutes(value.getMinutes());
+        onChange(newDate);
       } else {
-        const newDate = new Date(date)
-        newDate.setHours(10, 0, 0, 0)
-        onChange(newDate)
+        const newDate = new Date(date);
+        newDate.setHours(10, 0, 0, 0);
+        onChange(newDate);
       }
     }
   }
 
   function quickSelect(offsetDays: number, hour = 10) {
-    const date = new Date()
-    date.setDate(date.getDate() + offsetDays)
-    date.setHours(hour, 0, 0, 0)
-    onChange(date)
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+    date.setHours(hour, 0, 0, 0);
+    if (!isDateDisabled(date)) {
+      onChange(date);
+    }
   }
 
   function quickSelectSpecific(date: Date, hour = 10) {
-    const newDate = new Date(date)
-    newDate.setHours(hour, 0, 0, 0)
-    onChange(newDate)
+    const newDate = new Date(date);
+    newDate.setHours(hour, 0, 0, 0);
+    if (!isDateDisabled(newDate)) {
+      onChange(newDate);
+    }
   }
 
   const quickOptions = [
@@ -90,13 +116,13 @@ export function DateTimePicker({
       icon: <CalendarIcon className="h-4 w-4" />,
       action: () => quickSelectSpecific(addMonths(new Date(), 1)),
     },
-  ]
+  ].filter((option) => !isDateDisabled(option.date));
 
   const timePresets = [
     { label: "Morning", time: "9:00 AM", hour: 9 },
     { label: "Afternoon", time: "2:00 PM", hour: 14 },
     { label: "Evening", time: "6:00 PM", hour: 18 },
-  ]
+  ];
 
   function handleTimeChange(type: string, newValue: string): void {
     if (!value) return;
@@ -132,7 +158,6 @@ export function DateTimePicker({
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 shadow-lg border-gray-200" align="start">
           <div className="flex flex-col">
-            {/* Top Section: Calendar and Quick Select */}
             <div className="flex flex-col sm:flex-row sm:items-start">
               <div className="p-1">
                 <Calendar
@@ -141,17 +166,15 @@ export function DateTimePicker({
                   onSelect={handleDateSelect}
                   autoFocus
                   className="rounded-lg"
+                  disabled={isDateDisabled}
                 />
               </div>
-
               <div className="flex flex-col w-full sm:w-64 sm:border-l border-t sm:border-t-0">
-                {/* Quick Date Selection */}
                 <div className="py-2.5 px-3 space-y-2">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Zap className="h-4 w-4 text-green-600" />
                     <h3 className="font-medium text-sm text-gray-900">Quick Select</h3>
                   </div>
-
                   <div className="space-y-1">
                     {quickOptions.map((option, index) => (
                       <Button
@@ -159,6 +182,7 @@ export function DateTimePicker({
                         variant="ghost"
                         className="h-auto py-1.5 px-2 justify-start hover:bg-green-50 hover:border-blue-200 border border-transparent w-full"
                         onClick={option.action}
+                        disabled={isDateDisabled(option.date)}
                       >
                         <div className="flex items-center gap-1.5 w-full">
                           <div className="flex-shrink-0 text-green-600">{option.icon}</div>
@@ -174,21 +198,14 @@ export function DateTimePicker({
                 </div>
               </div>
             </div>
-
             <Separator />
-
-            {/* Bottom Section: Time Controls Spanning Full Width */}
             <div className="py-2.5 px-3">
               <div className="flex flex-col sm:flex-row gap-6">
-                
-
-                {/* Custom Time */}
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Clock className="h-4 w-4 text-purple-600" />
                     <h3 className="font-medium text-sm text-gray-900">Custom Time</h3>
                   </div>
-
                   <div className="flex items-center justify-center gap-2">
                     <TimePickerInput
                       picker="12hours"
@@ -216,14 +233,11 @@ export function DateTimePicker({
                     </select>
                   </div>
                 </div>
-                
-                {/* Time Presets */}
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Clock className="h-4 w-4 text-green-600" />
                     <h3 className="font-medium text-sm text-gray-900">Time Presets</h3>
                   </div>
-
                   <div className="grid grid-cols-3 gap-2">
                     {timePresets.map((preset, index) => (
                       <Button
@@ -233,9 +247,9 @@ export function DateTimePicker({
                         className="h-auto p-2 flex-col hover:bg-green-50 hover:border-green-200 text-xs"
                         onClick={() => {
                           if (value) {
-                            const newDate = new Date(value)
-                            newDate.setHours(preset.hour, 0, 0, 0)
-                            onChange(newDate)
+                            const newDate = new Date(value);
+                            newDate.setHours(preset.hour, 0, 0, 0);
+                            onChange(newDate);
                           }
                         }}
                       >
@@ -245,12 +259,11 @@ export function DateTimePicker({
                     ))}
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

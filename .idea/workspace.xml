@@ -4,6 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+    <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="filter car admin">
+      <change afterPath="$PROJECT_DIR$/car-rental/public/img.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/about-us/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/contact/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/learn-more/page.tsx" afterDir="false" />
     <list default="true" id="8d0c08dd-54e3-4519-8d94-13bad2fda496" name="Changes" comment="update route">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/package-lock.json" afterDir="false" />
@@ -11,11 +16,23 @@
       <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/booking/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/booking/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/components/car/edit-car/edit-car-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/car/edit-car/edit-car-details.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/car-rental/src/lib/services/booking-api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/lib/services/booking-api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/user/wallet/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/app/(car-rent)/vnpay-callback/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/booking/booking-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/booking/booking-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/layouts/footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/layouts/footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/car-rental/src/components/wallet/pagination.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/car-rental/src/components/wallet/pagination.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="UML Sequence" />
+      </list>
+    </option>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -62,6 +79,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultPlantUmlFileTemplate&quot;: &quot;UML Sequence&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
@@ -72,6 +90,8 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Document\\Projects\\FE\\car-rental\\node_modules\\typescript\\lib&quot;,
     &quot;ts.external.directory.path&quot;: &quot;D:\\Intellij Project\\CarRental_FrontEnd\\car-rental\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -118,6 +138,12 @@
       <workItem from="1752031596271" duration="20045000" />
       <workItem from="1752076483212" duration="40000" />
       <workItem from="1752331965580" duration="1876000" />
+      <workItem from="1752601297291" duration="6637000" />
+      <workItem from="1752635652255" duration="37000" />
+      <workItem from="1752674950298" duration="58000" />
+      <workItem from="1752675030038" duration="755000" />
+      <workItem from="1752945211643" duration="5109000" />
+      <workItem from="1753279589147" duration="10437000" />
       <workItem from="1752601297291" duration="6316000" />
       <workItem from="1753333886896" duration="9514000" />
       <workItem from="1753357312030" duration="8268000" />
@@ -146,6 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752054221926</updated>
     </task>
+    <task id="LOCAL-00004" summary="filter car admin">
+      <option name="closed" value="true" />
+      <created>1752608274120</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1752608274120</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <task id="LOCAL-00004" summary="update route">
       <option name="closed" value="true" />
       <created>1753334057456</created>
@@ -176,6 +211,8 @@
     <MESSAGE value="Create admin account management page" />
     <MESSAGE value="update chatbot" />
     <MESSAGE value="update admin: uẻ's car" />
+    <MESSAGE value="filter car admin" />
+    <option name="LAST_COMMIT_MESSAGE" value="filter car admin" />
     <MESSAGE value="update route" />
     <option name="LAST_COMMIT_MESSAGE" value="update route" />
   </component>

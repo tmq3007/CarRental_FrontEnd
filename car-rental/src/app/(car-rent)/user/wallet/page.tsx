@@ -67,30 +67,33 @@ export default function WalletPage() {
 
     const handleWithdraw = async () => {
         try {
-            const amount = Number.parseInt(withdrawAmount)
+            const amount = Number.parseInt(withdrawAmount);
             if (amount <= 0) {
-                toast.error("Please enter a valid amount")
-                return
+                toast.error("Please enter a valid amount");
+                return;
             }
+
+            console.log("Withdraw amount:", amount); // ✅ Debug log
 
             const result = await withdrawMoney({
                 accountId: ACCOUNT_ID,
                 dto: { amount, message: "Withdrawal from wallet" },
-            }).unwrap()
+            }).unwrap();
 
-            toast.success("Money withdrawn successfully")
-            setShowWithdrawModal(false)
-            setWithdrawAmount("")
+            toast.success("Money withdrawn successfully");
+            setShowWithdrawModal(false);
+            setWithdrawAmount("");
 
-            // Force refetch both balance and transactions
+            // Refetch data
             setTimeout(() => {
-                refetchBalance()
-                refetchTransactions()
-            }, 100)
+                refetchBalance();
+                refetchTransactions();
+            }, 100);
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to withdraw money")
+            toast.error(error?.data?.message || "Failed to withdraw money");
         }
-    }
+    };
+
 
     const handleTopup = async (paymentMethod: string) => {
         try {
@@ -113,12 +116,12 @@ export default function WalletPage() {
                 window.location.href = paymentUrl.paymentUrl;
                 return;
             }
-
+            console.log("Top amount:", amount);
             // Original wallet top-up logic
-            const result = await topupMoney({
-                accountId: ACCOUNT_ID,
-                dto: { amount, message: "Top-up to wallet" },
-            }).unwrap();
+            // const result = await topupMoney({
+            //     accountId: ACCOUNT_ID,
+            //     dto: { amount, message: "Top-up to wallet" },
+            // }).unwrap();
 
             toast.success("Money topped up successfully");
             setShowTopupModal(false);
@@ -170,8 +173,8 @@ export default function WalletPage() {
     const balance = walletData?.data?.formattedBalance || "0 VND"
     const currentBalance = walletData?.data?.balance || 0
     const transactions = transactionData?.data?.data || []
-    const totalCount = transactionData?.data?.totalCount || 0
-    const totalPages = Math.ceil(totalCount / itemsPerPage)
+    const totalCount = transactionData?.data?.totalPages || 0
+    const totalPages = transactionData?.data?.totalPages || 0
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = Math.min(startIndex + itemsPerPage, totalCount)
 
@@ -242,7 +245,7 @@ export default function WalletPage() {
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
-                                totalItems={totalCount}
+                                totalItems={totalPages * 5}
                                 startIndex={startIndex}
                                 endIndex={endIndex}
                                 onPageChange={handlePageChange}

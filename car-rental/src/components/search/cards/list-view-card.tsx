@@ -6,6 +6,8 @@ import { Star, Bookmark, Car, Fuel, Cog, Ruler, Box, ChevronLeft, ChevronRight, 
 import { Card } from "@/components/ui/card"
 import { useState, useRef } from "react"
 import { CarSearchVO } from "@/lib/services/car-api"
+import { useRouter } from "next/navigation"
+import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 
 
 interface CarRentalListCardProps {
@@ -19,6 +21,7 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const rentButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
   const viewButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
+  const router = useRouter();
 
   const handleMouseEnter = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -96,9 +99,8 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
                 <button
                   key={i}
                   onClick={() => goToImage(i)}
-                  className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${
-                    i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
-                  }`}
+                  className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
+                    }`}
                 />
               ))}
             </div>
@@ -130,7 +132,10 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
               <Box size={20} className="text-gray-500 mb-1 md:mb-2" />
               <span className="text-xs text-gray-500">{car.specs.numberOfSeat}</span>
             </div>
-            <div className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer hover:bg-green-50">
+            <div onClick={() => {
+              router.push(`/home/car-list/${car.id}`);
+            }}
+              className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer hover:bg-green-50">
               <span className="text-xs font-medium">View All</span>
               <span className="text-xs">Specification</span>
             </div>
@@ -156,9 +161,9 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
         {/* Right Section - Pricing and Actions */}
         <div className="w-full lg:w-1/3 p-4 border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col justify-center">
           <div className="text-center lg:text-right mb-6">
-            <p className="text-sm text-gray-500 mb-1">Total 5 days</p>
-            <p className="text-gray-500 line-through text-lg">${car.basePrice * 1.2}</p>
-            <p className="text-green-600 text-3xl md:text-4xl font-bold mb-1">${car.basePrice}</p>
+            <p className="text-sm text-gray-500 mb-1">Per day</p>
+            <p className="text-gray-500 line-through text-lg">{formatCurrency(car.basePrice * 1.2)}</p>
+            <p className="text-green-600 text-3xl md:text-4xl font-bold mb-1">{formatCurrency(car.basePrice)}</p>
           </div>
 
           <div className="space-y-3">
@@ -166,6 +171,9 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
               ref={rentButtonRef}
               className="relative overflow-hidden bg-black text-white w-full py-2 md:py-3 px-4 md:px-6 rounded-full font-medium transition-colors duration-700 group"
               onMouseEnter={(e) => handleMouseEnter(e, rentButtonRef, setRentButtonPos)}
+              onClick={() => {
+                router.push(`/booking?carId=${car.id}`);
+              }}
             >
               <span className="relative z-10">RENT NOW</span>
               <div
@@ -183,6 +191,9 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
               ref={viewButtonRef}
               className="relative overflow-hidden border border-gray-300 text-gray-700 w-full py-2 md:py-3 px-4 md:px-6 rounded-full font-medium hover:border-green-500 transition-colors duration-700 group"
               onMouseEnter={(e) => handleMouseEnter(e, viewButtonRef, setViewButtonPos)}
+              onClick={() => {
+                router.push(`/home/car-list/${car.id}`);
+              }}
             >
               <span className="relative z-10 transition-colors duration-700 group-hover:text-white">VIEW DEAL</span>
               <div

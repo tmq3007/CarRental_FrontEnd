@@ -1,40 +1,52 @@
-
+'use client'
 import type React from "react"
 
 import Link from "next/link"
 import { Car, Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {useSelector} from "react-redux";
+import {RootState} from "@/lib/store";
 export default function Footer() {
+  const role = useSelector((state: RootState) => state.user?.role);
+  const fptUniversityAddress =
+      "FPT University Hà Nội, Khu Công nghệ cao Hòa Lạc, Km29 Đại lộ Thăng Long, Thạch Thất, Hà Nội"
+  const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fptUniversityAddress)}`
+
   const footerSections = [
     {
       title: "RENT CARS",
       links: [
-        { name: "Search Cars and Rates", href: "/search", icon: ArrowRight },
+        { name: "Search Cars and Rates", href: "/", icon: ArrowRight },
         { name: "Rental Locations", href: "/locations", icon: ArrowRight },
-        { name: "Special Deals", href: "/deals", icon: ArrowRight },
-        { name: "Fleet Overview", href: "/fleet", icon: ArrowRight },
       ],
     },
-    {
-      title: "CUSTOMER ACCESS",
-      links: [
-        { name: "Manage My Booking", href: "/manage-booking", icon: ArrowRight },
-        { name: "My Wallet", href: "/wallet", icon: ArrowRight },
-        { name: "My Car", href: "/my-car", icon: ArrowRight },
-        { name: "Log In", href: "/login", icon: ArrowRight },
-      ],
-    },
-    {
-      title: "JOIN US",
-      links: [
-        { name: "New User Sign Up", href: "/signup", icon: ArrowRight },
-        { name: "Become a Partner", href: "/partner", icon: ArrowRight },
-        { name: "Careers", href: "/careers", icon: ArrowRight },
-        { name: "Investor Relations", href: "/investors", icon: ArrowRight },
-      ],
-    },
-  ]
+    ...(role === "customer"
+        ? [
+          {
+            title: "CUSTOMER ACCESS",
+            links: [
+              { name: "Manage My Booking", href: "user/booking", icon: ArrowRight },
+              { name: "My Wallet", href: "user/wallet", icon: ArrowRight },
+              { name: "My Profile", href: "user/profile", icon: ArrowRight },
+            ],
+          },
+        ]
+        : []),
+    ...(!role
+        ? [
+          {
+            title: "JOIN US",
+            links: [
+              { name: "New User Sign Up", href: "signup", icon: ArrowRight },
+              { name: "Become a Partner", href: "signup", icon: ArrowRight },
+              { name: "Log In", href: "signin", icon: ArrowRight },
+            ],
+          },
+        ]
+        : []),
+  ];
+
 
   const socialLinks = [
     { name: "Facebook", icon: Facebook, href: "#", color: "hover:text-blue-500" },
@@ -78,7 +90,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3 text-green-100 hover:text-white transition-colors group">
                 <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                <span className="text-sm">50+ Locations Nationwide</span>
+                <span className="text-sm">FPT University Ha Noi</span>
               </div>
             </div>
 
@@ -127,16 +139,16 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-green-100 text-sm">&copy; 2024 RentCar Pro. All rights reserved.</p>
             <div className="flex flex-wrap gap-6 text-sm">
-              <Link href="/privacy" className="text-green-100 hover:text-white transition-colors hover:underline">
+              <Link href="privacy" className="text-green-100 hover:text-white transition-colors hover:underline">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-green-100 hover:text-white transition-colors hover:underline">
+              <Link href="terms" className="text-green-100 hover:text-white transition-colors hover:underline">
                 Terms of Service
               </Link>
-              <Link href="/contact" className="text-green-100 hover:text-white transition-colors hover:underline">
+              <Link href="contact" className="text-green-100 hover:text-white transition-colors hover:underline">
                 Contact Us
               </Link>
-              <Link href="/sitemap" className="text-green-100 hover:text-white transition-colors hover:underline">
+              <Link href={googleMapsDirectionsUrl} target="_blank" className="text-green-100 hover:text-white transition-colors hover:underline">
                 Sitemap
               </Link>
             </div>

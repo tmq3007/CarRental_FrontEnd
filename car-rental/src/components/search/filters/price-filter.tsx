@@ -1,6 +1,7 @@
 "use client"
 
 import { DualRangeSlider } from "@/components/ui/dual-slider"
+import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 
 interface PriceFilterProps {
   filters: any
@@ -15,8 +16,8 @@ export default function PriceFilter({ filters, handleFilterChange, rentalDays, c
       <div className="space-y-4">
         <div>
           <div className="flex items-center justify-between text-xs mb-2">
-            <span>Total: ${filters.priceRange[0]}</span>
-            <span>${filters.priceRange[1]}</span>
+            <span>Total: {formatCurrency(filters.priceRange[0])}</span>
+            <span>{formatCurrency(filters.priceRange[1])}</span>
           </div>
           <DualRangeSlider
             value={filters.priceRange}
@@ -39,8 +40,8 @@ export default function PriceFilter({ filters, handleFilterChange, rentalDays, c
 
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">${filters.priceRange[0]}</span>
-            <span className="font-medium">${filters.priceRange[1]}</span>
+            <span className="font-medium">{formatCurrency(filters.priceRange[0])}</span>
+            <span className="font-medium">{formatCurrency(filters.priceRange[1])}</span>
           </div>
 
           <DualRangeSlider
