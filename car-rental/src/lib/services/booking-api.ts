@@ -241,7 +241,6 @@ export const {
     useGetBookingDetailQuery,
     useUpdateBookingMutation,
     useRateCarMutation,
-    useUpdateBookingMutation,
     useGetBookingCarAndUserQuery,
     useCreateBookingMutation,
 } = bookingApi;
