@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {useState} from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 interface BookingHeaderProps {
@@ -24,22 +24,22 @@ interface BookingHeaderProps {
 }
 
 export default function BookingHeader({
-                                          title = "Booking Details",
-                                          carName = "Nissan Navara El 2017",
-                                          fromDate = "13/02/2022 - 12:00 PM",
-                                          toDate = "23/02/2022 - 14:00 PM",
-                                          numberOfDays = 10,
-                                          basePrice = "500,000",
-                                          total = "5,000,000",
-                                          deposit = "1,000,000",
-                                          bookingNo = "012345",
-                                          bookingStatus = "Confirmed",
-                                          carImageFront ,
-                                          carImageBack ,
-                                          carImageLeft,
-                                          carImageRight,
-                                            carId
-                                      }: BookingHeaderProps) {
+    title = "Booking Details",
+    carName = "Nissan Navara El 2017",
+    fromDate = "13/02/2022 - 12:00 PM",
+    toDate = "23/02/2022 - 14:00 PM",
+    numberOfDays = 10,
+    basePrice = "500,000",
+    total = "5,000,000",
+    deposit = "1,000,000",
+    bookingNo = "012345",
+    bookingStatus = "Confirmed",
+    carImageFront,
+    carImageBack,
+    carImageLeft,
+    carImageRight,
+    carId
+}: BookingHeaderProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
     const carImages = [
@@ -131,8 +131,8 @@ export default function BookingHeader({
                             <div className="grid grid-cols-2 gap-4">
                                 <span className="font-medium">Booking status:</span>
                                 <span className={`font-medium ${bookingStatus === "Confirmed" ? "text-green-600" : ""}`}>
-                  {bookingStatus}
-                </span>
+                                    {bookingStatus}
+                                </span>
                             </div>
                         </div>
                     </div>
