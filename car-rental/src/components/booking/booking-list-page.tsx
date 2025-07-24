@@ -42,7 +42,7 @@ export default function BookingListPage({ onViewDetails }: BookingListPageProps)
   const itemsPerPage = 6
   const [searchTerm, setSearchTerm] = useState("")
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState<BookingDetailVO | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<BookingVO | null>(null)
   const [rating, setRating] = useState<number>(0)
   const [review, setReview] = useState<string>("")
 
