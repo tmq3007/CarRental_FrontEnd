@@ -10,10 +10,12 @@ import {TermsOfUseTab} from "@/components/car/car-detail/terms-of-use-tab";
 import {useGetCarDetailQuery} from "@/lib/services/car-api";
 import NoResult from "@/components/common/no-result";
 import CarDetailsPageSkeleton from "@/components/skeleton/car-detail-skeleton";
+import { useRouter } from "next/navigation";
 
 export default async function MyCarDetailsPage({ params }: { params: Promise< {carId: string }> }) {
     console.log("params.carId:", params); // Debug log
     const { data: carDetail, isLoading, error } = useGetCarDetailQuery((await params).carId);
+    const route =  useRouter();
     console.log("carDetail", carDetail)
 
     if (isLoading) {
@@ -85,8 +87,8 @@ export default async function MyCarDetailsPage({ params }: { params: Promise< {c
     }
 
     const handleRentClick = () => {
-        console.log("Rent button clicked");
         // Implement rent functionality
+        route.push(`/booking?carId=${car.id}`);
     }
 
     return (
