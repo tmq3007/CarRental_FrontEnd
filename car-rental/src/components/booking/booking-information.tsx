@@ -1,439 +1,193 @@
-"use client"
-
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { CalendarIcon } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import {useEffect, useState} from "react"
-import {BookingDetailVO, BookingEditDTO, useUpdateBookingMutation} from "@/lib/services/booking-api";
-import {AddressComponent} from "@/components/common/address-input-information";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import type { BookingDetailVO, BookingVO } from "@/lib/services/booking-api"
+import { Calendar, MapPin, User, Phone, Mail, Hash } from "lucide-react"
 
 interface BookingInformationProps {
-    bookingDetail: BookingDetailVO
+  bookingDetail: BookingDetailVO
 }
 
 export default function BookingInformation({ bookingDetail }: BookingInformationProps) {
-    const [renterDob, setRenterDob] = useState<Date | undefined>(
-        bookingDetail.renterDob ? new Date(bookingDetail.renterDob) : undefined
-    )
-    const [driverDob, setDriverDob] = useState<Date | undefined>(
-        bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined
-    )
-    const [updateBooking, { isLoading }] = useUpdateBookingMutation()
+  function formatDate(dateString?: string): string {
+    if (!dateString) return "N/A"
+    const date = new Date(dateString)
+    return date.toLocaleDateString() + " - " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  }
 
-    const [sameAsRenter, setSameAsRenter] = useState(bookingDetail.isRenterSameAsDriver)
-    // State for editable driver information
-    const [driverInfo, setDriverInfo] = useState({
-        fullName: bookingDetail.driverFullName || "",
-        phoneNumber: bookingDetail.driverPhoneNumber || "",
-        email: bookingDetail.driverEmail || "",
-        nationalId: bookingDetail.driverNationalId || "",
-        houseNumberStreet: bookingDetail.driverHouseNumberStreet || "",
-        ward: bookingDetail.driverWard || "",
-        district: bookingDetail.driverDistrict || "",
-        cityProvince: bookingDetail.driverCityProvince || "",
-    })
-    // Original driver info for comparison
-    const [originalDriverInfo, setOriginalDriverInfo] = useState(driverInfo)
-    const [hasChanges, setHasChanges] = useState(false)
+  function calculateNumberOfDays(startDate?: string, endDate?: string): number {
+    if (!startDate || !endDate) return 0
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const diffTime = Math.abs(end.getTime() - start.getTime())
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+  }
 
-    // Check for changes whenever driverInfo or driverDob changes
-    useEffect(() => {
-        const dobChanged = driverDob?.getTime() !== (bookingDetail.driverDob ? new Date(bookingDetail.driverDob).getTime() : undefined)
-        const infoChanged = JSON.stringify(driverInfo) !== JSON.stringify(originalDriverInfo)
-        setHasChanges(dobChanged || infoChanged)
-    }, [driverInfo, driverDob, originalDriverInfo, bookingDetail.driverDob])
-
-    const handleDriverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value } = e.target
-        setDriverInfo(prev => ({
-            ...prev,
-            [id]: value
-        }))
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      confirmed: { label: "Confirmed", className: "bg-green-100 text-green-800 border-green-200" },
+      in_progress: { label: "In Progress", className: "bg-blue-100 text-blue-800 border-blue-200" },
+      pending_payment: { label: "Pending Payment", className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+      pending_deposit: { label: "Pending Deposit", className: "bg-orange-100 text-orange-800 border-orange-200" },
+      completed: { label: "Completed", className: "bg-gray-100 text-gray-800 border-gray-200" },
+      cancelled: { label: "Cancelled", className: "bg-red-100 text-red-800 border-red-200" },
     }
 
-    // const handleSave = () => {
-    //     // Here you would typically send the updated data to your API
-    //     console.log("Saving changes:", {
-    //         ...driverInfo,
-    //         dob: driverDob
-    //     })
-    //
-    //     // Update original data to reflect the saved state
-    //     setOriginalDriverInfo(driverInfo)
-    //     setHasChanges(false)
-    //
-    //     // You might want to show a success message here
-    // }
-
-    const handleSave = async () => {
-        try {
-            const updateData: BookingEditDTO = {
-                driverFullName: driverInfo.fullName,
-                driverDob: driverDob ? format(driverDob, 'yyyy-MM-dd') : undefined,
-                driverPhoneNumber: driverInfo.phoneNumber,
-                driverEmail: driverInfo.email,
-                driverNationalId: driverInfo.nationalId,
-                driverHouseNumberStreet: driverInfo.houseNumberStreet,
-                driverWard: driverInfo.ward,
-                driverDistrict: driverInfo.district,
-                driverCityProvince: driverInfo.cityProvince,
-                // Note: driverDrivingLicenseUri is not included as it's handled separately
-            }
-
-            await updateBooking({
-                bookingNumber: bookingDetail.bookingNumber,
-                bookingDto: updateData
-            }).unwrap()
-
-            // Update original data to reflect the saved state
-            setOriginalDriverInfo(driverInfo)
-            setHasChanges(false)
-            setDriverDob(updateData.driverDob ? new Date(updateData.driverDob) : undefined)
-
-            console.log("Driver Dob:", driverDob)
-            console.log("Renter Dob:", bookingDetail.renterDob)
-
-            const isSameAsRenterNow = (
-                driverInfo.fullName === bookingDetail.renterFullName &&
-                driverInfo.phoneNumber === bookingDetail.renterPhoneNumber &&
-                driverInfo.email === bookingDetail.renterEmail &&
-                driverInfo.nationalId === bookingDetail.renterNationalId &&
-                driverInfo.houseNumberStreet === bookingDetail.renterHouseNumberStreet &&
-                driverInfo.ward === bookingDetail.renterWard &&
-                driverInfo.district === bookingDetail.renterDistrict &&
-                driverInfo.cityProvince === bookingDetail.renterCityProvince &&
-                (driverDob ? format(driverDob, 'yyyy-MM-dd') : undefined) ===
-                (bookingDetail.renterDob ? format(new Date(bookingDetail.renterDob), 'yyyy-MM-dd') : undefined)
-            )
-
-
-            // Nếu giống thì tự động check "Same as renter"
-            if (isSameAsRenterNow) {
-                setSameAsRenter(true)
-            }
-
-            // You might want to show a success toast here
-        } catch (error) {
-            // Handle error (show error toast, etc.)
-            console.error('Failed to update booking:', error)
-        }
-    }
-
-    const handleSameAsRenterChange = (checked: boolean) => {
-        setSameAsRenter(checked)
-
-        if (checked) {
-            // Đặt thông tin tài xế giống với người thuê
-            setDriverInfo({
-                fullName: bookingDetail.renterFullName || "",
-                phoneNumber: bookingDetail.renterPhoneNumber || "",
-                email: bookingDetail.renterEmail || "",
-                nationalId: bookingDetail.renterNationalId || "",
-                houseNumberStreet: bookingDetail.renterHouseNumberStreet || "",
-                ward: bookingDetail.renterWard || "",
-                district: bookingDetail.renterDistrict || "",
-                cityProvince: bookingDetail.renterCityProvince || "",
-            })
-            setDriverDob(bookingDetail.renterDob ? new Date(bookingDetail.renterDob) : undefined)
-
-            // Đánh dấu có thay đổi để người dùng có thể lưu
-            setHasChanges(true)
-        } else {
-            // Khôi phục về thông tin tài xế gốc
-            setDriverInfo(originalDriverInfo)
-            setDriverDob(bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined)
-
-            // Kiểm tra xem có thay đổi không
-            const dobChanged = bookingDetail.driverDob ?
-                new Date(bookingDetail.driverDob).getTime() !== driverDob?.getTime() :
-                driverDob !== undefined
-            const infoChanged = JSON.stringify(originalDriverInfo) !== JSON.stringify(driverInfo)
-            setHasChanges(dobChanged || infoChanged)
-        }
-    }
-    const handleDiscard = () => {
-        // Reset to original values
-        setDriverInfo(originalDriverInfo)
-        setDriverDob(bookingDetail.driverDob ? new Date(bookingDetail.driverDob) : undefined)
-        setHasChanges(false)
-    }
-
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.confirmed
     return (
-        <div className="border rounded-md p-6 mt-4">
-            <div className="space-y-6">
-                {/* Renter's Information - Read Only */}
-                <div>
-                    <h3 className="text-lg font-medium mb-4">Renter&apos;s Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="fullName">Full Name*</Label>
-                            <Input
-                                id="renterFullName"
-                                value={bookingDetail.renterFullName || ""}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="dob">Date of birth*</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal" aria-readonly={true}>
-                                        {renterDob ? format(renterDob, "P") : "N/A"}
-                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar mode="single" selected={renterDob} onSelect={setRenterDob} initialFocus disabled />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-
-
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone number*</Label>
-                            <Input
-                                id="renterPhoneNumber"
-                                value={bookingDetail.renterPhoneNumber || ""}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email address*</Label>
-                            <Input
-                                id="renterEmail"
-                                type="email"
-                                value={bookingDetail.renterEmail || ""}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="nationalId">National ID No.*</Label>
-                            <Input
-                                id="renterNationalId"
-                                value={bookingDetail.renterNationalId || ""}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="license">Driving license*</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="renterDrivingLicenseUri"
-                                    className="flex-1"
-                                    value={bookingDetail.renterDrivingLicenseUri ? "Uploaded" : "Not provided"}
-                                    readOnly
-                                />
-                                {bookingDetail.renterDrivingLicenseUri && (
-                                    <Button
-                                        variant="outline"
-                                        className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700"
-                                        asChild
-                                    >
-                                        <a href={bookingDetail.renterDrivingLicenseUri} target="_blank" rel="noopener noreferrer">
-                                            View
-                                        </a>
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="address">Address*</Label>
-                            <Input
-                                id="renterHouseNumberStreet"
-                                value={`${bookingDetail.renterHouseNumberStreet || ""}, ${bookingDetail.renterWard || ""}, ${bookingDetail.renterDistrict || ""}, ${bookingDetail.renterCityProvince || ""}`}
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Driver's Information - Editable when not same as renter */}
-                <div>
-                    <h3 className="text-lg font-medium mb-4">Driver&apos;s Information</h3>
-                    <div className="mb-4">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="same-as-renter"
-                                checked={sameAsRenter}
-                                onCheckedChange={handleSameAsRenterChange}
-                                disabled={isLoading}
-                            />
-                            <label
-                                htmlFor="same-as-renter"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                                Same as renter&apos;s information
-                            </label>
-                        </div>
-                    </div>
-
-                    {!sameAsRenter && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="driverFullName">Full Name*</Label>
-                                <Input
-                                    id="fullName"
-                                    value={driverInfo.fullName}
-                                    onChange={handleDriverChange}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="driver-dob">Date of birth*</Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                            {driverDob ? format(driverDob, "P") : "Select date"}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={driverDob}
-                                            onSelect={setDriverDob}
-                                            initialFocus
-                                            // fromYear={1900}
-                                            // toYear={new Date().getFullYear() - 18}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-
-
-
-                            <div className="space-y-2">
-                                <Label htmlFor="driverPhoneNumber">Phone number*</Label>
-                                <Input
-                                    id="phoneNumber"
-                                    value={driverInfo.phoneNumber}
-                                    onChange={handleDriverChange}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="driverEmail">Email address*</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={driverInfo.email}
-                                    onChange={handleDriverChange}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="driverNationalId">National ID No.*</Label>
-                                <Input
-                                    id="nationalId"
-                                    value={driverInfo.nationalId}
-                                    onChange={handleDriverChange}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="driverDrivingLicenseUri">Driving license*</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        id="driverDrivingLicenseUri"
-                                        className="flex-1"
-                                        value={bookingDetail.driverDrivingLicenseUri ? "Uploaded" : "Not provided"}
-                                        readOnly
-                                    />
-                                    {bookingDetail.driverDrivingLicenseUri && (
-                                        <Button
-                                            variant="outline"
-                                            className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700"
-                                            asChild
-                                        >
-                                            <a href={bookingDetail.driverDrivingLicenseUri} target="_blank" rel="noopener noreferrer">
-                                                View
-                                            </a>
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                            <AddressComponent
-                                mode="booking"
-                                houseNumberStreet={driverInfo.houseNumberStreet}
-                                cityProvince={driverInfo.cityProvince}
-                                district={driverInfo.district}
-                                ward={driverInfo.ward}
-                                onHouseNumberStreetChange={(value) => setDriverInfo(prev => ({ ...prev, houseNumberStreet: value }))}
-                                onCityProvinceChange={(value) => setDriverInfo(prev => ({ ...prev, cityProvince: value }))}
-                                onDistrictChange={(value) => setDriverInfo(prev => ({ ...prev, district: value }))}
-                                onWardChange={(value) => setDriverInfo(prev => ({ ...prev, ward: value }))}
-                               // errors={errors}
-                            />
-                            {(hasChanges || sameAsRenter) && (
-                                <div className="flex justify-center gap-2 mt-4">
-                                    <Button
-                                        variant="outline"
-                                        onClick={handleDiscard}
-                                        disabled={isLoading}
-                                    >
-                                        Discard
-                                    </Button>
-                                    <Button
-                                        onClick={handleSave}
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? "Saving..." : "Save Changes"}
-                                    </Button>
-                                </div>
-                            )}
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="driverHouseNumberStreet">House number & Street*</Label>*/}
-                            {/*    <Input*/}
-                            {/*        id="houseNumberStreet"*/}
-                            {/*        value={driverInfo.houseNumberStreet}*/}
-                            {/*        onChange={handleDriverChange}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="driverWard">Ward*</Label>*/}
-                            {/*    <Input*/}
-                            {/*        id="ward"*/}
-                            {/*        value={driverInfo.ward}*/}
-                            {/*        onChange={handleDriverChange}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="driverDistrict">District*</Label>*/}
-                            {/*    <Input*/}
-                            {/*        id="district"*/}
-                            {/*        value={driverInfo.district}*/}
-                            {/*        onChange={handleDriverChange}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="driverCityProvince">City/Province*</Label>*/}
-                            {/*    <Input*/}
-                            {/*        id="cityProvince"*/}
-                            {/*        value={driverInfo.cityProvince}*/}
-                            {/*        onChange={handleDriverChange}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
-                        </div>
-                    )}
-
-                </div>
-            </div>
-        </div>
+      <Badge variant="outline" className={`${config.className} font-medium`}>
+        {config.label}
+      </Badge>
     )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Booking Overview */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="border-green-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-green-700 flex items-center">
+              <Hash className="w-5 h-5 mr-2" />
+              Booking Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Booking Number:</span>
+              <span className="font-semibold text-gray-900">{bookingDetail.bookingNumber}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Status:</span>
+              {getStatusBadge(bookingDetail.status)}
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Duration:</span>
+              <span className="font-semibold text-gray-900">
+                {calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime)} days
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-green-700 flex items-center">
+              <Calendar className="w-5 h-5 mr-2" />
+              Schedule
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center text-gray-600 mb-1">
+                <Calendar className="w-4 h-4 mr-2 text-green-500" />
+                <span className="text-sm font-medium">Pick-up Date</span>
+              </div>
+              <p className="text-gray-900 font-semibold ml-6">{formatDate(bookingDetail.pickUpTime)}</p>
+            </div>
+            <div>
+              <div className="flex items-center text-gray-600 mb-1">
+                <Calendar className="w-4 h-4 mr-2 text-green-500" />
+                <span className="text-sm font-medium">Drop-off Date</span>
+              </div>
+              <p className="text-gray-900 font-semibold ml-6">{formatDate(bookingDetail.dropOffTime)}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Location Information */}
+      <Card className="border-green-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-green-700 flex items-center">
+            <MapPin className="w-5 h-5 mr-2" />
+            Location Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+            <div className="flex items-center">
+              <MapPin className="w-5 h-5 text-green-600 mr-3" />
+              <div>
+                <p className="font-semibold text-gray-900">{bookingDetail.renterCityProvince || "Ho Chi Minh City"}</p>
+                <p className="text-sm text-gray-600">Pickup & Return Location</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Customer Information */}
+      <Card className="border-green-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-green-700 flex items-center">
+            <User className="w-5 h-5 mr-2" />
+            Customer Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Full Name</p>
+                  <p className="font-semibold text-gray-900">{bookingDetail.renterFullName || ""}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Phone Number</p>
+                  <p className="font-semibold text-gray-900">{bookingDetail.renterPhoneNumber || ""}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Email Address</p>
+                  <p className="font-semibold text-gray-900">{bookingDetail.renterEmail || ""}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Important Notes */}
+      <Card className="border-green-100 bg-green-50">
+        <CardContent className="pt-6">
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div>
+              <h4 className="font-semibold text-green-800 mb-2">Important Information</h4>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• Please bring a valid driver's license and ID for pickup</li>
+                <li>• Arrive 15 minutes early for vehicle inspection</li>
+                <li>• Contact us immediately if you need to modify your booking</li>
+                <li>• Late returns may incur additional charges</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
