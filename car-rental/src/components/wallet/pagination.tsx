@@ -23,7 +23,7 @@ export function Pagination({
     return (
         <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-600">
-                Showing {startIndex + 1} to {endIndex} of {totalItems} entries
+                Showing {startIndex + 1} to {startIndex+5}
             </div>
             <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
