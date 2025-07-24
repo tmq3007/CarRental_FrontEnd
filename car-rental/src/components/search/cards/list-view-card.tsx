@@ -132,7 +132,10 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
               <Box size={20} className="text-gray-500 mb-1 md:mb-2" />
               <span className="text-xs text-gray-500">{car.specs.numberOfSeat}</span>
             </div>
-            <div className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer hover:bg-green-50">
+            <div onClick={() => {
+              router.push(`/home/car-list/${car.id}`);
+            }}
+              className="border border-gray-200 rounded-lg p-2 md:p-3 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer hover:bg-green-50">
               <span className="text-xs font-medium">View All</span>
               <span className="text-xs">Specification</span>
             </div>
@@ -188,6 +191,9 @@ export default function CarRentalListCard({ car }: CarRentalListCardProps) {
               ref={viewButtonRef}
               className="relative overflow-hidden border border-gray-300 text-gray-700 w-full py-2 md:py-3 px-4 md:px-6 rounded-full font-medium hover:border-green-500 transition-colors duration-700 group"
               onMouseEnter={(e) => handleMouseEnter(e, viewButtonRef, setViewButtonPos)}
+              onClick={() => {
+                router.push(`/home/car-list/${car.id}`);
+              }}
             >
               <span className="relative z-10 transition-colors duration-700 group-hover:text-white">VIEW DEAL</span>
               <div
