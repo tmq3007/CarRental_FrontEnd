@@ -101,10 +101,14 @@ export interface BookingEditDTO {
     driverCityProvince?: string | null;
 }
 
-
 export interface PaginatedBookingResponse {
     data: BookingVO[];
     totalCount: number;
+}
+
+export interface FeedbackResponseDTO {
+    success: boolean;
+    message: string;
 }
 
 export const bookingApi = createApi({
@@ -167,6 +171,23 @@ export const bookingApi = createApi({
                 "Booking",
             ],
         }),
+
+        rateCar: build.mutation<
+            ApiResponse<FeedbackResponseDTO>,
+            { bookingNumber: string; rating: number; comment: string }
+        >({
+            query: ({ bookingNumber, rating, comment }) => ({
+                url: '/feedback/submit',
+                method: 'POST',
+                body: {
+                    BookingNumber: bookingNumber,
+                    Rating: rating,
+                    Comment: comment,
+                },
+            }),
+            invalidatesTags: ['Booking'],
+        }),
+
     }),
 });
 
@@ -177,5 +198,6 @@ export const {
     useConfirmPickupMutation,
     useReturnCarMutation,
     useGetBookingDetailQuery,
-    useUpdateBookingMutation
+    useUpdateBookingMutation,
+    useRateCarMutation,
 } = bookingApi;

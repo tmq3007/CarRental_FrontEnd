@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation"
 
 export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: any }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
-    const [status, setStatus] = useState("Available")
+    const [status, setStatus] = useState("");
     const [showOtherTermsInput, setShowOtherTermsInput] = useState(false)
     const [carData, setCarData] = useState<any>(initialData)
     const [formData, setFormData] = useState({
@@ -60,7 +60,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                 district: initialData.district || "",
                 ward: initialData.ward || "",
             })
-            setStatus(initialData.status || "Available")
+            setStatus(initialData.status || "verified")
         }
     }, [initialData])
 
@@ -260,11 +260,12 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Available">Available</SelectItem>
-                                        <SelectItem value="Rented">Rented</SelectItem>
-                                        <SelectItem value="Maintenance">Maintenance</SelectItem>
+                                        <SelectItem value="verified">Verified</SelectItem>
+                                        <SelectItem value="not_verified">Not Verified</SelectItem>
+                                        <SelectItem value="stopped">Stopped</SelectItem>
                                     </SelectContent>
                                 </Select>
+
                             </div>
                         </div>
                     </div>

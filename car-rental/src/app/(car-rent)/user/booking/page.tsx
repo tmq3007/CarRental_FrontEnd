@@ -1,23 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { useGetBookingsByAccountIdQuery, BookingVO, useReturnCarMutation } from "@/lib/services/booking-api";
+import {
+    useGetBookingsByAccountIdQuery,
+    BookingVO,
+    useReturnCarMutation,
+    useRateCarMutation,
+} from "@/lib/services/booking-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useCancelBookingMutation } from "@/lib/services/booking-api";
+import { useCancelBookingMutation, useConfirmPickupMutation } from "@/lib/services/booking-api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { toast } from "sonner";
-import { useConfirmPickupMutation } from "@/lib/services/booking-api";
+import { useRouter } from "next/navigation";
 import LoadingPage from "@/components/common/loading";
-import {useRouter} from "next/navigation";
 import NoResult from "@/components/common/no-result";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Star } from "lucide-react";
 
 export default function BookingListPage() {
     const userId = useSelector((state: RootState) => state.user?.id);
     const [cancelBooking] = useCancelBookingMutation();
     const [cancellingId, setCancellingId] = useState<string | null>(null);
     const router = useRouter();
+    const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState<BookingVO | null>(null);
+    const [rating, setRating] = useState<number>(0);
+    const [review, setReview] = useState<string>("");
+    const [rateCar] = useRateCarMutation();
+
     const handleCancelBooking = async (booking: BookingVO) => {
         const confirmed = window.confirm("Are you sure you want to cancel this booking?");
         if (!confirmed) return;
@@ -28,15 +40,16 @@ export default function BookingListPage() {
             toast.success("Booking cancelled successfully", {
                 description: `Booking No: ${booking.bookingNumber}`,
             });
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error cancelling booking", err);
             toast.error("Failed to cancel booking", {
-                description: "Please try again later.",
+                description: err?.data?.message || "Please try again later.",
             });
         } finally {
             setCancellingId(null);
         }
     };
+
     const [confirmPickup] = useConfirmPickupMutation();
 
     const handleConfirmPickup = async (booking: BookingVO) => {
@@ -48,12 +61,13 @@ export default function BookingListPage() {
             toast.success("Pick-up confirmed successfully", {
                 description: `Booking No: ${booking.bookingNumber}`,
             });
-        } catch (error) {
+        } catch (error: any) {
             toast.error("Failed to confirm pick-up", {
-                description: "Please try again later.",
+                description: error?.data?.message || "Please try again later.",
             });
         }
     };
+
     const [returnCar] = useReturnCarMutation();
 
     const handleReturnCar = async (booking: BookingVO) => {
@@ -62,7 +76,6 @@ export default function BookingListPage() {
         const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const total = booking.basePrice * numberOfDays;
         const deposit = booking.deposit;
-
 
         let message = "";
         if (total > deposit) {
@@ -81,8 +94,36 @@ export default function BookingListPage() {
             toast.success("Car returned successfully", {
                 description: `Booking No: ${booking.bookingNumber}`,
             });
+            setSelectedBooking(booking);
+            setRatingDialogOpen(true);
         } catch (error: any) {
             const errMsg = error?.data?.message || "Failed to return car";
+            toast.error("Error", { description: errMsg });
+        }
+    };
+
+    const handleSubmitRating = async () => {
+        console.log("User ID:", userId);
+        if (!selectedBooking || rating === 0) {
+            toast.error("Please select a rating and ensure a booking is selected");
+            return;
+        }
+
+        try {
+            const response = await rateCar({
+                bookingNumber: selectedBooking.bookingNumber,
+                rating,
+                comment: review,
+            }).unwrap();
+            toast.success(response.data?.message || "Rating and review submitted successfully", {
+                description: `You rated ${selectedBooking.carName} ${rating} star${rating > 1 ? "s" : ""}.`,
+            });
+            setRatingDialogOpen(false);
+            setRating(0);
+            setReview("");
+            setSelectedBooking(null);
+        } catch (error: any) {
+            const errMsg = error?.data?.message || "Failed to submit rating and review";
             toast.error("Error", { description: errMsg });
         }
     };
@@ -99,8 +140,8 @@ export default function BookingListPage() {
 
     const bookings = data?.data || [];
 
-    if (isLoading) return <LoadingPage/>;
-    if (isError) return <NoResult/>;
+    if (isLoading) return <LoadingPage />;
+    if (isError) return <NoResult />;
 
     return (
         <div className="p-6">
@@ -128,18 +169,16 @@ export default function BookingListPage() {
                                     <div className="flex flex-col gap-3 ml-4">
                                         <Button
                                             onClick={() => handleViewDetails(String(booking.bookingNumber))}
-                                            className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full">View details</Button>
+                                            className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white w-full"
+                                        >
+                                            View details
+                                        </Button>
                                         {(booking.status === "confirmed" || booking.status === "pending_payment") && (
                                             <>
-                                                <Button className="bg-gray-200 text-black hover:bg-gray-300 text-xs w-full">Confirm Pickup</Button>
-                                                <Button className="bg-red-500 hover:bg-red-600 text-white text-xs w-full">Cancel Booking</Button>
-                                            </>
-                                        )}
-
-                                        {(booking.status === "confirmed" || booking.status === "pending_payment") && (
-                                            <>
-                                                <Button className="w-full text-sm py-2 rounded-md bg-gray-200 text-black hover:bg-gray-300"
-                                                    onClick={() => handleConfirmPickup(booking)}>
+                                                <Button
+                                                    className="w-full text-sm py-2 rounded-md bg-gray-200 text-black hover:bg-gray-300"
+                                                    onClick={() => handleConfirmPickup(booking)}
+                                                >
                                                     Confirm Pick-up
                                                 </Button>
                                                 <Button
@@ -151,7 +190,6 @@ export default function BookingListPage() {
                                                 </Button>
                                             </>
                                         )}
-
                                         {booking.status === "in_progress" && (
                                             <Button
                                                 className="w-full text-sm py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
@@ -164,28 +202,34 @@ export default function BookingListPage() {
                                 </div>
 
                                 <div className="text-sm text-gray-700 mt-4 space-y-1">
-                                    <p><strong>From:</strong> {pickupDate.toLocaleString('en-US')}</p>
-                                    <p><strong>To:</strong> {returnDate.toLocaleString('en-US')}</p>
-                                    <p><strong>Number of days:</strong> {numberOfDays} day{numberOfDays > 1 ? 's' : ''}</p>
-                                    <p><strong>Base price:</strong> {booking.basePrice.toLocaleString('en-US')}₫</p>
-                                    <p><strong>Total:</strong> {total.toLocaleString('en-US')}₫</p>
-                                    <p><strong>Deposit:</strong> {booking.deposit.toLocaleString('en-US')}₫</p>
+                                    <p><strong>From:</strong> {pickupDate.toLocaleString("en-US")}</p>
+                                    <p><strong>To:</strong> {returnDate.toLocaleString("en-US")}</p>
+                                    <p><strong>Number of days:</strong> {numberOfDays} day{numberOfDays > 1 ? "s" : ""}</p>
+                                    <p><strong>Base price:</strong> {booking.basePrice.toLocaleString("en-US")}₫</p>
+                                    <p><strong>Total:</strong> {total.toLocaleString("en-US")}₫</p>
+                                    <p><strong>Deposit:</strong> {booking.deposit.toLocaleString("en-US")}₫</p>
                                     <p><strong>Payment:</strong> {booking.paymentType}</p>
-                                    <p><strong>Booking No:</strong> <span className="text-black font-medium">{booking.bookingNumber}</span></p>
+                                    <p>
+                                        <strong>Booking No:</strong>{" "}
+                                        <span className="text-black font-medium">{booking.bookingNumber}</span>
+                                    </p>
                                     <p>
                                         <strong>Status:</strong>
-                                        <span className={`ml-1 font-semibold ${booking.status === "confirmed"
-                                            ? "text-green-600"
-                                            : booking.status === "in_progress"
-                                                ? "text-blue-600"
-                                                : booking.status === "pending_payment"
-                                                    ? "text-yellow-600"
-                                                    : booking.status === "completed"
-                                                        ? "text-gray-600"
-                                                        : "text-red-600"
-                                            }`}>
-                                            {booking.status}
-                                        </span>
+                                        <span
+                                            className={`ml-1 font-semibold ${
+                                                booking.status === "confirmed"
+                                                    ? "text-green-600"
+                                                    : booking.status === "in_progress"
+                                                        ? "text-blue-600"
+                                                        : booking.status === "pending_payment"
+                                                            ? "text-yellow-600"
+                                                            : booking.status === "completed"
+                                                                ? "text-gray-600"
+                                                                : "text-red-600"
+                                            }`}
+                                        >
+                      {booking.status}
+                    </span>
                                     </p>
                                 </div>
                             </CardContent>
@@ -193,9 +237,48 @@ export default function BookingListPage() {
                     );
                 })}
             </div>
+
+            {/* Rating Dialog */}
+            <Dialog.Root open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+                    <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                        <Dialog.Title className="text-lg font-bold">Rate your trip</Dialog.Title>
+                        <Dialog.Description className="text-sm text-gray-500 mt-2">
+                            Do you enjoy your trip, please let us know what you think
+                        </Dialog.Description>
+                        <div className="flex justify-center gap-2 my-4">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                    key={star}
+                                    className={`w-6 h-6 cursor-pointer ${
+                                        rating >= star ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                    }`}
+                                    onClick={() => setRating(star)}
+                                />
+                            ))}
+                        </div>
+                        <textarea
+                            className="w-full h-32 p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Write your review here..."
+                            value={review}
+                            onChange={(e) => setReview(e.target.value)}
+                        />
+                        <div className="flex justify-end gap-4 mt-4">
+                            <Dialog.Close asChild>
+                                <Button className="bg-gray-200 text-black hover:bg-gray-300">Skip</Button>
+                            </Dialog.Close>
+                            <Button
+                                className="bg-blue-500 text-white hover:bg-blue-600"
+                                onClick={handleSubmitRating}
+                                disabled={rating === 0}
+                            >
+                                Send Review
+                            </Button>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
         </div>
     );
 }
-
-
-
