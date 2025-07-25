@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import type { BookingDetailVO, BookingVO } from "@/lib/services/booking-api"
-import { Calendar, MapPin, User, Phone, Mail, Hash } from "lucide-react"
+import { Calendar, User, Phone, Mail, Hash, CreditCard, DollarSign, MapPin } from "lucide-react"
+import { BookingDetailVO } from "@/lib/services/booking-api"
 
 interface BookingInformationProps {
   bookingDetail: BookingDetailVO
@@ -14,12 +14,27 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
     return date.toLocaleDateString() + " - " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
+  function formatCurrency(amount?: number): string {
+    if (!amount) return "N/A"
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount)
+  }
+
   function calculateNumberOfDays(startDate?: string, endDate?: string): number {
     if (!startDate || !endDate) return 0
     const start = new Date(startDate)
     const end = new Date(endDate)
     const diffTime = Math.abs(end.getTime() - start.getTime())
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+  }
+
+  function formatLocation(address?: string, city?: string): string {
+    if (address && city) return `${address}, ${city}`
+    if (address) return address
+    if (city) return city
+    return "N/A"
   }
 
   const getStatusBadge = (status: string) => {
@@ -31,7 +46,6 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
       completed: { label: "Completed", className: "bg-gray-100 text-gray-800 border-gray-200" },
       cancelled: { label: "Cancelled", className: "bg-red-100 text-red-800 border-red-200" },
     }
-
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.confirmed
     return (
       <Badge variant="outline" className={`${config.className} font-medium`}>
@@ -41,75 +55,87 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
   }
 
   return (
-    <div className="space-y-6">
-      {/* Booking Overview */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="border-green-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-green-700 flex items-center">
-              <Hash className="w-5 h-5 mr-2" />
-              Booking Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Booking Number:</span>
-              <span className="font-semibold text-gray-900">{bookingDetail.bookingNumber}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Status:</span>
-              {getStatusBadge(bookingDetail.status)}
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Duration:</span>
-              <span className="font-semibold text-gray-900">
-                {calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime)} days
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-green-700 flex items-center">
-              <Calendar className="w-5 h-5 mr-2" />
-              Schedule
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex items-center text-gray-600 mb-1">
-                <Calendar className="w-4 h-4 mr-2 text-green-500" />
-                <span className="text-sm font-medium">Pick-up Date</span>
-              </div>
-              <p className="text-gray-900 font-semibold ml-6">{formatDate(bookingDetail.pickUpTime)}</p>
-            </div>
-            <div>
-              <div className="flex items-center text-gray-600 mb-1">
-                <Calendar className="w-4 h-4 mr-2 text-green-500" />
-                <span className="text-sm font-medium">Drop-off Date</span>
-              </div>
-              <p className="text-gray-900 font-semibold ml-6">{formatDate(bookingDetail.dropOffTime)}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Location Information */}
+    <div className="space-y-4">
+      {/* Booking Details */}
       <Card className="border-green-100">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-green-700 flex items-center">
-            <MapPin className="w-5 h-5 mr-2" />
-            Location Details
+            <Hash className="w-5 h-5 mr-2" />
+            Booking Details
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-            <div className="flex items-center">
-              <MapPin className="w-5 h-5 text-green-600 mr-3" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-3">
               <div>
-                <p className="font-semibold text-gray-900">{bookingDetail.renterCityProvince || "Ho Chi Minh City"}</p>
-                <p className="text-sm text-gray-600">Pickup & Return Location</p>
+                <p className="text-sm text-gray-600 mb-1">Booking Number</p>
+                <p className="font-semibold text-gray-900">{bookingDetail.bookingNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Status</p>
+                {getStatusBadge(bookingDetail.status)}
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Duration</p>
+                <p className="font-semibold text-gray-900">
+                  {calculateNumberOfDays(bookingDetail.pickUpTime, bookingDetail.dropOffTime)} days
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3 md:col-span-2 lg:col-span-1">
+              <div>
+                <div className="flex items-center text-gray-600 mb-2">
+                  <MapPin className="w-4 h-4 mr-1" />
+                  <span className="text-sm font-medium">Locations</span>
+                </div>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Pick-up Location</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {formatLocation(bookingDetail.carAddress, bookingDetail.renterCityProvince)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Drop-off Location</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {formatLocation(bookingDetail.carAddress, bookingDetail.renterCityProvince)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Schedule */}
+      <Card className="border-blue-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-blue-700 flex items-center">
+            <Calendar className="w-5 h-5 mr-2" />
+            Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex items-start space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Pick-up Date & Time</p>
+                <p className="font-semibold text-gray-900">{formatDate(bookingDetail.pickUpTime)}</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Drop-off Date & Time</p>
+                <p className="font-semibold text-gray-900">{formatDate(bookingDetail.dropOffTime)}</p>
               </div>
             </div>
           </div>
@@ -117,46 +143,137 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
       </Card>
 
       {/* Customer Information */}
-      <Card className="border-green-100">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-green-700 flex items-center">
-            <User className="w-5 h-5 mr-2" />
-            Customer Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Renter Information */}
+        <Card className="border-green-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-green-700 flex items-center">
+              <User className="w-5 h-5 mr-2" />
+              Renter Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-green-600" />
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-green-600" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-600">Full Name</p>
-                  <p className="font-semibold text-gray-900">{bookingDetail.renterFullName || ""}</p>
+                  <p className="font-semibold text-gray-900">{bookingDetail.renterFullName || "N/A"}</p>
                 </div>
               </div>
-
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-green-600" />
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-green-600" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-600">Phone Number</p>
-                  <p className="font-semibold text-gray-900">{bookingDetail.renterPhoneNumber || ""}</p>
+                  <p className="font-semibold text-gray-900">{bookingDetail.renterPhoneNumber || "N/A"}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">Email Address</p>
+                  <p className="font-semibold text-gray-900 break-all">{bookingDetail.renterEmail || "N/A"}</p>
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
+        {/* Driver Information */}
+        <Card className="border-purple-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-purple-700 flex items-center">
+              <User className="w-5 h-5 mr-2" />
+              Driver Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-green-600" />
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-purple-600" />
                 </div>
-                <div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">Full Name</p>
+                  <p className="font-semibold text-gray-900">
+                    {bookingDetail.isRenterSameAsDriver
+                      ? bookingDetail.renterFullName || "N/A"
+                      : bookingDetail.driverFullName || "N/A"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">Phone Number</p>
+                  <p className="font-semibold text-gray-900">
+                    {bookingDetail.isRenterSameAsDriver
+                      ? bookingDetail.renterPhoneNumber || "N/A"
+                      : bookingDetail.driverPhoneNumber || "N/A"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-600">Email Address</p>
-                  <p className="font-semibold text-gray-900">{bookingDetail.renterEmail || ""}</p>
+                  <p className="font-semibold text-gray-900 break-all">
+                    {bookingDetail.isRenterSameAsDriver
+                      ? bookingDetail.renterEmail || "N/A"
+                      : bookingDetail.driverEmail || "N/A"}
+                  </p>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Payment Information */}
+      <Card className="border-indigo-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-indigo-700 flex items-center">
+            <CreditCard className="w-5 h-5 mr-2" />
+            Payment Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Base Price</p>
+                <p className="font-semibold text-gray-900 text-lg">{formatCurrency(bookingDetail.basePrice)}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Deposit</p>
+                <p className="font-semibold text-gray-900 text-lg">{formatCurrency(bookingDetail.deposit)}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Payment Type</p>
+                <p className="font-semibold text-gray-900">{bookingDetail.paymentType || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -165,7 +282,7 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
 
       {/* Important Notes */}
       <Card className="border-green-100 bg-green-50">
-        <CardContent className="pt-6">
+        <CardContent className="pt-4">
           <div className="flex items-start space-x-3">
             <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">

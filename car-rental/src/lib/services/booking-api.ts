@@ -20,6 +20,10 @@ export interface BookingVO {
     paymentType: string;
     createdAt: string;
     status: string;
+    carImageFront?: string;
+    carImageBack?: string;
+    carImageLeft?: string;
+    carImageRight?: string;
 }
 
 export interface BookingDetailVO {
@@ -30,7 +34,9 @@ export interface BookingDetailVO {
     pickUpTime?: string;
     dropOffTime?: string;
     accountEmail?: string;
-
+    pickUpLocation?: string;
+    dropOffLocation?: string;
+    
     // Renter's information
     renterFullName?: string;
     renterDob?: string;
@@ -150,7 +156,7 @@ export const bookingApi = createApi({
             providesTags: ["Booking"],
         }),
 
-        getBookingsByAccountId: build.query<ApiResponse<BookingDetailVO[]>, { accountId: string }>({
+        getBookingsByAccountId: build.query<ApiResponse<BookingVO[]>, { accountId: string }>({
             query: ({ accountId }) => ({
                 url: `/booking/${accountId}`,
                 method: "GET",

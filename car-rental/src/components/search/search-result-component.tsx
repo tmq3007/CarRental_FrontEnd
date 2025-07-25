@@ -6,6 +6,7 @@ import CarGrid from "./car-grid";
 import { CarSearchVO } from "@/lib/services/car-api";
 import { PaginationMetadata } from "@/lib/store";
 import EnhancedPagination from "../common/enhanced-pagination";
+import LoadingPage from "../common/loading";
 
 interface SearchResultComponentProps {
     cars: CarSearchVO[];
@@ -40,16 +41,7 @@ export default function SearchResultComponent({
 
     if (isLoading) {
         return (
-            <div className="mx-10 p-4 md:p-6">
-                <div className="animate-pulse">
-                    <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-                    <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-64 bg-gray-200 rounded-lg"></div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+            <LoadingPage />
         );
     }
     const handlePreviousPage = () => {

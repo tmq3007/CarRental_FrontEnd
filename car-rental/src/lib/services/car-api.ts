@@ -193,7 +193,7 @@ export const carApi = createApi({
   baseQuery: baseQueryWithAuthCheck, // có thể sửa về baseQuery nếu muốn cho public API
   endpoints: (build) => ({
     // ADMIN / OWNER API
-    getCars: build.query<ApiResponse<PaginationResponse<{data:CarVO_ViewACar[], pagination: PaginationMetadata}>>, { accountId: string; pageNumber?: number; pageSize?: number; filters?: CarFilters }>({
+    getCars: build.query<ApiResponse<{data:CarVO_ViewACar[], pagination: PaginationMetadata}>, { accountId: string; pageNumber?: number; pageSize?: number; filters?: CarFilters }>({
       query: ({ accountId, pageNumber = 1, pageSize = 10, filters = {} }) => {
         const params = new URLSearchParams({
           pageNumber: pageNumber.toString(),
