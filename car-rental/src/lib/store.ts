@@ -13,6 +13,8 @@ import {dashboardApi} from "@/lib/services/dashboard-api";
 import {walletApi} from "@/lib/services/wallet-api";
 import {chatbotApi   } from "@/lib/services/chatbot-api";
 import carReducer from "@/lib/slice/carSlice";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { feedbackApi } from "@/lib/services/feedback-api";
 
 export type ApiResponse<T> = {
     code: number;
@@ -43,9 +45,11 @@ const baseReducer = combineReducers({
     [vnpayApi.reducerPath]: vnpayApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [walletApi.reducerPath]: walletApi.reducer,
+    [feedbackApi.reducerPath]: feedbackApi.reducer,
     user: userReducer,
     search: searchReducer,
     car: carReducer,
+
 })
 
 export const persistConfig = {
@@ -77,6 +81,7 @@ export const store = () => {
                 vnpayApi.middleware,
                 dashboardApi.middleware,
                 walletApi.middleware,
+                feedbackApi.middleware,
             ),
     })
 }
