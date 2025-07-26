@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import CarListPage from "@/components/homepage/car-list-page"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
