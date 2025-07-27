@@ -1,6 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
-import { ApiResponse, PaginationMetadata } from "@/lib/store";
+import {createApi} from "@reduxjs/toolkit/query/react";
+import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
+import {ApiResponse, PaginationMetadata, PaginationResponse} from "@/lib/store";
+import {CarVO_Detail} from "@/lib/services/car-api";
 
 export interface DashboardStatsVO {
     totalRevenue: number;
@@ -19,47 +20,47 @@ export interface MonthlyRevenueVO {
 }
 
 export interface TopBookedVehicleVO {
-    carId: string;
-    brand: string;
-    model: string;
-    year: number;
-    totalBookings: number;
-    revenue: number;
-    utilizationRate: number;
-    status: string;
-    trend: string;
+    carId: string,
+    brand: string,
+    model: string,
+    year: number,
+    totalBookings: number,
+    revenue: number,
+    utilizationRate: number,
+    status: string,
+    trend: string,
 }
 
 export interface TopPayingCustomerVO {
-    accountId: string;
-    customerName: string;
-    email: string;
-    phone: string;
-    totalPayments: number;
-    totalBookings: number;
-    memberSince: string;
-    lastBooking: string;
-    avatar: string;
-    preferredVehicle: string;
+    accountId: string,
+    customerName: string,
+    email: string,
+    phone: string,
+    totalPayments: number,
+    totalBookings: number,
+    memberSince: string,
+    lastBooking: string,
+    avatar: "/placeholder.svg?height=40&width=40",
+    preferredVehicle: string,
 }
 
 export interface AccountVO {
-    id: string;
-    email: string;
-    isActive: boolean;
-    isEmailVerified: boolean;
-    createdAt: string;
-    updatedAt?: string;
-    roleId: number;
+    id: string // Guid Id
+    email: string // string Email
+    isActive: boolean // bool IsActive
+    isEmailVerified: boolean // bool IsEmailVerified
+    createdAt: string // DateTime CreatedAt
+    updatedAt?: string // DateTime? UpdatedAt
+    roleId: number // int RoleId
 }
 
 export interface AccountFilters {
-    sortBy: string;
-    sortDirection: "asc" | "desc";
-    status?: string;
-    role?: string;
-    emailVerified?: string;
-    search?: string;
+    sortBy: string
+    sortDirection: "asc" | "desc"
+    status?: string
+    role?: string
+    emailVerified?: string
+    search?: string
 }
 
 export interface CarVO_Full {
@@ -100,10 +101,10 @@ export interface CarVO_Full {
 }
 
 export interface CarUnverifiedFilters {
-    sortBy: string;
-    sortDirection: "asc" | "desc";
-    brand?: string;
-    search?: string;
+    sortBy: string
+    sortDirection: "asc" | "desc"
+    brand?: string
+    search?: string
 }
 
 export const dashboardApi = createApi({
@@ -156,6 +157,7 @@ export const dashboardApi = createApi({
                     method: "GET",
                 };
             },
+            providesTags: ['DashBoard'],
         }),
 
         getCars: build.query<ApiResponse<{data: CarVO_Full[], pagination: PaginationMetadata}>, {pageNumber?: number; pageSize?: number; filters?: CarUnverifiedFilters }>({
@@ -173,9 +175,10 @@ export const dashboardApi = createApi({
                     method: "GET",
                 };
             },
+            providesTags: ['DashBoard'],
         }),
 
-        toggleAccountStatus: build.mutation<ApiResponse<{ id: string; isActive: boolean }>, { accountId: string; isActive: boolean }>({
+        toggleAccountStatus: build.mutation<ApiResponse<{ Id: string, IsActive: boolean }>, { accountId: string, isActive: boolean }>({
             query: ({ accountId, isActive }) => ({
                 url: `/Admin/${accountId}/status`,
                 method: "PATCH",
@@ -215,7 +218,7 @@ export const dashboardApi = createApi({
             providesTags: (result, error, { accountId }) =>
                 result ? [{ type: 'DashBoard', id: `ACCOUNT_CARS_${accountId}` }] : ['DashBoard'],
         }),
-    }),
+    })
 });
 
 export const {
@@ -224,7 +227,6 @@ export const {
     useGetTopBookedVehiclesQuery,
     useGetTopPayingCustomersQuery,
     useGetAccountsQuery,
-    useGetCarsQuery,
     useToggleAccountStatusMutation,
     useVerifyCarMutation,
     useGetCarsByAccountIdQuery,
