@@ -1,7 +1,6 @@
-import {createApi} from "@reduxjs/toolkit/query/react";
-import {baseQueryWithAuthCheck} from "@/lib/services/config/baseQuery";
-import {ApiResponse, PaginationMetadata, PaginationResponse} from "@/lib/store";
-import {CarVO_Detail} from "@/lib/services/car-api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
+import { ApiResponse, PaginationMetadata } from "@/lib/store";
 
 export interface DashboardStatsVO {
     totalRevenue: number;
@@ -20,48 +19,47 @@ export interface MonthlyRevenueVO {
 }
 
 export interface TopBookedVehicleVO {
-    carId: string,
-    brand: string,
-    model: string,
-    year: number,
-    totalBookings: number,
-    revenue: number,
-    utilizationRate: number,
-    status: string,
-    trend: string,
+    carId: string;
+    brand: string;
+    model: string;
+    year: number;
+    totalBookings: number;
+    revenue: number;
+    utilizationRate: number;
+    status: string;
+    trend: string;
 }
 
 export interface TopPayingCustomerVO {
-    accountId: string,
-    customerName: string,
-    email: string,
-    phone: string,
-    totalPayments: number,
-    totalBookings: number,
-    memberSince: string,
-    lastBooking: string,
-    avatar: "/placeholder.svg?height=40&width=40",
-    preferredVehicle: string,
+    accountId: string;
+    customerName: string;
+    email: string;
+    phone: string;
+    totalPayments: number;
+    totalBookings: number;
+    memberSince: string;
+    lastBooking: string;
+    avatar: string;
+    preferredVehicle: string;
 }
 
 export interface AccountVO {
-    id: string // Guid Id
-    email: string // string Email
-    isActive: boolean // bool IsActive
-    isEmailVerified: boolean // bool IsEmailVerified
-    createdAt: string // DateTime CreatedAt
-    updatedAt?: string // DateTime? UpdatedAt
-    roleId: number // int RoleId
-    // Remove all virtual properties and stats
+    id: string;
+    email: string;
+    isActive: boolean;
+    isEmailVerified: boolean;
+    createdAt: string;
+    updatedAt?: string;
+    roleId: number;
 }
 
 export interface AccountFilters {
-    sortBy: string
-    sortDirection: "asc" | "desc"
-    status?: string
-    role?: string
-    emailVerified?: string
-    search?: string
+    sortBy: string;
+    sortDirection: "asc" | "desc";
+    status?: string;
+    role?: string;
+    emailVerified?: string;
+    search?: string;
 }
 
 export interface CarVO_Full {
@@ -102,10 +100,10 @@ export interface CarVO_Full {
 }
 
 export interface CarUnverifiedFilters {
-    sortBy: string
-    sortDirection: "asc" | "desc"
-    brand?: string
-    search?: string
+    sortBy: string;
+    sortDirection: "asc" | "desc";
+    brand?: string;
+    search?: string;
 }
 
 export const dashboardApi = createApi({
@@ -113,7 +111,6 @@ export const dashboardApi = createApi({
     baseQuery: baseQueryWithAuthCheck,
     tagTypes: ['DashBoard'],
     endpoints: (build) => ({
-
         getDashboardStats: build.query<ApiResponse<DashboardStatsVO>, void>({
             query: () => ({
                 url: "/Dashboard/stats",
@@ -178,12 +175,13 @@ export const dashboardApi = createApi({
             },
         }),
 
-        toggleAccountStatus: build.mutation<ApiResponse<string>, { accountId: string}>({
-            query: ({ accountId }) => ({
-                url: `/Dashboard/accounts/toggle-status/${accountId}`,
-                method: "PUT",
+        toggleAccountStatus: build.mutation<ApiResponse<{ id: string; isActive: boolean }>, { accountId: string; isActive: boolean }>({
+            query: ({ accountId, isActive }) => ({
+                url: `/Admin/${accountId}/status`,
+                method: "PATCH",
+                body: { IsActive: isActive },
             }),
-            invalidatesTags: ['DashBoard']
+            invalidatesTags: ['DashBoard'],
         }),
 
         verifyCar: build.mutation<ApiResponse<string>, { carId: string }>({
@@ -191,11 +189,11 @@ export const dashboardApi = createApi({
                 url: `/Dashboard/cars/toggle-verification/${carId}`,
                 method: "PUT",
             }),
-            invalidatesTags: ['DashBoard']
+            invalidatesTags: ['DashBoard'],
         }),
 
         getCarsByAccountId: build.query<ApiResponse<{data: CarVO_Full[], pagination: PaginationMetadata}>, {
-            accountId: string ,
+            accountId: string,
             pageNumber?: number,
             pageSize?: number,
             filters?: CarUnverifiedFilters
@@ -217,9 +215,7 @@ export const dashboardApi = createApi({
             providesTags: (result, error, { accountId }) =>
                 result ? [{ type: 'DashBoard', id: `ACCOUNT_CARS_${accountId}` }] : ['DashBoard'],
         }),
-
-
-    })
+    }),
 });
 
 export const {

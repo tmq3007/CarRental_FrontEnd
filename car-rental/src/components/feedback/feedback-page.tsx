@@ -91,34 +91,6 @@ export default function FeedbackPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-            {/* Header */}
-            <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white shadow-xl">
-                <div className="flex items-center justify-between max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-600 rounded-lg">
-                            <Car className="w-6 h-6" />
-                        </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Rent a car today!
-            </span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <Button
-                            variant="ghost"
-                            className="text-white hover:text-blue-300 hover:bg-slate-700/50 transition-all duration-200"
-                        >
-                            ABOUT US
-                        </Button>
-                        <div className="flex items-center gap-3 bg-slate-700/50 rounded-full px-4 py-2">
-                            <div className="p-1 bg-blue-600 rounded-full">
-                                <User className="w-4 h-4" />
-                            </div>
-                            <span className="text-sm font-medium">Welcome, {userName}</span>
-                            <ChevronDown className="w-4 h-4 text-slate-300" />
-                        </div>
-                    </div>
-                </div>
-            </header>
 
             {/* Breadcrumb */}
             <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-6 py-3">

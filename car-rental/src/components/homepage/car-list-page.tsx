@@ -7,13 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { type CarFilters, type CarVO_ViewACar, useGetCarsQuery } from "@/lib/services/car-api"
-import CarListSkeleton from "@/components/skeleton/car-list-skeleton"
 import NoResult from "@/components/common/no-result"
 import Breadcrumb from "@/components/common/breadcum"
 import { useSelector } from "react-redux"
-import { RootState } from "@/lib/store"
+import type { RootState } from "@/lib/store"
 import { useRouter } from "next/navigation"
 import LoadingPage from "@/components/common/loading"
+import Link from "next/link"
 
 interface CarListPageProps {
     accountId: string
@@ -30,7 +30,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     const [isTransitioning, setIsTransitioning] = useState(false)
 
     const handleViewDetails = (carId: string) => {
-        router.push(`/car-owner/my-car/edit-car/${carId}`) // Thay đổi route sang edit-car/{id}
+        router.push(`/car-owner/my-car/edit-car/${carId}`)
     }
 
     const {
@@ -43,15 +43,16 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         pageSize,
         filters,
     })
-const cars = data?.data.data || [];
-  const pagination = data?.data.pagination || {
-    pageNumber: 1,
-    pageSize: 10,
-    totalRecords: 0,
-    totalPages: 1,
-    hasPreviousPage: false,
-    hasNextPage: false,
-  };
+
+    const cars = data?.data.data || []
+    const pagination = data?.data.pagination || {
+        pageNumber: 1,
+        pageSize: 10,
+        totalRecords: 0,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+    }
 
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
@@ -115,12 +116,20 @@ const cars = data?.data.data || [];
 
     const renderPaginationButtons = () => {
         if (!cars) return null
-        const {pageNumber, totalPages} = {
+        const { pageNumber, totalPages } = {
             pageNumber: pagination?.pageNumber ?? 1,
-            totalPages: pagination?.totalPages ?? 1
+            totalPages: pagination?.totalPages ?? 1,
         }
         const buttons = []
+        const maxVisible = 5
+        let startPage = Math.max(1, pageNumber - Math.floor(maxVisible / 2))
+        const endPage = Math.min(totalPages, startPage + maxVisible - 1)
 
+        if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1)
+        }
+
+        // Previous button
         buttons.push(
             <Button
                 key="prev"
@@ -134,9 +143,7 @@ const cars = data?.data.data || [];
             </Button>,
         )
 
-        const startPage = Math.max(1, pageNumber - 2)
-        const endPage = Math.min(totalPages, pageNumber + 2)
-
+        // Page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(
                 <Button
@@ -153,14 +160,7 @@ const cars = data?.data.data || [];
             )
         }
 
-        if (endPage < totalPages) {
-            buttons.push(
-                <span key="ellipsis" className="mx-2 text-gray-400">
-                    ...
-                </span>,
-            )
-        }
-
+        // Next button
         buttons.push(
             <Button
                 key="next"
@@ -178,7 +178,7 @@ const cars = data?.data.data || [];
     }
 
     if (loading || !cars) {
-        return <LoadingPage/>
+        return <LoadingPage />
     }
 
     return (
@@ -188,7 +188,7 @@ const cars = data?.data.data || [];
                     <Breadcrumb
                         items={[
                             { label: "Home", path: "/home" },
-                            { label: "My Car", path: "/car-owner/my-car" }, // Đường dẫn chính xác
+                            { label: "My Car", path: "/car-owner/my-car" },
                         ]}
                     />
                 </div>
@@ -199,15 +199,13 @@ const cars = data?.data.data || [];
                         List of Cars {pagination?.totalRecords ? `(${pagination?.totalRecords} total)` : ""}
                     </h1>
                     <div className="flex gap-4">
-                        <Button
-                            className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"
-                        >
-                            Add car
-                        </Button>
+                        <Link href="/car-owner/add-car">
+                            <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                                Add car
+                            </Button>
+                        </Link>
                         <Select defaultValue="id-desc" onValueChange={handleSortChange}>
-                            <SelectTrigger
-                                className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500"
-                            >
+                            <SelectTrigger className="w-48 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
@@ -243,16 +241,15 @@ const cars = data?.data.data || [];
 
                 {/* Car Cards */}
                 {cars && (
-                    <div
-                        className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
+                    <div className={`space-y-4 transition-all duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
                         {cars.length === 0 ? (
                             <div className="text-center py-12 animate-in fade-in duration-500">
                                 <p className="text-gray-500 mb-4">Not Found Any Car</p>
-                                <Button
-                                    className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"
-                                >
-                                    Add Your First Car!
-                                </Button>
+                                <Link href="/car-owner/add-car">
+                                    <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                                        Add Your First Car!
+                                    </Button>
+                                </Link>
                             </div>
                         ) : (
                             cars.map((car: CarVO_ViewACar, index: number) => (
@@ -273,9 +270,7 @@ const cars = data?.data.data || [];
                                             </Button>
 
                                             {/* Car Image */}
-                                            <div
-                                                className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group"
-                                            >
+                                            <div className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group">
                                                 {car.carImageFront ? (
                                                     <img
                                                         src={car.carImageFront || "/placeholder.svg"}
@@ -285,32 +280,18 @@ const cars = data?.data.data || [];
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center">
                                                         <div className="w-full h-full relative">
-                                                            <div
-                                                                className="absolute inset-0 flex items-center justify-center"
-                                                            >
-                                                                <div
-                                                                    className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"
-                                                                ></div>
-                                                                <div
-                                                                    className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"
-                                                                ></div>
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="w-32 h-32 border border-gray-400 transform rotate-45 transition-transform duration-500 group-hover:rotate-90"></div>
+                                                                <div className="absolute w-32 h-32 border border-gray-400 transform -rotate-45 transition-transform duration-500 group-hover:-rotate-90"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 )}
                                                 {/* Dots indicator */}
-                                                <div
-                                                    className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1"
-                                                >
-                                                    <div
-                                                        className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"
-                                                    ></div>
-                                                    <div
-                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"
-                                                    ></div>
-                                                    <div
-                                                        className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"
-                                                    ></div>
+                                                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                                                    <div className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
                                                 </div>
                                             </div>
 
@@ -328,11 +309,8 @@ const cars = data?.data.data || [];
                                                 <h3 className="text-xl font-semibold transition-colors duration-200 hover:text-blue-600">
                                                     {car.brand} {car.model} {car.productionYear}
                                                 </h3>
-
                                                 <div className="grid grid-cols-2 gap-4 text-sm">
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Ratings:</span>
                                                         <div className="flex items-center gap-1 mt-1">
                                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -344,51 +322,28 @@ const cars = data?.data.data || [];
                                                             <span className="text-gray-500 ml-2">No ratings yet</span>
                                                         </div>
                                                     </div>
-
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">No. of rides:</span>
                                                         <div className="mt-1 font-semibold text-blue-600">0</div>
                                                     </div>
-
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Price:</span>
-                                                        <div
-                                                            className="mt-1 font-semibold text-green-600"
-                                                        >
-                                                            {formatPrice(car.basePrice)}
-                                                        </div>
+                                                        <div className="mt-1 font-semibold text-green-600">{formatPrice(car.basePrice)}</div>
                                                     </div>
-
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Locations:</span>
-                                                        <div
-                                                            className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                                                        >
+                                                        <div className="mt-1 text-blue-600 hover:text-blue-800 transition-colors duration-200">
                                                             {formatLocation(car)}
                                                         </div>
                                                     </div>
-
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Seats:</span>
                                                         <div className="mt-1">{car.numberOfSeats} seats</div>
                                                     </div>
-
-                                                    <div
-                                                        className="transition-all duration-200 hover:bg-gray-50 p-2 rounded"
-                                                    >
+                                                    <div className="transition-all duration-200 hover:bg-gray-50 p-2 rounded">
                                                         <span className="font-medium">Status:</span>
                                                         <div className="mt-1">
-                                                            <Badge {...getStatusBadgeProps(car.status)}>
-                                                                {car.status}
-                                                            </Badge>
+                                                            <Badge {...getStatusBadgeProps(car.status)}>{car.status}</Badge>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -407,7 +362,7 @@ const cars = data?.data.data || [];
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105"
+                                                    className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105 bg-transparent"
                                                 >
                                                     Confirm deposit
                                                 </Button>
@@ -415,7 +370,7 @@ const cars = data?.data.data || [];
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105"
+                                                        className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105 bg-transparent"
                                                     >
                                                         Confirm payment
                                                     </Button>
@@ -431,16 +386,11 @@ const cars = data?.data.data || [];
 
                 {/* Pagination */}
                 {pagination?.totalPages && pagination.totalPages > 1 && (
-                    <div
-                        className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500"
-                    >
+                    <div className="flex justify-between items-center mt-8 animate-in fade-in slide-in-from-bottom duration-500">
                         <div className="flex items-center gap-2">{renderPaginationButtons()}</div>
-
                         <div className="flex items-center gap-2">
                             <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                                <SelectTrigger
-                                    className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500"
-                                >
+                                <SelectTrigger className="w-20 transition-all duration-200 hover:border-blue-300 focus:border-blue-500">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
@@ -466,9 +416,11 @@ const cars = data?.data.data || [];
                 {/* Pagination Info */}
                 {cars && (
                     <div className="text-center mt-4 text-sm text-gray-600 animate-in fade-in duration-500">
-                        Showing {(pagination?.pageNumber ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0)} to{" "}
-                        {pagination?.pageNumber ? Math.min((pagination.pageNumber ?? 0) * (pagination.pageSize ?? 0), pagination.totalRecords ?? 0) : 0} of {pagination?.totalRecords ?? 0}{" "}
-                        cars
+                        Showing {pagination?.pageNumber ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0} to{" "}
+                        {pagination?.pageNumber
+                            ? Math.min((pagination.pageNumber ?? 0) * (pagination.pageSize ?? 0), pagination.totalRecords ?? 0)
+                            : 0}{" "}
+                        of {pagination?.totalRecords ?? 0} cars
                     </div>
                 )}
             </div>
