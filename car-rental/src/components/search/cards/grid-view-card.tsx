@@ -181,7 +181,7 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
               router.push(`/home/car-list/${car.id}`);
             }}
           >
-            <span className="relative z-10 transition-colors duration-700 group-hover:text-white">VIEW DEAL</span>
+            <span className="relative z-10 transition-colors duration-700 group-hover:text-white">VIEW DETAIL</span>
             <div
               className="absolute bg-green-500 rounded-full scale-0 group-hover:scale-[35] transition-transform duration-1500 ease-in-out"
               style={{
