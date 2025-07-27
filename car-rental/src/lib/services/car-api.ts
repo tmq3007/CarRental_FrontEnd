@@ -1,8 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery, baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
-import { ApiResponse, PaginationMetadata, PaginationResponse } from "@/lib/store";
+import { ApiResponse, PaginationMetadata } from "@/lib/store";
 import { useCarFormData } from "@/lib/hook/useCarFormData";
-import toQueryParams from "../hook/useToQueryParam";
+import toQueryParams from "@/lib/hook/useToQueryParam";
 
 export interface CarSearchVO {
   id: string;
@@ -85,6 +85,39 @@ export interface CarVO_Detail {
   totalRating?: number;
 }
 
+export interface BookingDetailVO {
+  bookingNumber: string;
+  carId: string;
+  driverFullName: string;
+  driverDob: string;
+  driverEmail: string;
+  driverPhoneNumber: string;
+  driverNationalId: string;
+  driverDrivingLicenseUri: string;
+  driverHouseNumberStreet: string;
+  driverWard: string;
+  driverDistrict: string;
+  driverCityProvince: string;
+  basePrice: number;
+  deposit: number;
+  pickUpLocation: string;
+  dropOffLocation: string;
+  pickUpTime: string;
+  dropOffTime: string;
+  paymentType: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  accountId: string;
+  car: {
+    id: string;
+    brand: string;
+    model: string;
+    productionYear: number;
+    basePrice: number;
+  };
+}
+
 export interface CarFilters {
   sortBy?: string;
   sortDirection?: "asc" | "desc";
@@ -108,12 +141,12 @@ export interface AddCarDTO {
   FuelConsumption: string;
   Address: {
     Search: string;
-    ProvinceCode: number | null
-    ProvinceName: string
-    DistrictCode: number | null
-    DistrictName: string
-    WardCode: number | null
-    WardName: string
+    ProvinceCode: number | null;
+    ProvinceName: string;
+    DistrictCode: number | null;
+    DistrictName: string;
+    WardCode: number | null;
+    WardName: string;
     HouseNumber: string;
   };
   Description: string;
@@ -143,25 +176,26 @@ export interface AddCarDTO {
     OtherText: string;
   };
 }
-// Define the filter criteria interface
+
 export interface FilterCriteria {
-    priceRange: [number, number];
-    carTypes: string[];
-    fuelTypes: string[];
-    transmissionTypes: string[];
-    brands: string[];
-    seats: string[];
-    searchQuery: string;
-    location?: {
-        province?: string;
-        district?: string;
-        ward?: string;
-    };
-    pickupTime?: Date | null;
-    dropoffTime?: Date | null;
-    sortBy: string;
-    order: "asc" | "desc";
+  priceRange: [number, number];
+  carTypes: string[];
+  fuelTypes: string[];
+  transmissionTypes: string[];
+  brands: string[];
+  seats: string[];
+  searchQuery: string;
+  location?: {
+    province?: string;
+    district?: string;
+    ward?: string;
+  };
+  pickupTime?: Date | null;
+  dropoffTime?: Date | null;
+  sortBy: string;
+  order: "asc" | "desc";
 }
+
 export interface QueryCriteria {
   priceRange: [number, number];
   carTypes: string[];
@@ -176,24 +210,21 @@ export interface QueryCriteria {
     ward?: string;
   };
   pickupTime?: string | null;
-  dropoffTime?: string | null;
+  dropOffTime?: string | null;
   sortBy: string;
   order: "asc" | "desc";
   page: number;
   pageSize: number;
 }
 
-
-
-
-
-// Tạo carApi chung
 export const carApi = createApi({
   reducerPath: "carApi",
-  baseQuery: baseQueryWithAuthCheck, // có thể sửa về baseQuery nếu muốn cho public API
+  baseQuery: baseQueryWithAuthCheck,
   endpoints: (build) => ({
-    // ADMIN / OWNER API
-    getCars: build.query<ApiResponse<{data:CarVO_ViewACar[], pagination: PaginationMetadata}>, { accountId: string; pageNumber?: number; pageSize?: number; filters?: CarFilters }>({
+    getCars: build.query<
+        ApiResponse<{ data: CarVO_ViewACar[]; pagination: PaginationMetadata }>,
+        { accountId: string; pageNumber?: number; pageSize?: number; filters?: CarFilters }
+    >({
       query: ({ accountId, pageNumber = 1, pageSize = 10, filters = {} }) => {
         const params = new URLSearchParams({
           pageNumber: pageNumber.toString(),
@@ -227,20 +258,63 @@ export const carApi = createApi({
       },
     }),
 
-    // USER SEARCH API
-    searchCars: build.query<ApiResponse<{ data: CarSearchVO[]; pagination: PaginationMetadata }>, QueryCriteria>({
+    searchCars: build.query<
+        ApiResponse<{ data: CarSearchVO[]; pagination: PaginationMetadata }>,
+        QueryCriteria
+    >({
       query: (filters) => ({
         url: `/Car/search?${toQueryParams(filters)}`,
+        method: "GET",
+      }),
+    }),
+
+    editCar: build.mutation<
+        ApiResponse<CarVO_Detail>,
+        { id: string; payload: Partial<CarVO_Detail> }
+    >({
+      query: ({ id, payload }) => ({
+        url: `/Car/edit-car/${id}`,
+        method: "PATCH",
+        body: payload,
+      }),
+    }),
+
+    confirmDeposit: build.mutation<
+        ApiResponse<{ success: boolean; message?: string }>,
+        string
+    >({
+      query: (bookingId) => ({
+        url: `/Booking/confirm-deposit/${bookingId}`,
+        method: "PATCH",
+      }),
+    }),
+
+    getBookingDetailsByCarId: build.query<ApiResponse<BookingDetailVO>, string>({
+      query: (carId) => ({
+        url: `/Booking/booking-details/${carId}`,
+        method: "GET",
+      }),
+    }),
+
+    getBookingDetailsByCarIds: build.query<
+        ApiResponse<Record<string, BookingDetailVO | null>>,
+        string[]
+    >({
+      query: (carIds) => ({
+        url: `/Booking/booking-details/batch?carIds=${carIds.join(",")}`,
         method: "GET",
       }),
     }),
   }),
 });
 
-// Hook exports
 export const {
   useGetCarsQuery,
   useGetCarDetailQuery,
   useAddCarMutation,
   useSearchCarsQuery,
+  useEditCarMutation,
+  useConfirmDepositMutation,
+  useGetBookingDetailsByCarIdQuery,
+  useGetBookingDetailsByCarIdsQuery,
 } = carApi;

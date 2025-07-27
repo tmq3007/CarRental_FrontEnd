@@ -11,58 +11,93 @@ import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useEditCarMutation, useGetCarDetailQuery, useGetBookingDetailsByCarIdQuery, useConfirmDepositMutation, CarVO_Detail } from "@/lib/services/car-api"
+import { useDispatch } from "react-redux"
+import { setCarId, resetCarId } from "@/lib/slice/carSlice"
 
-export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: any }) {
+interface Document {
+    id: number
+    name: string
+    status: string
+    link: string | null
+}
+
+interface Image {
+    id: number
+    alt: string
+    src: string
+}
+
+export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: CarVO_Detail }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
-    const [status, setStatus] = useState("");
+    const [status, setStatus] = useState("")
     const [showOtherTermsInput, setShowOtherTermsInput] = useState(false)
-    const [carData, setCarData] = useState<any>(initialData)
+    const [carData, setCarData] = useState<CarVO_Detail>(initialData)
+    const dispatch = useDispatch()
+
+    // Fetch car details if not provided
+    const { data: fetchedCarData, isLoading, isError } = useGetCarDetailQuery(carId, {
+        skip: !!initialData
+    })
+
+    // Fetch booking details for the car
+    const { data: bookingData, isLoading: isLoadingBooking } = useGetBookingDetailsByCarIdQuery(carId)
+    const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
+
     const [formData, setFormData] = useState({
         mileage: "",
         fuelConsumption: "",
         houseNumberStreet: "",
         description: "",
         basePrice: "",
-        requiredDeposit: "",
+        deposit: "",
         otherTerms: "",
         cityProvince: "",
         district: "",
         ward: "",
     })
 
-    // Mock documents and images (replace with real data if available from API)
-    const documents = [
-        { id: 1, name: "Registration paper", status: "Verified", link: initialData?.registrationPaperLink || "File1.PDF" },
-        { id: 2, name: "Certificate of inspection", status: "Verified", link: initialData?.inspectionCertLink || "File2.PDF" },
-        { id: 3, name: "Insurance", status: "Not available", link: initialData?.insuranceLink || null },
+    const documents: Document[] = [
+        { id: 1, name: "Registration paper", status: carData.registrationPaperUriIsVerified ? "Verified" : "Pending", link: carData.registrationPaperUri || null },
+        { id: 2, name: "Certificate of inspection", status: carData.certificateOfInspectionUriIsVerified ? "Verified" : "Pending", link: carData.certificateOfInspectionUri || null },
+        { id: 3, name: "Insurance", status: carData.insuranceUriIsVerified ? "Verified" : "Pending", link: carData.insuranceUri || null },
     ]
 
-    const images = [
-        { id: 1, alt: "Car image front", src: initialData?.carImageFront || "" },
-        { id: 2, alt: "Car image back", src: initialData?.carImageBack || "" },
-        { id: 3, alt: "Car image left", src: initialData?.carImageLeft || "" },
-        { id: 4, alt: "Car image right", src: initialData?.carImageRight || "" },
+    const images: Image[] = [
+        { id: 1, alt: "Car image front", src: carData.carImageFront || "" },
+        { id: 2, alt: "Car image back", src: carData.carImageBack || "" },
+        { id: 3, alt: "Car image left", src: carData.carImageLeft || "" },
+        { id: 4, alt: "Car image right", src: carData.carImageRight || "" },
     ]
 
-    // Pre-fill form with initial data
     useEffect(() => {
-        if (initialData) {
-            setCarData(initialData)
-            setFormData({
-                mileage: initialData.mileage?.toString() || "",
-                fuelConsumption: initialData.fuelConsumption?.toString() || "",
-                houseNumberStreet: initialData.houseNumberStreet || "",
-                description: initialData.description || "",
-                basePrice: initialData.basePrice?.toString() || "",
-                requiredDeposit: initialData.deposit?.toString() || "",
-                otherTerms: initialData.otherTerms || "",
-                cityProvince: initialData.cityProvince || "",
-                district: initialData.district || "",
-                ward: initialData.ward || "",
-            })
-            setStatus(initialData.status || "verified")
+        // Set car ID in Redux
+        dispatch(setCarId(carId))
+
+        return () => {
+            dispatch(resetCarId())
         }
-    }, [initialData])
+    }, [carId, dispatch])
+
+    useEffect(() => {
+        const data = initialData || fetchedCarData?.data
+        if (data) {
+            setCarData(data)
+            setStatus(data.status || "verified")
+            setFormData({
+                mileage: data.mileage?.toString() || "",
+                fuelConsumption: data.fuelConsumption?.toString() || "",
+                houseNumberStreet: data.houseNumberStreet || "",
+                description: data.description || "",
+                basePrice: data.basePrice?.toString() || "",
+                deposit: data.deposit?.toString() || "",
+                otherTerms: data.additionalFunction || "",
+                cityProvince: data.cityProvince || "",
+                district: data.district || "",
+                ward: data.ward || "",
+            })
+        }
+    }, [initialData, fetchedCarData])
 
     const nextImage = () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length)
@@ -86,49 +121,58 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
     }
 
     const router = useRouter()
-    const handleSave = async () => {
-        if (!carData) return
+    const [editCar] = useEditCarMutation()
 
-        const payload = {
-            ...carData,
-            mileage: formData.mileage || carData.mileage,
-            fuelConsumption: formData.fuelConsumption || carData.fuelConsumption,
+    const handleSave = async () => {
+        const payload: Partial<CarVO_Detail> = {
+            mileage: Number(formData.mileage) || carData.mileage,
+            fuelConsumption: Number(formData.fuelConsumption) || carData.fuelConsumption,
             houseNumberStreet: formData.houseNumberStreet || carData.houseNumberStreet,
             description: formData.description || carData.description,
-            basePrice: formData.basePrice || carData.basePrice,
-            deposit: formData.requiredDeposit || carData.deposit,
+            basePrice: Number(formData.basePrice) || carData.basePrice,
+            deposit: Number(formData.deposit) || carData.deposit,
             cityProvince: formData.cityProvince || carData.cityProvince,
             district: formData.district || carData.district,
             ward: formData.ward || carData.ward,
-            termOfUse: carData.termOfUse + (formData.otherTerms ? `, ${formData.otherTerms}` : ""),
+            additionalFunction: formData.otherTerms || carData.additionalFunction,
             status: status,
-            updatedAt: new Date().toISOString(),
         }
 
         try {
-            const response = await fetch(`http://localhost:5227/api/Car/edit-car/${carId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify(payload),
-            })
+            const response = await editCar({
+                id: carId,
+                payload
+            }).unwrap()
 
-            if (response.ok) {
-                alert("Car details updated successfully!")
-                router.push(`/car-owner/my-car`)
-            } else {
-                const errorData = await response.json()
-                alert(`Failed to update car details: ${errorData.message || response.statusText}`)
+            if (response.data) {
+                alert("Car updated successfully")
+                router.push("/car-owner/my-car")
             }
-        } catch (error) {
-            console.error("Error updating car details:", error)
-            alert("An error occurred while saving.")
+        } catch (error: any) {
+            console.error("Update failed", error)
+            alert(error?.data?.message || "Failed to update the car")
         }
     }
 
-    if (!carData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    const handleConfirmDeposit = async () => {
+        if (!bookingData?.data?.bookingNumber) return;
+
+        try {
+            const response = await confirmDeposit(bookingData.data.bookingNumber).unwrap()
+            if (response.data.success) {
+                alert("Deposit confirmed successfully")
+            }
+        } catch (error: any) {
+            console.error("Confirm deposit failed", error)
+            alert(error?.data?.message || "Failed to confirm deposit")
+        }
+    }
+
+    if (isLoading && !initialData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+
+    if (isError) return <div className="min-h-screen flex items-center justify-center">Error loading car details</div>
+
+    if (!carData) return <div className="min-h-screen flex items-center justify-center">No car data found</div>
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
@@ -218,9 +262,15 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                         <div className="flex items-start justify-between">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{carData.brand} {carData.model}</h2>
-                                <Button className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105">
-                                    Confirm deposit
-                                </Button>
+                                {bookingData?.data && bookingData.data.status?.toLowerCase() === "pending_deposit" && (
+                                    <Button
+                                        onClick={handleConfirmDeposit}
+                                        disabled={isConfirmingDeposit || isLoadingBooking}
+                                        className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105 disabled:opacity-50"
+                                    >
+                                        {isConfirmingDeposit ? "Confirming..." : "Confirm deposit"}
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
@@ -265,8 +315,28 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                         <SelectItem value="stopped">Stopped</SelectItem>
                                     </SelectContent>
                                 </Select>
-
                             </div>
+
+                            {/* Display booking status if available */}
+                            {bookingData?.data && (
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-medium text-gray-700">Booking Status:</span>
+                                    <Badge
+                                        variant={bookingData.data.status === "pending_deposit" ? "outline" : "default"}
+                                        className={`transition-all duration-200 ${
+                                            bookingData.data.status === "pending_deposit"
+                                                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                                : bookingData.data.status === "confirmed"
+                                                    ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
+                                                    : bookingData.data.status === "in_progress"
+                                                        ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                                        : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                        }`}
+                                    >
+                                        {bookingData.data.status}
+                                    </Badge>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -552,8 +622,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 { id: "gps", label: "GPS" },
                                                 { id: "camera", label: "Camera" },
                                                 { id: "sunroof", label: "Sun roof" },
-                                                { id: "childlock", label: "Child lock", defaultChecked: initialData?.childLock || false },
-                                                { id: "childseat", label: "Child seat", defaultChecked: initialData?.childSeat || false },
                                                 { id: "dvd", label: "DVD" },
                                                 { id: "usb", label: "USB" },
                                             ].map((item) => (
@@ -566,7 +634,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                         id={item.id}
                                                         name={item.id}
                                                         className="rounded transition-all duration-200 hover:scale-110"
-                                                        defaultChecked={item.defaultChecked}
+                                                        defaultChecked={carData.additionalFunction?.includes(item.label) || false}
                                                         onChange={handleInputChange}
                                                     />
                                                     <Label htmlFor={item.id} className="text-sm cursor-pointer">
@@ -652,8 +720,8 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                             <div className="flex items-center space-x-2">
                                                 <Input
                                                     id="required-deposit"
-                                                    name="requiredDeposit"
-                                                    value={formData.requiredDeposit}
+                                                    name="deposit" // Sửa lỗi typo từ "requiredDeposit" thành "deposit" để đồng bộ với formData
+                                                    value={formData.deposit}
                                                     onChange={handleInputChange}
                                                     className="flex-1 transition-all duration-200 focus:scale-105"
                                                 />
@@ -671,7 +739,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                     id="no-smoking"
                                                     name="no-smoking"
                                                     className="rounded transition-all duration-200 hover:scale-110"
-                                                    defaultChecked={initialData?.termOfUse?.includes("No smoking") || false}
+                                                    defaultChecked={carData?.termOfUse?.includes("No smoking") || false}
                                                     onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-smoking" className="text-sm cursor-pointer">
@@ -684,7 +752,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                     id="no-food"
                                                     name="no-food"
                                                     className="rounded transition-all duration-200 hover:scale-110"
-                                                    defaultChecked={initialData?.termOfUse?.includes("No food") || false}
+                                                    defaultChecked={carData?.termOfUse?.includes("No food") || false}
                                                     onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-food" className="text-sm cursor-pointer">
@@ -697,7 +765,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                     id="no-pet"
                                                     name="no-pet"
                                                     className="rounded transition-all duration-200 hover:scale-110"
-                                                    defaultChecked={initialData?.termOfUse?.includes("No pet") || false}
+                                                    defaultChecked={carData?.termOfUse?.includes("No pet") || false}
                                                     onChange={handleInputChange}
                                                 />
                                                 <Label htmlFor="no-pet" className="text-sm cursor-pointer">
