@@ -1,48 +1,50 @@
-"use client"
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEditCarMutation, useGetCarDetailQuery, useGetBookingDetailsByCarIdQuery, useConfirmDepositMutation, CarVO_Detail } from "@/lib/services/car-api"
-import { useDispatch } from "react-redux"
-import { setCarId, resetCarId } from "@/lib/slice/carSlice"
+"use client";
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight, Star, ExternalLink, Search, Upload, X, Info } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEditCarMutation, useGetCarDetailQuery, useGetBookingDetailsByCarIdQuery, useConfirmDepositMutation, CarVO_Detail } from "@/lib/services/car-api";
+import { useDispatch } from "react-redux";
+import { setCarId, resetCarId } from "@/lib/slice/carSlice";
+import { useToast } from "@/hooks/use-toast";
 
 interface Document {
-    id: number
-    name: string
-    status: string
-    link: string | null
+    id: number;
+    name: string;
+    status: string;
+    link: string | null;
 }
 
 interface Image {
-    id: number
-    alt: string
-    src: string
+    id: number;
+    alt: string;
+    src: string;
 }
 
 export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: CarVO_Detail }) {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0)
-    const [status, setStatus] = useState("")
-    const [showOtherTermsInput, setShowOtherTermsInput] = useState(false)
-    const [carData, setCarData] = useState<CarVO_Detail>(initialData)
-    const dispatch = useDispatch()
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [status, setStatus] = useState("");
+    const [showOtherTermsInput, setShowOtherTermsInput] = useState(false);
+    const [carData, setCarData] = useState<CarVO_Detail | null>(initialData || null);
+    const dispatch = useDispatch();
+    const { toast } = useToast();
 
     // Fetch car details if not provided
     const { data: fetchedCarData, isLoading, isError } = useGetCarDetailQuery(carId, {
-        skip: !!initialData
-    })
+        skip: !!initialData,
+    });
 
     // Fetch booking details for the car
-    const { data: bookingData, isLoading: isLoadingBooking } = useGetBookingDetailsByCarIdQuery(carId)
-    const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
+    const { data: bookingData, isLoading: isLoadingBooking, refetch } = useGetBookingDetailsByCarIdQuery(carId);
+    const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation();
 
     const [formData, setFormData] = useState({
         mileage: "",
@@ -55,35 +57,31 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
         cityProvince: "",
         district: "",
         ward: "",
-    })
+    });
 
     const documents: Document[] = [
-        { id: 1, name: "Registration paper", status: carData.registrationPaperUriIsVerified ? "Verified" : "Pending", link: carData.registrationPaperUri || null },
-        { id: 2, name: "Certificate of inspection", status: carData.certificateOfInspectionUriIsVerified ? "Verified" : "Pending", link: carData.certificateOfInspectionUri || null },
-        { id: 3, name: "Insurance", status: carData.insuranceUriIsVerified ? "Verified" : "Pending", link: carData.insuranceUri || null },
-    ]
+        { id: 1, name: "Registration paper", status: carData?.registrationPaperUriIsVerified ? "Verified" : "Pending", link: carData?.registrationPaperUri || null },
+        { id: 2, name: "Certificate of inspection", status: carData?.certificateOfInspectionUriIsVerified ? "Verified" : "Pending", link: carData?.certificateOfInspectionUri || null },
+        { id: 3, name: "Insurance", status: carData?.insuranceUriIsVerified ? "Verified" : "Pending", link: carData?.insuranceUri || null },
+    ];
 
     const images: Image[] = [
-        { id: 1, alt: "Car image front", src: carData.carImageFront || "" },
-        { id: 2, alt: "Car image back", src: carData.carImageBack || "" },
-        { id: 3, alt: "Car image left", src: carData.carImageLeft || "" },
-        { id: 4, alt: "Car image right", src: carData.carImageRight || "" },
-    ]
+        { id: 1, alt: "Car image front", src: carData?.carImageFront || "" },
+        { id: 2, alt: "Car image back", src: carData?.carImageBack || "" },
+        { id: 3, alt: "Car image left", src: carData?.carImageLeft || "" },
+        { id: 4, alt: "Car image right", src: carData?.carImageRight || "" },
+    ];
 
     useEffect(() => {
-        // Set car ID in Redux
-        dispatch(setCarId(carId))
-
-        return () => {
-            dispatch(resetCarId())
-        }
-    }, [carId, dispatch])
+        dispatch(setCarId(carId));
+        return () => { dispatch(resetCarId()); };
+    }, [carId, dispatch]);
 
     useEffect(() => {
-        const data = initialData || fetchedCarData?.data
+        const data = initialData || fetchedCarData?.data;
         if (data) {
-            setCarData(data)
-            setStatus(data.status || "verified")
+            setCarData(data);
+            setStatus(data.status || "verified");
             setFormData({
                 mileage: data.mileage?.toString() || "",
                 fuelConsumption: data.fuelConsumption?.toString() || "",
@@ -95,35 +93,29 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                 cityProvince: data.cityProvince || "",
                 district: data.district || "",
                 ward: data.ward || "",
-            })
+            });
         }
-    }, [initialData, fetchedCarData])
+    }, [initialData, fetchedCarData]);
 
-    const nextImage = () => {
-        setCurrentImageIndex((prev) => (prev + 1) % images.length)
-    }
+    const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
 
-    const prevImage = () => {
-        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
-    }
-
-    const handleOtherTermsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setShowOtherTermsInput(e.target.checked)
-    }
+    const handleOtherTermsChange = (e: React.ChangeEvent<HTMLInputElement>) => setShowOtherTermsInput(e.target.checked);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
-    }
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
     const handleSelectChange = (name: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [name]: value }))
-    }
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-    const router = useRouter()
-    const [editCar] = useEditCarMutation()
+    const router = useRouter();
+    const [editCar] = useEditCarMutation();
 
     const handleSave = async () => {
+        if (!carData) return;
         const payload: Partial<CarVO_Detail> = {
             mileage: Number(formData.mileage) || carData.mileage,
             fuelConsumption: Number(formData.fuelConsumption) || carData.fuelConsumption,
@@ -136,43 +128,40 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
             ward: formData.ward || carData.ward,
             additionalFunction: formData.otherTerms || carData.additionalFunction,
             status: status,
-        }
+        };
 
         try {
-            const response = await editCar({
-                id: carId,
-                payload
-            }).unwrap()
-
+            const response = await editCar({ id: carId, payload }).unwrap();
             if (response.data) {
-                alert("Car updated successfully")
-                router.push("/car-owner/my-car")
+                toast({ title: "Success", description: "Car updated successfully", variant: "default" });
+                router.push("/car-owner/my-car");
             }
         } catch (error: any) {
-            console.error("Update failed", error)
-            alert(error?.data?.message || "Failed to update the car")
+            console.error("Update failed", error);
+            toast({ title: "Error", description: error?.data?.message || "Failed to update the car", variant: "destructive" });
         }
-    }
+    };
 
     const handleConfirmDeposit = async () => {
-        if (!bookingData?.data?.bookingNumber) return;
-
+        if (!bookingData?.data?.bookingNumber) {
+            toast({ title: "Error", description: "No booking data available", variant: "destructive" });
+            return;
+        }
         try {
-            const response = await confirmDeposit(bookingData.data.bookingNumber).unwrap()
+            const response = await confirmDeposit(bookingData.data.bookingNumber).unwrap();
             if (response.data.success) {
-                alert("Deposit confirmed successfully")
+                toast({ title: "Success", description: "Deposit confirmed successfully", variant: "default" });
+                refetch(); // Làm mới dữ liệu booking
             }
         } catch (error: any) {
-            console.error("Confirm deposit failed", error)
-            alert(error?.data?.message || "Failed to confirm deposit")
+            console.error("Confirm deposit failed", error);
+            toast({ title: "Error", description: error?.data?.message || "Failed to confirm deposit", variant: "destructive" });
         }
-    }
+    };
 
-    if (isLoading && !initialData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>
-
-    if (isError) return <div className="min-h-screen flex items-center justify-center">Error loading car details</div>
-
-    if (!carData) return <div className="min-h-screen flex items-center justify-center">No car data found</div>
+    if (isLoading && !initialData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    if (isError) return <div className="min-h-screen flex items-center justify-center">Error loading car details</div>;
+    if (!carData) return <div className="min-h-screen flex items-center justify-center">No car data found</div>;
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
@@ -262,13 +251,13 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                         <div className="flex items-start justify-between">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{carData.brand} {carData.model}</h2>
-                                {bookingData?.data && bookingData.data.status?.toLowerCase() === "pending_deposit" && (
+                                {bookingData?.data?.status === "pending_deposit" && (
                                     <Button
                                         onClick={handleConfirmDeposit}
                                         disabled={isConfirmingDeposit || isLoadingBooking}
                                         className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105 disabled:opacity-50"
                                     >
-                                        {isConfirmingDeposit ? "Confirming..." : "Confirm deposit"}
+                                        {isConfirmingDeposit ? "Confirming..." : "Confirm Deposit"}
                                     </Button>
                                 )}
                             </div>
@@ -317,7 +306,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                 </Select>
                             </div>
 
-                            {/* Display booking status if available */}
                             {bookingData?.data && (
                                 <div className="flex items-center space-x-2">
                                     <span className="font-medium text-gray-700">Booking Status:</span>
@@ -384,7 +372,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="color">Color:</Label>
                                             <Input
@@ -394,7 +381,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="brand">Brand name:</Label>
                                             <Input
@@ -404,7 +390,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="model">Model:</Label>
                                             <Input
@@ -414,7 +399,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="production-year">Production year:</Label>
                                             <Input
@@ -424,7 +408,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="seats">No. of seats:</Label>
                                             <Input
@@ -434,7 +417,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="transmission">Transmission:</Label>
                                             <Input
@@ -444,7 +426,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 disabled
                                             />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="fuel">Fuel:</Label>
                                             <Input
@@ -481,7 +462,9 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                     <td className="border border-gray-300 px-4 py-2">
                                                         <Badge
                                                             variant={doc.status === "Verified" ? "default" : "secondary"}
-                                                            className={`transition-all duration-200 ${doc.status === "Verified" ? "bg-green-100 text-green-800 hover:bg-green-200" : "hover:bg-gray-200"}`}
+                                                            className={`transition-all duration-200 ${
+                                                                doc.status === "Verified" ? "bg-green-100 text-green-800 hover:bg-green-200" : "hover:bg-gray-200"
+                                                            }`}
                                                         >
                                                             {doc.status}
                                                         </Badge>
@@ -634,7 +617,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                         id={item.id}
                                                         name={item.id}
                                                         className="rounded transition-all duration-200 hover:scale-110"
-                                                        defaultChecked={carData.additionalFunction?.includes(item.label) || false}
+                                                        defaultChecked={carData?.additionalFunction?.includes(item.label) || false}
                                                         onChange={handleInputChange}
                                                     />
                                                     <Label htmlFor={item.id} className="text-sm cursor-pointer">
@@ -677,7 +660,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 </div>
                                             ))}
                                         </div>
-
                                         <p className="text-sm text-gray-600">
                                             Please include full 4 images of your vehicle
                                             <br />
@@ -714,13 +696,12 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 <span className="text-sm text-gray-600 font-medium">VND/Day</span>
                                             </div>
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="required-deposit">Required deposit: *</Label>
                                             <div className="flex items-center space-x-2">
                                                 <Input
                                                     id="required-deposit"
-                                                    name="deposit" // Sửa lỗi typo từ "requiredDeposit" thành "deposit" để đồng bộ với formData
+                                                    name="deposit"
                                                     value={formData.deposit}
                                                     onChange={handleInputChange}
                                                     className="flex-1 transition-all duration-200 focus:scale-105"
@@ -784,7 +765,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 </Label>
                                             </div>
                                         </div>
-
                                         {showOtherTermsInput && (
                                             <div className="mt-2">
                                                 <Input
@@ -813,5 +793,5 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                 </div>
             </div>
         </div>
-    )
+    );
 }
