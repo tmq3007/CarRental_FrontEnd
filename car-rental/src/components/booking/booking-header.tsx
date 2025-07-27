@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 import { BookingDetailVO } from "@/lib/services/booking-api"
+import Link from "next/link";
 
 interface BookingHeaderProps {
   title: string
@@ -13,6 +14,7 @@ interface BookingHeaderProps {
   handleConfirmPickup: () => void
   handleCancelBooking: () => void
   handleReturnCar: () => void
+  carId? : string
 }
 
 export default function BookingHeader({
@@ -21,6 +23,7 @@ export default function BookingHeader({
   handleConfirmPickup,
   handleCancelBooking,
   handleReturnCar,
+    carId
 }: BookingHeaderProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const carImages = [
@@ -169,11 +172,12 @@ export default function BookingHeader({
 
             {/* Action Buttons */}
             <div className="space-y-3">
+              <Link href={`/user/booking/car-detail/${bookingData.carId}`} passHref>
               <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
                 <CheckCircle className="w-4 h-4 mr-2" />
                 View Car Details
               </Button>
-
+              </Link>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {bookingData.status === "confirmed" && (
                   <>

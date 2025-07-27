@@ -57,12 +57,13 @@ export default function Header() {
     }, [handleScroll])
 
     const navItems = [
-        { name: "FLEET", href: "#fleet" },
-        { name: "LOCATIONS", href: "#locations" },
-        { name: "PRICING", href: "#pricing" },
-        { name: "ABOUT US", href: "#about" },
-        { name: "CONTACT", href: "#contact" },
+        { name: "HOME", href: "/" },
+        { name: "SEARCH", href: "/search" },
+        // { name: "PRICING", href: "/pricing" },
+        { name: "ABOUT US", href: "/about-us" },
+        { name: "CONTACT", href: "/contact" },
     ]
+
 
     // Handle dropdown menu item clicks without affecting scroll
     const handleDropdownItemClick = (action: string) => {
@@ -164,24 +165,19 @@ export default function Header() {
                     {/* Center - Navigation (Desktop) */}
                     <nav className="hidden lg:flex items-center space-x-1">
                         {navItems.map((item, index) => (
-                            <Button
-                                key={item.name}
-                                variant="ghost"
-                                className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out relative group ${isScrolled ? "text-sm px-3 py-2" : "text-base px-4 py-2"
-                                    }`}
-                                style={{ animationDelay: `${index * 100}ms` }}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    // Handle navigation without scrolling to top
-                                    console.log(`Navigate to: ${item.name}`)
-                                }}
-                            >
-                                {item.name}
-                                <div
-                                    className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></div>
-                            </Button>
+                            <Link key={item.name} href={item.href}>
+                                <Button
+                                    variant="ghost"
+                                    className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out relative group ${isScrolled ? "text-sm px-3 py-2" : "text-base px-4 py-2"}`}
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    {item.name}
+                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></div>
+                                </Button>
+                            </Link>
                         ))}
                     </nav>
+
 
                     {/* Right side - User menu and mobile menu */}
                     <div className="flex items-center gap-2">
@@ -329,21 +325,19 @@ export default function Header() {
                 >
                     <nav className="flex flex-col space-y-2 pb-4">
                         {navItems.map((item, index) => (
-                            <Button
-                                key={item.name}
-                                variant="ghost"
-                                className="text-white hover:bg-white/20 justify-start transition-all duration-200 ease-in-out"
-                                style={{ animationDelay: `${index * 50}ms` }}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    setIsMobileMenuOpen(false)
-                                    console.log(`Navigate to: ${item.name}`)
-                                }}
-                            >
-                                {item.name}
-                            </Button>
+                            <Link key={item.name} href={item.href}>
+                                <Button
+                                    variant="ghost"
+                                    className="text-white hover:bg-white/20 justify-start transition-all duration-200 ease-in-out"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    {item.name}
+                                </Button>
+                            </Link>
                         ))}
                     </nav>
+
                 </div>
 
                 {/* Dialog logout */}

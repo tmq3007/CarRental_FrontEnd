@@ -184,6 +184,7 @@ export default function BookingDetails({ bookingId }: { bookingId: string }) {
                 handleConfirmPickup={handleConfirmPickup}
                 handleCancelBooking={handleCancelBooking}
                 handleReturnCar={handleReturnCar}
+                carId = {bookingDetail.carId}
             />
 
             <div className="bg-white rounded-xl shadow-sm border border-green-100">
