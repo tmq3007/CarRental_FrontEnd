@@ -11,9 +11,7 @@ import {
     Mail,
     Shield,
     Search,
-    MoreHorizontal,
     Eye,
-    Edit,
     Ban,
     CheckCircle,
     XCircle,
@@ -41,6 +39,17 @@ export default function AccountManagement() {
     })
     const [searchTerm, setSearchTerm] = useState("")
     const [isTransitioning, setIsTransitioning] = useState(false)
+    const [selectedCustomer, setSelectedCustomer] = useState<AccountVO | null>(null)
+    const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+    const [isUpdating, setIsUpdating] = useState<string | null>(null)
+    const [confirmDialog, setConfirmDialog] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        action: () => void
+        actionLabel: string
+        variant: "default" | "destructive"
+    } | null>(null)
 
     const {
         data: accounts,
@@ -52,7 +61,10 @@ export default function AccountManagement() {
         filters,
     })
 
+    const [toggleAccountStatus] = useToggleAccountStatusMutation();
+
     const pagination = accounts?.data?.pagination;
+
     const handleSortChange = (value: string) => {
         setIsTransitioning(true)
         const [sortBy, sortDirection] = value.split("-")
@@ -134,7 +146,7 @@ export default function AccountManagement() {
                     variant: "default" as const,
                     className: "bg-purple-100 text-purple-800",
                 }
-            case "car owner":
+            case "car_owner":
                 return {
                     variant: "secondary" as const,
                     className: "bg-blue-100 text-blue-800",
@@ -147,7 +159,6 @@ export default function AccountManagement() {
         }
     }
 
-    // Update the getRoleName function
     const getRoleName = (roleId: number): string => {
         switch (roleId) {
             case 1:
@@ -162,20 +173,6 @@ export default function AccountManagement() {
                 return "Unknown"
         }
     }
-
-    const [selectedCustomer, setSelectedCustomer] = useState<AccountVO | null>(null)
-    const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-    const [isUpdating, setIsUpdating] = useState<string | null>(null)
-    const [confirmDialog, setConfirmDialog] = useState<{
-        isOpen: boolean
-        title: string
-        description: string
-        action: () => void
-        actionLabel: string
-        variant: "default" | "destructive"
-    } | null>(null)
-
-    const [toggleAccountStatus, {isLoading: statusLoading}] = useToggleAccountStatusMutation();
 
     const handleAccountAction = async (action: string, customerId: string) => {
         const customer = accounts?.data.data.find((c) => c.id === customerId)
@@ -215,17 +212,31 @@ export default function AccountManagement() {
         const toastId = toast.loading(`${newStatus ? "Activating" : "Deactivating"} account...`)
 
         try {
-            // Replace with your actual API endpoint
-            const response = await toggleAccountStatus({accountId: customerId}).unwrap();
+            const response = await toggleAccountStatus({ accountId: customerId, isActive: newStatus }).unwrap();
 
-            window.location.reload();
+            if (selectedCustomer?.id === customerId) {
+                setSelectedCustomer({
+                    ...selectedCustomer,
+                    isActive: response.data.IsActive,
+                    updatedAt: new Date().toISOString(),
+                })
+            }
 
             toast.success(`Account ${newStatus ? "activated" : "deactivated"} successfully!`, { id: toastId })
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error changing user status:", error)
-            toast.error(`Failed to ${newStatus ? "activate" : "deactivate"} account. Please try again.`, { id: toastId })
+            let errorMessage = `Failed to ${newStatus ? "activate" : "deactivate"} account. Please try again.`
+            if (error?.status === 401) {
+                errorMessage = "Unauthorized: Please log in again."
+            } else if (error?.status === 404) {
+                errorMessage = "User not found."
+            } else if (error?.data?.message) {
+                errorMessage = error.data.message
+            }
+            toast.error(errorMessage, { id: toastId })
         } finally {
             setIsUpdating(null)
+            setConfirmDialog(null)
         }
     }
 
@@ -311,13 +322,7 @@ export default function AccountManagement() {
                                 ({pagination?.totalRecords ? `(${pagination?.totalRecords} total)` : ""})
                             </p>
                         </div>
-                        <div className="flex gap-4">
-                            <Button
-                                className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
-                                <User className="h-4 w-4 mr-2"/>
-                                Add Account
-                            </Button>
-                        </div>
+
                     </div>
 
                     {/* Filters and Search */}
@@ -484,37 +489,35 @@ export default function AccountManagement() {
                                                         </Link>
                                                     ) : null}
 
-
                                                     <Button
                                                         onClick={() => handleAccountAction("changeUserStatus", Account.id)}
-                                                        variant="outline"
+                                                        variant={Account.isActive ? "destructive" : "default"}
                                                         size="sm"
-                                                        className="flex-1 md:flex-none transition-all duration-200 hover:shadow-md hover:scale-105 bg-transparent"
-                                                        disabled={isUpdating === Account.id || Account.roleId === 1} // 👈 Chặn nếu là roleId 1
+                                                        className="flex-1 md:flex-none transition-all duration-200 hover:shadow-md hover:scale-105"
+                                                        disabled={isUpdating === Account.id || Account.roleId === 1}
                                                     >
                                                         {Account.isActive ? (
                                                             <>
-                                                                <UserX className="h-4 w-4 text-red-500" />
-                                                                <span className="hidden sm:inline ml-1">
-        {isUpdating === Account.id ? "Deactivating..." : "Deactivate"}
-      </span>
-                                                                <span className="sm:hidden ml-1">
-        {isUpdating === Account.id ? "..." : "Deactivate"}
-      </span>
+                                                                <UserX className="h-4 w-4 mr-1" />
+                                                                <span className="hidden sm:inline">
+                                                                    {isUpdating === Account.id ? "Deactivating..." : "Deactivate"}
+                                                                </span>
+                                                                <span className="sm:hidden">
+                                                                    {isUpdating === Account.id ? "..." : "Deactivate"}
+                                                                </span>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <UserCheck className="h-4 w-4 text-green-500" />
-                                                                <span className="hidden sm:inline ml-1">
-        {isUpdating === Account.id ? "Activating..." : "Activate"}
-      </span>
-                                                                <span className="sm:hidden ml-1">
-        {isUpdating === Account.id ? "..." : "Activate"}
-      </span>
+                                                                <UserCheck className="h-4 w-4 mr-1" />
+                                                                <span className="hidden sm:inline">
+                                                                    {isUpdating === Account.id ? "Activating..." : "Activate"}
+                                                                </span>
+                                                                <span className="sm:hidden">
+                                                                    {isUpdating === Account.id ? "..." : "Activate"}
+                                                                </span>
                                                             </>
                                                         )}
                                                     </Button>
-
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -553,12 +556,10 @@ export default function AccountManagement() {
                         <div className="text-center mt-4 text-sm text-gray-600 animate-in fade-in duration-500">
                             Showing {(pagination?.pageNumber ? (pagination.pageNumber - 1) * pagination.pageSize + 1 : 0)} to{" "}
                             {pagination?.pageNumber ? Math.min((pagination.pageNumber ?? 0) * (pagination.pageSize ?? 0), pagination.totalRecords ?? 0) : 0} of {pagination?.totalRecords ?? 0}{" "}
-                            cars
+                            accounts
                         </div>
                     )}
                 </div>
-                {/* Customer Details Dialog */}
-
             </div>
 
             <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
@@ -713,7 +714,7 @@ export default function AccountManagement() {
                                         onClick={() => handleAccountAction("changeUserStatus", selectedCustomer.id)}
                                         variant={selectedCustomer.isActive ? "destructive" : "default"}
                                         size="sm"
-                                        disabled={isUpdating === selectedCustomer.id || selectedCustomer.roleId === 1} // 👈 check roleId
+                                        disabled={isUpdating === selectedCustomer.id || selectedCustomer.roleId === 1}
                                     >
                                         {isUpdating === selectedCustomer.id ? (
                                             "Processing..."
@@ -729,7 +730,6 @@ export default function AccountManagement() {
                                             </>
                                         )}
                                     </Button>
-
                                 </div>
                                 <Button onClick={() => setIsViewDialogOpen(false)} variant="outline" size="sm">
                                     Close
@@ -757,6 +757,6 @@ export default function AccountManagement() {
                         </div>
                     </DialogContent>
                 </Dialog>)}
-            </>
+        </>
     )
 }

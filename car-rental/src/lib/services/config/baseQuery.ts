@@ -7,9 +7,16 @@ export const BASE_URL = 'http://localhost:5227/api';
 
 export const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
-    // Đảm bảo cookie được gửi kèm request
     credentials: 'include',
+    prepareHeaders: (headers, { getState }) => {
+        const token = (getState() as any).user.token;
+        if (token) {
+            headers.set('Authorization', `Bearer ${token}`);
+        }
+        return headers;
+    },
 });
+
 
 export const baseQueryWithAuthCheck = async (
     args: FetchArgs,
