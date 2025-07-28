@@ -1,54 +1,48 @@
 "use client"
 
 import type React from "react"
-
 import { Star, Bookmark, Car, Fuel, Cog, Ruler, Box, ChevronLeft, ChevronRight } from "lucide-react"
 import { Card, CardFooter, CardHeader } from "@/components/ui/card"
-import { useState, useRef } from "react"
 import { CarSearchVO } from "@/lib/services/car-api"
-import { Router } from "next/router"
-import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
-
+import { useRef } from "react"
 
 interface CarRentalGridCardProps {
   car: CarSearchVO
-}
-
-export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
-  const [isSaved, setIsSaved] = useState(false)
-  const [rentButtonPos, setRentButtonPos] = useState({ x: 0, y: 0 })
-  const [viewButtonPos, setViewButtonPos] = useState({ x: 0, y: 0 })
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const rentButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
-  const viewButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
-  const router = useRouter();
-
-  const handleMouseEnter = (
+  isSaved: boolean
+  currentImageIndex: number
+  rentButtonPos: { x: number; y: number }
+  viewButtonPos: { x: number; y: number }
+  toggleSave: () => void
+  nextImage: () => void
+  prevImage: () => void
+  goToImage: (index: number) => void
+  handleMouseEnter: (
+    carId: string,
     e: React.MouseEvent<HTMLButtonElement>,
     buttonRef: React.RefObject<HTMLButtonElement>,
-    setPosition: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>,
-  ) => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      setPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      })
-    }
-  }
+    setPosition: "rentButtonPos" | "viewButtonPos"
+  ) => void
+  handleRentNow: () => void
+  handleViewDeal: () => void
+}
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % car.images.length)
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + car.images.length) % car.images.length)
-  }
-
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index)
-  }
+export default function CarRentalGridCard({
+  car,
+  isSaved,
+  currentImageIndex,
+  rentButtonPos,
+  viewButtonPos,
+  toggleSave,
+  nextImage,
+  prevImage,
+  goToImage,
+  handleMouseEnter,
+  handleRentNow,
+  handleViewDeal,
+}: CarRentalGridCardProps) {
+  const rentButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
+  const viewButtonRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>
 
   return (
     <Card className="overflow-hidden border border-gray-200 rounded-lg h-full flex flex-col">
@@ -57,7 +51,7 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
           <h3 className="font-bold text-lg">{car.brand}</h3>
           <p className="text-sm text-gray-500">{car.model}</p>
         </div>
-        <button onClick={() => setIsSaved(!isSaved)} className="text-gray-500 hover:text-gray-700">
+        <button onClick={toggleSave} className="text-gray-500 hover:text-gray-700">
           <Bookmark className={isSaved ? "fill-black" : ""} size={20} />
         </button>
       </CardHeader>
@@ -68,7 +62,6 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
           alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
           className="w-full h-48 object-cover transition-opacity duration-300"
         />
-
         {/* Navigation Arrows */}
         <button
           onClick={prevImage}
@@ -82,7 +75,6 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
         >
           <ChevronRight size={20} />
         </button>
-
         {/* Image Counter */}
         <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
           {currentImageIndex + 1} / {car.images.length}
@@ -102,8 +94,9 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
             <button
               key={i}
               onClick={() => goToImage(i)}
-              className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
-                }`}
+              className={`w-2 h-2 rounded-full mx-0.5 transition-colors duration-200 ${
+                i === currentImageIndex ? "bg-red-500" : "bg-gray-300 hover:bg-gray-400"
+              }`}
             />
           ))}
         </div>
@@ -134,15 +127,15 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
               <Box size={18} className="text-gray-500 mb-1" />
               <span className="text-xs">{car.specs.numberOfSeat}</span>
             </div>
-            <div className="border p-2 flex flex-col items-center justify-center text-center text-green-600" onClick={() => {
-              router.push(`/home/car-list/${car.id}`);
-            }}>
+            <div
+              className="border p-2 flex flex-col items-center justify-center text-center text-green-600 cursor-pointer"
+              onClick={handleViewDeal}
+            >
               <span className="text-xs font-medium">View All</span>
               <span className="text-xs">Specification</span>
             </div>
           </div>
         </div>
-
         {/* Price Section */}
         <div className="w-1/3 p-3 flex flex-col justify-center items-center border-l">
           <p className="text-xs text-gray-500">Per day</p>
@@ -156,10 +149,8 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
           <button
             ref={rentButtonRef}
             className="relative overflow-hidden bg-black text-white w-full py-2 px-4 rounded-full font-medium transition-colors duration-700 group"
-            onMouseEnter={(e) => handleMouseEnter(e, rentButtonRef, setRentButtonPos)}
-            onClick={() => {
-              router.push(`/booking?carId=${car.id}`);
-            }}
+            onMouseEnter={(e) => handleMouseEnter(car.id, e, rentButtonRef, "rentButtonPos")}
+            onClick={handleRentNow}
           >
             <span className="relative z-10">RENT NOW</span>
             <div
@@ -176,10 +167,8 @@ export default function CarRentalGridCard({ car }: CarRentalGridCardProps) {
           <button
             ref={viewButtonRef}
             className="relative overflow-hidden border border-gray-300 text-gray-700 w-full py-2 px-4 rounded-full font-medium hover:border-green-500 transition-colors duration-700 group"
-            onMouseEnter={(e) => handleMouseEnter(e, viewButtonRef, setViewButtonPos)}
-            onClick={() => {
-              router.push(`/home/car-list/${car.id}`);
-            }}
+            onMouseEnter={(e) => handleMouseEnter(car.id, e, viewButtonRef, "viewButtonPos")}
+            onClick={handleViewDeal}
           >
             <span className="relative z-10 transition-colors duration-700 group-hover:text-white">VIEW DETAIL</span>
             <div

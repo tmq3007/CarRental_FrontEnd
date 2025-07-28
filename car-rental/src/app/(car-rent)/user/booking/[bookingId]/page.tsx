@@ -21,10 +21,10 @@ import { toast } from "sonner"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 import { useRouter } from "next/navigation"
 
-export default function BookingDetails({ params }: { params: { bookingId: string } }) {
+export default async function BookingDetails({ params }: { params: Promise<{ bookingId: string }> }) {
   const [activeTab, setActiveTab] = useState("booking-information")
   const router = useRouter()
-  const { data, isLoading, isError } = useGetBookingDetailQuery(params.bookingId)
+  const { data, isLoading, isError } = useGetBookingDetailQuery((await params).bookingId)
   const [cancelBooking] = useCancelBookingMutation()
   const [confirmPickup] = useConfirmPickupMutation()
   const [returnCar] = useReturnCarMutation()
