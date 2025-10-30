@@ -142,6 +142,11 @@ export interface FeedbackResponseDTO {
     success: boolean;
     message: string;
 }
+export interface BookingQueryParams {
+    searchTerm?: string;
+    sortOrder?: "newest" | "oldest";
+    statuses?: string[];
+}
 
 export const bookingApi = createApi({
     reducerPath: "bookingApi",
@@ -163,6 +168,33 @@ export const bookingApi = createApi({
             }),
             providesTags: ["Booking"],
         }),
+
+        // API mới với search, filter, sort
+        searchBookingsByAccountId: build.query<
+            ApiResponse<BookingVO[]>,
+            { accountId: string; queryParams: BookingQueryParams }
+        >({
+            query: ({ accountId, queryParams }) => {
+                const params = new URLSearchParams();
+
+                if (queryParams.searchTerm) {
+                    params.append('searchTerm', queryParams.searchTerm);
+                }
+                if (queryParams.sortOrder) {
+                    params.append('sortOrder', queryParams.sortOrder);
+                }
+                if (queryParams.statuses && queryParams.statuses.length > 0) {
+                    queryParams.statuses.forEach(status => params.append('statuses', status));
+                }
+
+                return {
+                    url: `/booking/${accountId}/search?${params.toString()}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Booking"],
+        }),
+
         cancelBooking: build.mutation<ApiResponse<string>, { bookingId: string }>({
             query: ({ bookingId }) => ({
                 url: `/booking/${bookingId}/cancel`,
@@ -241,6 +273,8 @@ export const bookingApi = createApi({
 export const {
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
+    useSearchBookingsByAccountIdQuery, // Thêm hook mới
+
     useCancelBookingMutation,
     useConfirmPickupMutation,
     useReturnCarMutation,
