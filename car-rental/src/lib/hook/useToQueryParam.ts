@@ -30,7 +30,7 @@ const toQueryParams = (filters: QueryCriteria): string => {
   }
 
   if (filters.pickupTime) params.append("pickupTime", filters.pickupTime)
-  if (filters.dropoffTime) params.append("dropoffTime", filters.dropoffTime)
+  if (filters.dropOffTime) params.append("dropOffTime", filters.dropOffTime)
 
   params.append("page", filters.page.toString())
   params.append("pageSize", filters.pageSize.toString())

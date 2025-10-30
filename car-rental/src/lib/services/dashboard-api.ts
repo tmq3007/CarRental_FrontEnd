@@ -230,4 +230,5 @@ export const {
     useToggleAccountStatusMutation,
     useVerifyCarMutation,
     useGetCarsByAccountIdQuery,
+    useGetCarsQuery
 } = dashboardApi;

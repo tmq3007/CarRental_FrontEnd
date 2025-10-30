@@ -85,7 +85,7 @@ export default function SearchPage() {
       const queryString = toQueryParams({
         ...filters,
         pickupTime: filters.pickupTime ? filters.pickupTime.toISOString() : null,
-        dropoffTime: filters.dropoffTime ? filters.dropoffTime.toISOString() : null,
+        dropOffTime: filters.dropoffTime ? filters.dropoffTime.toISOString() : null,
         page,
         pageSize: size,
       });

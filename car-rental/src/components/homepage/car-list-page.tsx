@@ -511,13 +511,6 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                             >
                                                 View details
                                             </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-all duration-200 hover:shadow-md hover:scale-105 bg-transparent"
-                                            >
-                                                Confirm deposit
-                                            </Button>
                                         </div>
                                     </div>
                                 </CardContent>

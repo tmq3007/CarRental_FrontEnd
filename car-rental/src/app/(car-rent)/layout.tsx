@@ -8,6 +8,7 @@ import ScrollToTopButton from "@/components/common/scroll-button";
 import ChatToggleButton from "@/components/chat-bot/chatbox";
 import { Props } from "@/components/provider/StoreProvider";
 import ClickSpark from "@/blocks/Animations/ClickSpark/ClickSpark";
+import RedirectOnLogout from "@/components/common/redirect-on-logout";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: Props) {
 
     return (
         <>
-            {/*<RedirectOnLogout />*/}
+            <RedirectOnLogout />
             <div>
                 <Header />
                 <div className="pt-28">
