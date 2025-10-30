@@ -1,0 +1,223 @@
+'use client'
+
+import { Filter } from 'lucide-react'
+import CarRentalListCard from './cards/list-view-card'
+import CarRentalGridCard from './cards/grid-view-card'
+import { CarSearchVO } from '@/lib/services/car-api'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/lib/store'
+import { LoginModal } from './login-modal'
+
+interface CarGridProps {
+  filteredCars: CarSearchVO[]
+  viewMode: 'list' | 'grid'
+  clearAllFilters: () => void
+}
+
+export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: CarGridProps) {
+  const router = useRouter()
+  const isLoggedIn = useSelector((state: RootState) => state.user.id !== '')
+  const [showLoginModal, setShowLoginModal] = useState(false)
+
+  // Maintain per-car state
+  const [carStates, setCarStates] = useState<{
+    [key: string]: {
+      isSaved: boolean
+      currentImageIndex: number
+      rentButtonPos: { x: number; y: number }
+      viewButtonPos: { x: number; y: number }
+    }
+  }>({})
+
+  // ✅ Sync carStates whenever filteredCars changes
+  useEffect(() => {
+    setCarStates((prev) => {
+      const newState = { ...prev }
+
+      // Add missing cars
+      filteredCars.forEach((car) => {
+        if (!newState[car.id]) {
+          newState[car.id] = {
+            isSaved: false,
+            currentImageIndex: 0,
+            rentButtonPos: { x: 0, y: 0 },
+            viewButtonPos: { x: 0, y: 0 },
+          }
+        }
+      })
+
+      // Remove cars that are no longer in filteredCars
+      Object.keys(newState).forEach((id) => {
+        if (!filteredCars.some((car) => car.id === id)) {
+          delete newState[id]
+        }
+      })
+
+      return newState
+    })
+  }, [filteredCars])
+
+  const handleMouseEnter = (
+    carId: string,
+    e: React.MouseEvent<HTMLButtonElement>,
+    buttonRef: React.RefObject<HTMLButtonElement>,
+    setPosition: 'rentButtonPos' | 'viewButtonPos'
+  ) => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setCarStates((prev) => ({
+        ...prev,
+        [carId]: {
+          ...prev[carId],
+          [setPosition]: {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+          },
+        },
+      }))
+    }
+  }
+
+  const nextImage = (carId: string) => {
+    setCarStates((prev) => {
+      const car = filteredCars.find((c) => c.id === carId)
+      if (!car) return prev
+      return {
+        ...prev,
+        [carId]: {
+          ...prev[carId],
+          currentImageIndex: (prev[carId].currentImageIndex + 1) % car.images.length,
+        },
+      }
+    })
+  }
+
+  const prevImage = (carId: string) => {
+    setCarStates((prev) => {
+      const car = filteredCars.find((c) => c.id === carId)
+      if (!car) return prev
+      return {
+        ...prev,
+        [carId]: {
+          ...prev[carId],
+          currentImageIndex:
+            (prev[carId].currentImageIndex - 1 + car.images.length) % car.images.length,
+        },
+      }
+    })
+  }
+
+  const goToImage = (carId: string, index: number) => {
+    setCarStates((prev) => ({
+      ...prev,
+      [carId]: {
+        ...prev[carId],
+        currentImageIndex: index,
+      },
+    }))
+  }
+
+  const toggleSave = (carId: string) => {
+    setCarStates((prev) => ({
+      ...prev,
+      [carId]: {
+        ...prev[carId],
+        isSaved: !prev[carId].isSaved,
+      },
+    }))
+  }
+
+  const handleRentNow = (carId: string) => {
+    if (isLoggedIn) {
+      router.push(`/booking?carId=${carId}`)
+    } else {
+      setShowLoginModal(true)
+    }
+  }
+
+  const handleLoginRedirect = () => {
+    setShowLoginModal(false)
+    router.push('/signin')
+  }
+
+  const handleSignupRedirect = () => {
+    setShowLoginModal(false)
+    router.push('/signup')
+  }
+
+  const handleCloseModal = () => {
+    setShowLoginModal(false)
+  }
+
+  if (filteredCars.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-400 mb-4">
+          <Filter size={48} className="mx-auto" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-600 mb-2">No cars found</h3>
+        <p className="text-gray-500 mb-4">Try adjusting your filters to see more results</p>
+        <button
+          onClick={clearAllFilters}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 hover:scale-105"
+        >
+          Clear all filters
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div
+        className={
+          viewMode === 'list'
+            ? 'space-y-4'
+            : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6'
+        }
+      >
+        {filteredCars.map((car, index) => {
+          const state = carStates[car.id] || {
+            isSaved: false,
+            currentImageIndex: 0,
+            rentButtonPos: { x: 0, y: 0 },
+            viewButtonPos: { x: 0, y: 0 },
+          }
+
+          const CardComponent =
+            viewMode === 'list' ? CarRentalListCard : CarRentalGridCard
+
+          return (
+            <div
+              key={car.id}
+              className="animate-in fade-in slide-in-from-bottom-2"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <CardComponent
+                car={car}
+                currentImageIndex={state.currentImageIndex}
+                rentButtonPos={state.rentButtonPos}
+                viewButtonPos={state.viewButtonPos}
+                nextImage={() => nextImage(car.id)}
+                prevImage={() => prevImage(car.id)}
+                goToImage={(i) => goToImage(car.id, i)}
+                handleMouseEnter={handleMouseEnter}
+                handleRentNow={() => handleRentNow(car.id)}
+                handleViewDeal={() => router.push(`/home/car-list/${car.id}`)}
+              />
+            </div>
+          )
+        })}
+      </div>
+
+      <LoginModal
+        open={showLoginModal}
+        onLoginRedirect={handleLoginRedirect}
+        onSignupRedirect={handleSignupRedirect}
+        onClose={handleCloseModal}
+      />
+    </>
+  )
+}
