@@ -9,11 +9,9 @@ import { useRef } from "react"
 
 interface CarRentalGridCardProps {
   car: CarSearchVO
-  isSaved: boolean
   currentImageIndex: number
   rentButtonPos: { x: number; y: number }
   viewButtonPos: { x: number; y: number }
-  toggleSave: () => void
   nextImage: () => void
   prevImage: () => void
   goToImage: (index: number) => void
@@ -29,11 +27,9 @@ interface CarRentalGridCardProps {
 
 export default function CarRentalGridCard({
   car,
-  isSaved,
   currentImageIndex,
   rentButtonPos,
   viewButtonPos,
-  toggleSave,
   nextImage,
   prevImage,
   goToImage,
@@ -51,9 +47,6 @@ export default function CarRentalGridCard({
           <h3 className="font-bold text-lg">{car.brand}</h3>
           <p className="text-sm text-gray-500">{car.model}</p>
         </div>
-        <button onClick={toggleSave} className="text-gray-500 hover:text-gray-700">
-          <Bookmark className={isSaved ? "fill-black" : ""} size={20} />
-        </button>
       </CardHeader>
 
       <div className="relative group">

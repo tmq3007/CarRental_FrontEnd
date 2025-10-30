@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 export default  async function MyCarDetailsPage({ params }: { params: Promise<{ carId: string }> }) {
     const carId =  (await params).carId;
 
-    const { data: carDetail, isLoading, error } = useGetCarDetailQuery( carId);
+    const { data: carDetail, isLoading, error } = useGetCarDetailQuery(carId);
     const route =  useRouter();
     console.log("carDetail", carDetail)
 

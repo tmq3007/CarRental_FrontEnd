@@ -1,27 +1,27 @@
-"use client"
+'use client'
 
-import { Filter } from "lucide-react"
-import CarRentalListCard from "./cards/list-view-card"
-import CarRentalGridCard from "./cards/grid-view-card"
-import { CarSearchVO } from "@/lib/services/car-api"
-import { useState, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { useSelector } from "react-redux"
-import type { RootState } from "@/lib/store"
-import { LoginModal } from "./login-modal"
+import { Filter } from 'lucide-react'
+import CarRentalListCard from './cards/list-view-card'
+import CarRentalGridCard from './cards/grid-view-card'
+import { CarSearchVO } from '@/lib/services/car-api'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/lib/store'
+import { LoginModal } from './login-modal'
 
 interface CarGridProps {
   filteredCars: CarSearchVO[]
-  viewMode: "list" | "grid"
+  viewMode: 'list' | 'grid'
   clearAllFilters: () => void
 }
 
 export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: CarGridProps) {
   const router = useRouter()
-  const isLoggedIn = useSelector((state: RootState) => state.user.id !== "")
+  const isLoggedIn = useSelector((state: RootState) => state.user.id !== '')
   const [showLoginModal, setShowLoginModal] = useState(false)
 
-  // Common state for each car
+  // Maintain per-car state
   const [carStates, setCarStates] = useState<{
     [key: string]: {
       isSaved: boolean
@@ -29,26 +29,41 @@ export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: Car
       rentButtonPos: { x: number; y: number }
       viewButtonPos: { x: number; y: number }
     }
-  }>(
-    filteredCars.reduce(
-      (acc, car) => ({
-        ...acc,
-        [car.id]: {
-          isSaved: false,
-          currentImageIndex: 0,
-          rentButtonPos: { x: 0, y: 0 },
-          viewButtonPos: { x: 0, y: 0 },
-        },
-      }),
-      {}
-    )
-  )
+  }>({})
+
+  // ✅ Sync carStates whenever filteredCars changes
+  useEffect(() => {
+    setCarStates((prev) => {
+      const newState = { ...prev }
+
+      // Add missing cars
+      filteredCars.forEach((car) => {
+        if (!newState[car.id]) {
+          newState[car.id] = {
+            isSaved: false,
+            currentImageIndex: 0,
+            rentButtonPos: { x: 0, y: 0 },
+            viewButtonPos: { x: 0, y: 0 },
+          }
+        }
+      })
+
+      // Remove cars that are no longer in filteredCars
+      Object.keys(newState).forEach((id) => {
+        if (!filteredCars.some((car) => car.id === id)) {
+          delete newState[id]
+        }
+      })
+
+      return newState
+    })
+  }, [filteredCars])
 
   const handleMouseEnter = (
     carId: string,
     e: React.MouseEvent<HTMLButtonElement>,
     buttonRef: React.RefObject<HTMLButtonElement>,
-    setPosition: "rentButtonPos" | "viewButtonPos"
+    setPosition: 'rentButtonPos' | 'viewButtonPos'
   ) => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
@@ -66,25 +81,32 @@ export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: Car
   }
 
   const nextImage = (carId: string) => {
-    setCarStates((prev) => ({
-      ...prev,
-      [carId]: {
-        ...prev[carId],
-        currentImageIndex: (prev[carId].currentImageIndex + 1) % filteredCars.find((car) => car.id === carId)!.images.length,
-      },
-    }))
+    setCarStates((prev) => {
+      const car = filteredCars.find((c) => c.id === carId)
+      if (!car) return prev
+      return {
+        ...prev,
+        [carId]: {
+          ...prev[carId],
+          currentImageIndex: (prev[carId].currentImageIndex + 1) % car.images.length,
+        },
+      }
+    })
   }
 
   const prevImage = (carId: string) => {
-    setCarStates((prev) => ({
-      ...prev,
-      [carId]: {
-        ...prev[carId],
-        currentImageIndex:
-          (prev[carId].currentImageIndex - 1 + filteredCars.find((car) => car.id === carId)!.images.length) %
-          filteredCars.find((car) => car.id === carId)!.images.length,
-      },
-    }))
+    setCarStates((prev) => {
+      const car = filteredCars.find((c) => c.id === carId)
+      if (!car) return prev
+      return {
+        ...prev,
+        [carId]: {
+          ...prev[carId],
+          currentImageIndex:
+            (prev[carId].currentImageIndex - 1 + car.images.length) % car.images.length,
+        },
+      }
+    })
   }
 
   const goToImage = (carId: string, index: number) => {
@@ -117,13 +139,14 @@ export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: Car
 
   const handleLoginRedirect = () => {
     setShowLoginModal(false)
-    router.push("/signin")
+    router.push('/signin')
   }
 
   const handleSignupRedirect = () => {
     setShowLoginModal(false)
-    router.push("/signup")
+    router.push('/signup')
   }
+
   const handleCloseModal = () => {
     setShowLoginModal(false)
   }
@@ -148,46 +171,45 @@ export default function CarGrid({ filteredCars, viewMode, clearAllFilters }: Car
 
   return (
     <>
-      <div className={viewMode === "list" ? "space-y-4" : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6"}>
-        {filteredCars.map((car, index) => (
-          <div
-            key={car.id}
-            className="animate-in fade-in slide-in-from-bottom-2"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            {viewMode === "list" ? (
-              <CarRentalListCard
+      <div
+        className={
+          viewMode === 'list'
+            ? 'space-y-4'
+            : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6'
+        }
+      >
+        {filteredCars.map((car, index) => {
+          const state = carStates[car.id] || {
+            isSaved: false,
+            currentImageIndex: 0,
+            rentButtonPos: { x: 0, y: 0 },
+            viewButtonPos: { x: 0, y: 0 },
+          }
+
+          const CardComponent =
+            viewMode === 'list' ? CarRentalListCard : CarRentalGridCard
+
+          return (
+            <div
+              key={car.id}
+              className="animate-in fade-in slide-in-from-bottom-2"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <CardComponent
                 car={car}
-                isSaved={carStates[car.id].isSaved}
-                currentImageIndex={carStates[car.id].currentImageIndex}
-                rentButtonPos={carStates[car.id].rentButtonPos}
-                viewButtonPos={carStates[car.id].viewButtonPos}
-                toggleSave={() => toggleSave(car.id)}
+                currentImageIndex={state.currentImageIndex}
+                rentButtonPos={state.rentButtonPos}
+                viewButtonPos={state.viewButtonPos}
                 nextImage={() => nextImage(car.id)}
                 prevImage={() => prevImage(car.id)}
-                goToImage={(index) => goToImage(car.id, index)}
+                goToImage={(i) => goToImage(car.id, i)}
                 handleMouseEnter={handleMouseEnter}
                 handleRentNow={() => handleRentNow(car.id)}
                 handleViewDeal={() => router.push(`/home/car-list/${car.id}`)}
               />
-            ) : (
-              <CarRentalGridCard
-                car={car}
-                isSaved={carStates[car.id].isSaved}
-                currentImageIndex={carStates[car.id].currentImageIndex}
-                rentButtonPos={carStates[car.id].rentButtonPos}
-                viewButtonPos={carStates[car.id].viewButtonPos}
-                toggleSave={() => toggleSave(car.id)}
-                nextImage={() => nextImage(car.id)}
-                prevImage={() => prevImage(car.id)}
-                goToImage={(index) => goToImage(car.id, index)}
-                handleMouseEnter={handleMouseEnter}
-                handleRentNow={() => handleRentNow(car.id)}
-                handleViewDeal={() => router.push(`/home/car-list/${car.id}`)}
-              />
-            )}
-          </div>
-        ))}
+            </div>
+          )
+        })}
       </div>
 
       <LoginModal

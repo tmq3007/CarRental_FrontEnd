@@ -190,6 +190,8 @@ export default function SearchPage() {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     updateUrl(currentFilters, newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
