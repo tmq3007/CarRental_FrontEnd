@@ -1,8 +1,4 @@
 "use client"
-
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp } from "lucide-react"
 import EarningsSummaryCards from "./earnings-summary-cards"
 import UpcomingBookingsList from "./upcoming-bookings-list"
 import RatingsReviewsSection from "./ratings-reviews-section"
@@ -24,71 +20,47 @@ export default function CarOwnerDashboard({ userId }: CarOwnerDashboardProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Welcome back! Here's your car rental business overview.</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className=" mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+        {/* Header Section */}
+        <section className="mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-gray-200 dark:border-gray-800">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-1">Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Welcome back! Here's your car rental business overview.
+          </p>
+        </section>
 
-        {/* Earnings & Payments Overview */}
-        <div className="mb-8">
+        {/* Earnings Summary Cards */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Key Metrics</h2>
           <EarningsSummaryCards />
-        </div>
+        </section>
 
-        {/* Earnings Chart */}
-        <div className="mb-8">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                Earnings Over Last 6 Months
-              </CardTitle>
-              <CardDescription>Your revenue trend for the past 6 months</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={earningsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
-                    formatter={(value) => `$${value}`}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="earnings"
-                    stroke="#22c55e"
-                    strokeWidth={3}
-                    dot={{ fill: "#22c55e", r: 5 }}
-                    activeDot={{ r: 7 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Business Activity Section */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+            Business Activity
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Upcoming Bookings - Takes 2 columns */}
+            <div className="lg:col-span-2">
+              <UpcomingBookingsList />
+            </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Upcoming Bookings - Takes 2 columns */}
-          <div className="lg:col-span-2">
-            <UpcomingBookingsList />
+            {/* Ratings & Reviews - Takes 1 column */}
+            <div>
+              <RatingsReviewsSection />
+            </div>
           </div>
-
-          {/* Ratings & Reviews - Takes 1 column */}
-          <div>
-            <RatingsReviewsSection />
-          </div>
-        </div>
+        </section>
 
         {/* Analytics & Insights */}
-        <div>
+        <section>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+            Analytics & Insights
+          </h2>
           <AnalyticsInsights />
-        </div>
+        </section>
       </div>
     </div>
   )

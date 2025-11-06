@@ -1,13 +1,8 @@
 import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/provider/theme-provider"
-import Header from "@/components/layouts/header";
-import Footer from "@/components/layouts/footer";
-import ScrollToTopButton from "@/components/common/scroll-button";
-import ChatToggleButton from "@/components/chat-bot/chatbox";
 import ReduxProvider, {Props} from "@/components/provider/StoreProvider";
 import { Toaster } from "@/components/ui/sonner"
-import RedirectOnLogout from "@/components/common/redirect-on-logout";
 
 const inter = Inter({ subsets: ["latin"] })
 
