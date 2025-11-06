@@ -1,90 +1,98 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Calendar, User } from "lucide-react"
+import { Calendar, MapPin, Clock } from "lucide-react"
 
 export default function UpcomingBookingsList() {
   // Mock data - replace with real API calls
   const bookings = [
     {
       id: 1,
-      carName: "Toyota Corolla",
-      customerName: "John Doe",
-      dateRange: "Nov 2–5, 2025",
+      customerName: "John Smith",
+      carModel: "Toyota Camry 2024",
+      startDate: "Dec 15, 2024",
+      endDate: "Dec 18, 2024",
+      pickupLocation: "Downtown",
       status: "Confirmed",
-      statusColor: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      image: "/placeholder.svg?height=80&width=80",
+      totalDays: 3,
+      totalAmount: "$450",
+      rating: 4.8,
     },
     {
       id: 2,
-      carName: "Honda Civic",
-      customerName: "Jane Smith",
-      dateRange: "Nov 3–7, 2025",
+      customerName: "Sarah Johnson",
+      carModel: "Honda Civic 2024",
+      startDate: "Dec 20, 2024",
+      endDate: "Dec 22, 2024",
+      pickupLocation: "Airport",
       status: "Pending",
-      statusColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-      image: "/placeholder.svg?height=80&width=80",
+      totalDays: 2,
+      totalAmount: "$280",
+      rating: null,
     },
     {
       id: 3,
-      carName: "BMW 3 Series",
-      customerName: "Mike Johnson",
-      dateRange: "Nov 6–10, 2025",
+      customerName: "Michael Chen",
+      carModel: "Ford Explorer 2024",
+      startDate: "Dec 25, 2024",
+      endDate: "Dec 29, 2024",
+      pickupLocation: "Downtown",
       status: "Confirmed",
-      statusColor: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      image: "/placeholder.svg?height=80&width=80",
+      totalDays: 4,
+      totalAmount: "$680",
+      rating: 5.0,
     },
   ]
 
-  return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-green-600" />
-          Upcoming Bookings
-        </CardTitle>
-        <CardDescription>Your next scheduled rentals</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-            >
-              {/* Car Image */}
-              <img
-                src={booking.image || "/placeholder.svg"}
-                alt={booking.carName}
-                className="w-16 h-16 rounded-lg object-cover"
-              />
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Confirmed":
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+      case "Pending":
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
+      case "Completed":
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+      default:
+        return "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300"
+    }
+  }
 
-              {/* Booking Details */}
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{booking.carName}</h4>
-                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    {booking.customerName}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {booking.dateRange}
-                  </div>
+  return (
+    <Card className="border-0 shadow-sm h-full">
+      <CardHeader className="pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
+        <CardTitle className="text-base sm:text-lg">Upcoming Bookings</CardTitle>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Next 3 confirmed and pending bookings</p>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {bookings.map((booking) => (
+            <div key={booking.id} className="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{booking.customerName}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{booking.carModel}</p>
+                </div>
+                <Badge className={`flex-shrink-0 text-xs ${getStatusColor(booking.status)}`}>{booking.status}</Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                  <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="truncate">{booking.startDate}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                  <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>{booking.totalDays} days</span>
                 </div>
               </div>
 
-              {/* Status and Action */}
-              <div className="flex items-center gap-3">
-                <Badge className={booking.statusColor}>{booking.status}</Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/20 bg-transparent"
-                >
-                  View Details
-                </Button>
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>{booking.pickupLocation}</span>
+                </div>
+                <p className="text-sm font-bold text-gray-900 dark:text-white">{booking.totalAmount}</p>
               </div>
             </div>
           ))}

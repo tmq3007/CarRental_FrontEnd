@@ -23,7 +23,7 @@ export default function RootLayout({children}: Props) {
                     <SidebarProvider defaultOpen={true}>
                     <AppSidebar />
                         <div className="flex min-h-screen w-full">
-                    {children}
+                            {children}
                         </div>
                     </SidebarProvider>
                 </div>

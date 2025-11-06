@@ -1,129 +1,112 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { TrendingUp, Users, Zap, Activity } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 
 export default function AnalyticsInsights() {
-  // Mock data - replace with real API calls
-  const bookingsPerCar = [
-    { name: "Toyota Corolla", bookings: 10 },
-    { name: "Honda Civic", bookings: 8 },
-    { name: "BMW 3 Series", bookings: 6 },
-    { name: "Audi A4", bookings: 5 },
+  // Mock data - bookings by day
+  const bookingsByDay = [
+    { day: "Mon", bookings: 12, revenue: 1800 },
+    { day: "Tue", bookings: 14, revenue: 2100 },
+    { day: "Wed", bookings: 10, revenue: 1500 },
+    { day: "Thu", bookings: 16, revenue: 2400 },
+    { day: "Fri", bookings: 18, revenue: 2700 },
+    { day: "Sat", bookings: 22, revenue: 3300 },
+    { day: "Sun", bookings: 19, revenue: 2850 },
   ]
 
-  const bookingSource = [
-    { name: "App", value: 65, color: "#22c55e" },
-    { name: "Web", value: 35, color: "#3b82f6" },
-  ]
-
-  const insights = [
-    {
-      title: "Top Performing Car",
-      value: "Toyota Corolla",
-      subtitle: "10 rentals this month",
-      icon: TrendingUp,
-      color: "bg-green-50 dark:bg-green-900/20",
-      iconColor: "text-green-600",
-    },
-    {
-      title: "Peak Booking Time",
-      value: "Weekends",
-      subtitle: "Fri–Sun (65% of bookings)",
-      icon: Activity,
-      color: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-blue-600",
-    },
-    {
-      title: "Returning Customers",
-      value: "25%",
-      subtitle: "Of total bookings",
-      icon: Users,
-      color: "bg-purple-50 dark:bg-purple-900/20",
-      iconColor: "text-purple-600",
-    },
-    {
-      title: "Utilization Rate",
-      value: "78%",
-      subtitle: "Fleet average",
-      icon: Zap,
-      color: "bg-yellow-50 dark:bg-yellow-900/20",
-      iconColor: "text-yellow-600",
-    },
+  const vehicleUtilization = [
+    { name: "Toyota Camry", value: 78, color: "#10b981" },
+    { name: "Honda Civic", value: 65, color: "#3b82f6" },
+    { name: "Ford Explorer", value: 82, color: "#8b5cf6" },
+    { name: "BMW X5", value: 45, color: "#f59e0b" },
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Insight Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {insights.map((insight, index) => {
-          const Icon = insight.icon
-          return (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className={`${insight.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
-                  <Icon className={`h-6 w-6 ${insight.iconColor}`} />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Weekly Bookings */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
+          <CardTitle className="text-base sm:text-lg">Weekly Activity</CardTitle>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Bookings and revenue by day</p>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4">
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={bookingsByDay} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+              <XAxis dataKey="day" stroke="#6b7280" className="dark:stroke-gray-500" fontSize={12} />
+              <YAxis stroke="#6b7280" className="dark:stroke-gray-500" fontSize={12} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                }}
+                className="dark:bg-gray-900 dark:border-gray-700"
+              />
+              <Bar dataKey="bookings" fill="#10b981" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Vehicle Utilization */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
+          <CardTitle className="text-base sm:text-lg">Vehicle Utilization</CardTitle>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Average usage percentage</p>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4">
+          <div className="space-y-3">
+            {vehicleUtilization.map((vehicle) => (
+              <div key={vehicle.name}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {vehicle.name}
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">{vehicle.value}%</span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{insight.title}</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{insight.value}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-500">{insight.subtitle}</p>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full" style={{ width: `${vehicle.value}%`, backgroundColor: vehicle.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Bookings per Car */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Bookings per Car</CardTitle>
-            <CardDescription>Performance by vehicle</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={bookingsPerCar}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
-                <YAxis stroke="#6b7280" />
-                <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }} />
-                <Bar dataKey="bookings" fill="#22c55e" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Booking Source */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Booking Source</CardTitle>
-            <CardDescription>App vs Web distribution</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={bookingSource}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {bookingSource.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `${value}%`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Revenue Trend */}
+      <Card className="border-0 shadow-sm lg:col-span-2">
+        <CardHeader className="pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
+          <CardTitle className="text-base sm:text-lg">Revenue Trend</CardTitle>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Daily revenue for the week</p>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4">
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={bookingsByDay} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+              <XAxis dataKey="day" stroke="#6b7280" className="dark:stroke-gray-500" fontSize={12} />
+              <YAxis stroke="#6b7280" className="dark:stroke-gray-500" fontSize={12} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                }}
+                className="dark:bg-gray-900 dark:border-gray-700"
+              />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ fill: "#3b82f6", r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </div>
   )
 }
