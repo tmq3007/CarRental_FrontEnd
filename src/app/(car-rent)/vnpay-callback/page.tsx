@@ -27,7 +27,7 @@ export default function VnpayCallbackPage() {
 
             if (!vnp_ResponseCode) {
                 toast.error('Wrong transaction information');
-                setTimeout(() => router.push('/wallet'), 3000);
+                setTimeout(() => router.push('/user/wallet'), 3000);
                 return;
             }
 
