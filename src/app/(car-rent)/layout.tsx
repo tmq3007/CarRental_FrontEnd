@@ -29,7 +29,6 @@ export default function RootLayout({ children }: Props) {
                 <Header />
                 <div className="pt-28">
                     {children}
-
                 </div>
                 <Footer />
                 <ScrollToTopButton />
