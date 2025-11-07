@@ -9,16 +9,6 @@ interface CarOwnerDashboardProps {
 }
 
 export default function CarOwnerDashboard({ userId }: CarOwnerDashboardProps) {
-  // Mock data - replace with real API calls
-  const earningsData = [
-    { month: "May", earnings: 2400 },
-    { month: "Jun", earnings: 1398 },
-    { month: "Jul", earnings: 9800 },
-    { month: "Aug", earnings: 3908 },
-    { month: "Sep", earnings: 4800 },
-    { month: "Oct", earnings: 3800 },
-  ]
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className=" mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
@@ -44,12 +34,12 @@ export default function CarOwnerDashboard({ userId }: CarOwnerDashboardProps) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Upcoming Bookings - Takes 2 columns */}
             <div className="lg:col-span-2">
-              <UpcomingBookingsList />
+              <UpcomingBookingsList accountId={userId} />
             </div>
 
             {/* Ratings & Reviews - Takes 1 column */}
             <div>
-              <RatingsReviewsSection />
+              <RatingsReviewsSection accountId={userId} />
             </div>
           </div>
         </section>
