@@ -76,7 +76,7 @@ export function CarOwnerSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: "Bookings",
-      url: "/car-owner/bookings",
+      url: "/car-owner/booking",
       icon: CalendarDays,
       isActive: pathname?.includes("/car-owner/bookings"),
     },

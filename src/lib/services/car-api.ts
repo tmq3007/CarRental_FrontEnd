@@ -279,15 +279,6 @@ export const carApi = createApi({
       }),
     }),
 
-    confirmDeposit: build.mutation<
-        ApiResponse<{ success: boolean; message?: string }>,
-        string
-    >({
-      query: (bookingId) => ({
-        url: `/Booking/confirm-deposit/${bookingId}`,
-        method: "PATCH",
-      }),
-    }),
 
     getBookingDetailsByCarId: build.query<ApiResponse<BookingDetailVO>, string>({
       query: (carId) => ({
@@ -314,7 +305,6 @@ export const {
   useAddCarMutation,
   useSearchCarsQuery,
   useEditCarMutation,
-  useConfirmDepositMutation,
   useGetBookingDetailsByCarIdQuery,
   useGetBookingDetailsByCarIdsQuery,
 } = carApi;
