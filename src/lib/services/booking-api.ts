@@ -2,7 +2,7 @@
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
-import { ApiResponse } from "@/lib/store";
+import { ApiResponse, PaginationResponse } from "@/lib/store";
 import { CarVO_Detail } from "./car-api";
 import { UserProfile } from "./user-api";
 import { Location } from "./local-api/address-api";
@@ -142,12 +142,99 @@ export interface FeedbackResponseDTO {
     success: boolean;
     message: string;
 }
+export interface BookingQueryParams {
+    searchTerm?: string;
+    sortOrder?: "newest" | "oldest";
+    statuses?: string[];
+}
+
+export interface CarOwnerBookingQueryParams {
+    accountId: string;
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    carName?: string;
+    sortBy?: "pickupDate" | "returnDate" | "totalAmount" | "status";
+    sortDirection?: "asc" | "desc";
+    statuses?: string[];
+    fromDate?: string;
+    toDate?: string;
+}
+
+export interface CarOwnerBookingVO extends BookingVO {
+    bookingId?: string;
+    carId?: string;
+    renterFullName?: string;
+    renterEmail?: string;
+    renterPhoneNumber?: string;
+    paymentStatus?: string;
+    totalAmount?: number;
+    updatedAt?: string;
+}
 
 export const bookingApi = createApi({
     reducerPath: "bookingApi",
     baseQuery: baseQueryWithAuthCheck,
     tagTypes: ["Booking"],
     endpoints: (build) => ({
+        getCarOwnerUpcommingBookings: build.query<
+            ApiResponse<CarOwnerBookingVO[]>,
+            { accountId: string; limit: number }
+        >({
+            query: ({ accountId, limit }) => ({
+                url: `/car-owner/dashboard/upcomming-bookings?accountId=${accountId}&limit=${limit}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
+        getCarOwnerBookings: build.query<
+            ApiResponse<PaginationResponse<CarOwnerBookingVO[]>>,
+            CarOwnerBookingQueryParams
+        >({
+            query: ({ accountId, statuses, ...params }) => {
+                const searchParams = new URLSearchParams();
+                searchParams.set("accountId", accountId);
+
+                if (typeof params.page === "number") {
+                    searchParams.set("page", String(params.page));
+                }
+                if (typeof params.pageSize === "number") {
+                    searchParams.set("pageSize", String(params.pageSize));
+                }
+                if (params.search) {
+                    searchParams.set("search", params.search);
+                }
+                if (params.carName) {
+                    searchParams.set("carName", params.carName);
+                }
+                if (params.sortBy) {
+                    searchParams.set("sortBy", params.sortBy);
+                }
+                if (params.sortDirection) {
+                    searchParams.set("sortDirection", params.sortDirection);
+                }
+                if (params.fromDate) {
+                    searchParams.set("fromDate", params.fromDate);
+                }
+                if (params.toDate) {
+                    searchParams.set("toDate", params.toDate);
+                }
+                statuses?.forEach((status) => {
+                    if (status) {
+                        searchParams.append("status", status);
+                    }
+                });
+
+                const queryString = searchParams.toString();
+
+                return {
+                    url: `/car-owner/bookings${queryString ? `?${queryString}` : ""}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Booking"],
+            keepUnusedDataFor: 0,
+        }),
         getBookings: build.query<ApiResponse<PaginatedBookingResponse>, { page: number; pageSize: number }>({
             query: ({ page, pageSize }) => ({
                 url: `/booking?page=${page}&pageSize=${pageSize}`,
@@ -163,6 +250,31 @@ export const bookingApi = createApi({
             }),
             providesTags: ["Booking"],
         }),
+        searchBookingsByAccountId: build.query<
+            ApiResponse<BookingVO[]>,
+            { accountId: string; queryParams: BookingQueryParams }
+        >({
+            query: ({ accountId, queryParams }) => {
+                const params = new URLSearchParams();
+
+                if (queryParams.searchTerm) {
+                    params.append('searchTerm', queryParams.searchTerm);
+                }
+                if (queryParams.sortOrder) {
+                    params.append('sortOrder', queryParams.sortOrder);
+                }
+                if (queryParams.statuses && queryParams.statuses.length > 0) {
+                    queryParams.statuses.forEach(status => params.append('statuses', status));
+                }
+
+                return {
+                    url: `/booking/${accountId}/search?${params.toString()}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Booking"],
+        }),
+
         cancelBooking: build.mutation<ApiResponse<string>, { bookingId: string }>({
             query: ({ bookingId }) => ({
                 url: `/booking/${bookingId}/cancel`,
@@ -173,6 +285,13 @@ export const bookingApi = createApi({
         confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
             query: ({ bookingNumber }) => ({
                 url: `/booking/${bookingNumber}/confirm-pickup`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        confirmDeposit: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
+            query: ({ bookingNumber }) => ({
+                url: `/booking/${bookingNumber}/confirm-deposit`,
                 method: "PUT",
             }),
             invalidatesTags: ["Booking"],
@@ -239,10 +358,14 @@ export const bookingApi = createApi({
 });
 
 export const {
+    useGetCarOwnerUpcommingBookingsQuery,
+    useGetCarOwnerBookingsQuery,
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
+    useSearchBookingsByAccountIdQuery,
     useCancelBookingMutation,
     useConfirmPickupMutation,
+    useConfirmDepositMutation,
     useReturnCarMutation,
     useGetBookingDetailQuery,
     useUpdateBookingMutation,

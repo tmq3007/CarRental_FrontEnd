@@ -10,6 +10,7 @@ import { carApi } from "@/lib/services/car-api";
 import { bookingApi } from "./services/booking-api";
 import {vnpayApi} from "@/lib/services/vnp-api";
 import {dashboardApi} from "@/lib/services/dashboard-api";
+import { carOwnerApi } from "@/lib/services/car-owner-api";
 import {walletApi} from "@/lib/services/wallet-api";
 import {chatbotApi   } from "@/lib/services/chatbot-api";
 import carReducer from "@/lib/slice/carSlice";
@@ -44,6 +45,7 @@ const baseReducer = combineReducers({
     [bookingApi.reducerPath]: bookingApi.reducer,
     [vnpayApi.reducerPath]: vnpayApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
+    [carOwnerApi.reducerPath]: carOwnerApi.reducer,
     [walletApi.reducerPath]: walletApi.reducer,
     [feedbackApi.reducerPath]: feedbackApi.reducer,
     user: userReducer,
@@ -80,6 +82,7 @@ export const store = () => {
                 bookingApi.middleware,
                 vnpayApi.middleware,
                 dashboardApi.middleware,
+                carOwnerApi.middleware,
                 walletApi.middleware,
                 feedbackApi.middleware,
             ),

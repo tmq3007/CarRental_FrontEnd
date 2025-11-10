@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import MultiDirectionalFilterPill from "./multi-directional-filter-pill"
 import FilterPanel from "./filter-panel"
 import { FilterCriteria } from "@/lib/services/car-api"
@@ -30,6 +30,8 @@ export default function FilterPillComponent({
   const [pickupTime, setPickupTime] = useState(initialFilters.pickupTime)
   const [dropoffTime, setDropoffTime] = useState(initialFilters.dropoffTime)
   const [searchQuery, setSearchQuery] = useState(initialFilters.searchQuery || "")
+  const applyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const applyFiltersRef = useRef<() => void>(() => {})
   console.log(initialFilters)
   // Sync state with initialFilters when prop changes
   useEffect(() => {
@@ -83,6 +85,44 @@ export default function FilterPillComponent({
     return tags
   }
 
+  const applyFilters = useCallback(() => {
+    if (applyDebounceRef.current) {
+      clearTimeout(applyDebounceRef.current)
+      applyDebounceRef.current = null
+    }
+    const updatedFilters: FilterCriteria = {
+      ...immediateFilters,
+      searchQuery,
+      location: location.province ? location : undefined,
+      pickupTime,
+      dropoffTime,
+    }
+    onFilterChange(updatedFilters)
+    setIsExpanded(false)
+  }, [dropoffTime, immediateFilters, location, onFilterChange, pickupTime, searchQuery])
+
+  useEffect(() => {
+    applyFiltersRef.current = applyFilters
+  }, [applyFilters])
+
+  const scheduleApplyFilters = useCallback(() => {
+    if (applyDebounceRef.current) {
+      clearTimeout(applyDebounceRef.current)
+    }
+    applyDebounceRef.current = setTimeout(() => {
+      applyFiltersRef.current()
+      applyDebounceRef.current = null
+    }, 1500)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (applyDebounceRef.current) {
+        clearTimeout(applyDebounceRef.current)
+      }
+    }
+  }, [])
+
   const removeFilterTag = (tagType: string, tagValue: any) => {
     switch (tagType) {
       case "search": setSearchQuery(""); break
@@ -106,6 +146,7 @@ export default function FilterPillComponent({
         setImmediateFilters((prev) => ({ ...prev, sortBy: "newest", order: "asc" }))
         break
     }
+    scheduleApplyFilters()
   }
 
   const handleFilterChange = (filterType: string, value: any) => {
@@ -146,21 +187,10 @@ export default function FilterPillComponent({
       searchQuery: "",
     })
     setSearchQuery("")
+    scheduleApplyFilters()
   }
 
   const activeFiltersCount = getFilterTags().filter((tag) => tag.type !== "location").length
-
-  const applyFilters = () => {
-    const updatedFilters: FilterCriteria = {
-      ...immediateFilters,
-      searchQuery,
-      location: location.province ? location : undefined,
-      pickupTime,
-      dropoffTime,
-    }
-    onFilterChange(updatedFilters)
-    setIsExpanded(false)
-  }
 
   return (
     <>
@@ -174,6 +204,7 @@ export default function FilterPillComponent({
         onClearAll={clearAllFilters}
         activeFiltersCount={activeFiltersCount}
         location={location}
+        onApplyFilters={applyFilters}
         pickupTime={pickupTime ?? undefined}
         dropoffTime={dropoffTime ?? undefined}
       />

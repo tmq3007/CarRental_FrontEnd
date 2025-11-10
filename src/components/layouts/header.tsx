@@ -1,6 +1,6 @@
 "use client"
 
-import { Car, ChevronDown, User, Phone, MapPin, Clock, Menu, X } from "lucide-react"
+import { Car, ChevronDown, User, Phone, MapPin, Clock, Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEffect, useState, useRef, useCallback } from "react"
@@ -181,169 +181,172 @@ export default function Header() {
 
                     {/* Right side - User menu and mobile menu */}
                     <div className="flex items-center gap-2">
-                        {/* User dropdown */}
                         {email ? (
-                            <DropdownMenu modal={false}>
+                            <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out flex items-center gap-2 ${isScrolled ? "text-sm px-2 py-1" : "text-base px-3 py-2"
-                                            }`}
+                                        className="text-white hover:bg-white/20 transition-colors flex items-center gap-2"
                                     >
                                         <div className="relative">
-                                            <User
-                                                className={`transition-all duration-300 ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`} />
-                                            <div
-                                                className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                                            <img
+                                                src="https://ferf1mheo22r9ira.public.blob.vercel-storage.com/avatar-01-n0x8HFv8EUetf9z6ht0wScJKoTHqf8.png"
+                                                alt="User avatar"
+                                                className={`rounded-full ring-2 ring-white/30 transition-all duration-300 ${
+                                                    isScrolled ? "w-7 h-7" : "w-8 h-8"
+                                                }`}
+                                            />
+                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
                                         </div>
-                                        <span className="hidden sm:inline">Welcome, {username ? username : email}</span>
-                                        <ChevronDown
-                                            className={`transition-all duration-300 ${isScrolled ? "h-3 w-3" : "h-4 w-4"}`} />
+                                        <span className="hidden sm:inline font-medium">{username || email}</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
                                     align="end"
-                                    className="w-48 animate-in slide-in-from-top-2 z-[60] bg-white border border-gray-200 shadow-lg"
-                                    sideOffset={5}
-                                    style={{ zIndex: 9999 }}
+                                    className="w-[280px] p-2 bg-white dark:bg-[#0F0F12] border border-gray-200 dark:border-[#1F1F23] rounded-lg shadow-lg "
+                                    style={{ zIndex: 101 }}
                                 >
-                                    <DropdownMenuItem
-                                        className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleDropdownItemClick("My Profile")
-                                        }}
-                                    >
-                                        <Link href="/user/profile">
-                                            My Profile
-                                        </Link>
-                                    </DropdownMenuItem>
+                                    <div className="flex items-center gap-3 p-2 mb-2">
+                                        <img
+                                            src="https://ferf1mheo22r9ira.public.blob.vercel-storage.com/avatar-01-n0x8HFv8EUetf9z6ht0wScJKoTHqf8.png"
+                                            alt="User avatar"
+                                            className="w-10 h-10 rounded-full ring-2 ring-gray-200 dark:ring-[#2B2B30]"
+                                        />
+                                        <div className="grid gap-0.5">
+                                            <div className="font-medium text-gray-900 dark:text-white">{username || "User"}</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">{email}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-gray-200 dark:border-[#1F1F23] -mx-2 my-2"></div>
+                                    
+                                    <Link href="/user/profile" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                        My Profile
+                                    </Link>
+                                    <Link href="/user/wallet" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                        My Wallet
+                                    </Link>
 
-                                    <DropdownMenuItem
-                                        className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleDropdownItemClick("My Wallet")
-                                        }}
-                                    >
-                                        <Link href="/user/wallet">My Wallet</Link>
-                                    </DropdownMenuItem>
                                     {role === "car_owner" ? (
                                         <>
-                                            <DropdownMenuItem
-                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                                onClick={() => handleDropdownItemClick("My Cars")}
-                                            >
-                                                <Link href="/car-owner/my-car">My Cars</Link>
-                                            </DropdownMenuItem>
-
-
-
-
-                                            <DropdownMenuItem
-                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                                onClick={() => handleDropdownItemClick("Add A Car")}
-                                            >
-                                                <Link href="/car-owner/add-car">Add A Car</Link>
-                                            </DropdownMenuItem>
+                                            <Link href="/car-owner/my-car" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                                My Cars
+                                            </Link>
+                                            <Link href="/car-owner" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                                Dashboard
+                                            </Link>
                                         </>
-
-
                                     ) : (
-                                        <>
-                                            <DropdownMenuItem
-                                                className="hover:bg-green-50 transition-colors duration-200 cursor-pointer"
-                                                onClick={() => handleDropdownItemClick("My Bookings")}
-                                            >
-                                                <Link href="/user/booking">My Bookings</Link>
-                                            </DropdownMenuItem>
-                                        </>
+                                        <Link href="/user/booking" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                            My Bookings
+                                        </Link>
                                     )}
 
+                                    <div className="border-t border-gray-200 dark:border-[#1F1F23] -mx-2 my-2"></div>
 
-
-                                    <DropdownMenuItem
-                                        className="text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleDropdownItemClick("Log Out")
-                                        }}
-                                    >
-                                        <Dialog>
-                                            <form>
-                                                <DialogTrigger asChild>
-                                                    <Link href="">Logout</Link>
-                                                </DialogTrigger>
-                                                <DialogContent className="sm:max-w-[425px]">
-                                                    <DialogHeader>
-                                                        <DialogTitle>Logout</DialogTitle>
-                                                        <DialogDescription>
-                                                            Are you want to logout?
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-                                                    <DialogFooter>
-                                                        <DialogClose asChild>
-                                                            <Button variant="outline">Cancel</Button>
-                                                        </DialogClose>
-                                                        <DialogClose asChild>
-                                                            <Button type="submit"
-                                                                onClick={() => handleLogout()}>Logout</Button>
-                                                        </DialogClose>
-                                                    </DialogFooter>
-                                                </DialogContent>
-                                            </form>
-                                        </Dialog>
-                                    </DropdownMenuItem>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                                Sign Out
+                                            </button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>Sign Out</DialogTitle>
+                                                <DialogDescription>
+                                                    Are you sure you want to sign out?
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <DialogFooter>
+                                                <DialogClose asChild>
+                                                    <Button variant="outline">Cancel</Button>
+                                                </DialogClose>
+                                                <DialogClose asChild>
+                                                    <Button onClick={handleLogout}>Sign Out</Button>
+                                                </DialogClose>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </DropdownMenuContent>
-                            </DropdownMenu>) : (
+                            </DropdownMenu>
+                        ) : (
                             <Button
                                 variant="ghost"
-                                className={`text-white hover:bg-white/20 hover:scale-105 transition-all duration-200 ease-in-out flex items-center gap-2 ${isScrolled ? "text-sm px-2 py-1" : "text-base px-3 py-2"
-                                    }`}
+                                className="text-white hover:bg-white/20 transition-colors flex items-center gap-2"
                                 onClick={() => router.push('/signin')}
                             >
                                 <User className={`transition-all duration-300 ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`} />
-                                <span className="hidden sm:inline">Login / Register</span>
+                                <span className="hidden sm:inline">Sign In</span>
                             </Button>
                         )}
 
                         {/* Mobile menu button */}
-                        <Button
-                            variant="ghost"
-                            className="lg:hidden text-white hover:bg-white/20 p-2"
+                        <button
+                            type="button"
+                            className="lg:hidden p-2 rounded-lg hover:bg-white/20 transition-colors"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                        </Button>
+                            {isMobileMenuOpen ? (
+                                <X className="h-5 w-5 text-white" />
+                            ) : (
+                                <Menu className="h-5 w-5 text-white" />
+                            )}
+                        </button>
                     </div>
                 </div>
 
-                {/* Mobile Navigation */}
-                <div
-                    className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? "max-h-64 opacity-100 mt-4" : "max-h-0 opacity-0"
-                        }`}
-                >
-                    <nav className="flex flex-col space-y-2 pb-4">
-                        {navItems.map((item, index) => (
-                            <Link key={item.name} href={item.href}>
-                                <Button
-                                    variant="ghost"
-                                    className="text-white hover:bg-white/20 justify-start transition-all duration-200 ease-in-out"
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {item.name}
-                                </Button>
-                            </Link>
-                        ))}
-                    </nav>
-
-                </div>
-
-                {/* Dialog logout */}
-                <div>
-
-                </div>
+                {/* Mobile Navigation Overlay */}
+                {isMobileMenuOpen && (
+                    <>
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                        <div className="fixed top-[72px] left-0 right-0 bottom-0 bg-white dark:bg-[#0F0F12] z-50 lg:hidden">
+                            <div className="flex flex-col h-full overflow-y-auto">
+                                <nav className="flex-1 py-4 px-4">
+                                    <div className="space-y-1">
+                                        {navItems.map((item) => (
+                                            <Link 
+                                                key={item.name} 
+                                                href={item.href}
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]"
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </nav>
+                                {email && (
+                                    <div className="border-t border-gray-200 dark:border-[#1F1F23] p-4">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <img
+                                                src="https://ferf1mheo22r9ira.public.blob.vercel-storage.com/avatar-01-n0x8HFv8EUetf9z6ht0wScJKoTHqf8.png"
+                                                alt="User avatar"
+                                                className="w-10 h-10 rounded-full ring-2 ring-gray-200 dark:ring-[#2B2B30]"
+                                            />
+                                            <div className="grid gap-0.5">
+                                                <div className="font-medium text-gray-900 dark:text-white">{username || "User"}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{email}</div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setIsMobileMenuOpen(false);
+                                                handleLogout();
+                                            }}
+                                            className="flex w-full items-center justify-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
 
             </div>
         </header>
