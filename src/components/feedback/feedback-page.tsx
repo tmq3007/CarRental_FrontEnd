@@ -1,13 +1,12 @@
 "use client"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/lib/store"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Star, User, ChevronDown, Car, Calendar, Clock } from "lucide-react"
+import { Star, Car, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import NoResult from "@/components/common/no-result"
 import LoadingPage from "@/components/common/loading"
-import { Pagination } from "@/components/wallet/pagination"
 import { useGetFeedbackReportByAccountIdQuery } from "@/lib/services/feedback-api"
 
 interface FeedbackItemDTO {
@@ -20,12 +19,6 @@ interface FeedbackItemDTO {
     dropOffTime: string
 }
 
-interface FeedbackSummaryDTO {
-    averageRating: number
-    totalRatings: number
-    ratingDistribution: { [key: number]: number }
-}
-
 interface PaginationMetadata {
     pageNumber: number
     pageSize: number
@@ -35,32 +28,135 @@ interface PaginationMetadata {
     hasNextPage: boolean
 }
 
+interface FeedbackSummaryDTO {
+    averageRating: number
+    totalRatings: number
+    ratingDistribution: { [key: number]: number }
+}
+
+interface PaginationResponse<T> {
+    data: T[]
+    pagination: PaginationMetadata
+}
+
 interface FeedbackReportDTO {
     summary: FeedbackSummaryDTO
-    details: {
-        data: FeedbackItemDTO[]
-        pagination: PaginationMetadata
-    }
+    details: PaginationResponse<FeedbackItemDTO>
+}
+
+// Simple Pagination Component - ĐÃ SỬA
+function SimplePagination({
+                              currentPage,
+                              totalPages,
+                              totalItems,
+                              itemsPerPage,
+                              onPageChange,
+                              hasPreviousPage,
+                              hasNextPage
+                          }: {
+    currentPage: number
+    totalPages: number
+    totalItems: number
+    itemsPerPage: number
+    onPageChange: (page: number) => void
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+}) {
+    const startItem = Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)
+    const endItem = Math.min(currentPage * itemsPerPage, totalItems)
+
+    // SỬA: Tính toán lại điều kiện hiển thị
+    const shouldShowPrevious = hasPreviousPage && currentPage > 1
+    const shouldShowNext = hasNextPage && currentPage < totalPages
+
+    return (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-slate-600">
+                Showing {startItem} to {endItem}
+            </div>
+
+            <div className="flex items-center gap-2">
+
+                {shouldShowPrevious && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onPageChange(currentPage - 1)}
+                        className="flex items-center gap-1"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                        Previous
+                    </Button>
+                )}
+
+                <span className="text-sm text-slate-600 px-3">
+                    Page {currentPage}
+                </span>
+
+                {shouldShowNext && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onPageChange(currentPage + 1)}
+                        className="flex items-center gap-1"
+                    >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                    </Button>
+                )}
+            </div>
+        </div>
+    )
 }
 
 export default function FeedbackPage() {
     const userId = useSelector((state: RootState) => state.user?.id)
     const role = useSelector((state: RootState) => state.user?.role)
-    const userName = useSelector((state: RootState) => state.user?.full_name || "Guest")
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 6
 
-    const { data, isLoading, isError } = useGetFeedbackReportByAccountIdQuery(
+    const { data: apiResponse, isLoading, isError } = useGetFeedbackReportByAccountIdQuery(
         { accountId: userId || "", pageNumber: currentPage, pageSize: itemsPerPage },
         { skip: !userId || role !== "car_owner" },
     )
 
-    const feedbackData = data?.data
+    // Debug để xem structure thực tế
+    useEffect(() => {
+        console.log('Full API Response:', apiResponse)
+        console.log('Data details:', apiResponse?.data?.details)
+        console.log('Data summary:', apiResponse?.data?.summary)
+    }, [apiResponse])
+
+    // Access data theo đúng structure FeedbackReportDTO
+    const feedbackData = apiResponse?.data as FeedbackReportDTO | undefined
+    const feedbackList = feedbackData?.details?.data || []
+    const paginationInfo = feedbackData?.details?.pagination
+    const summaryData = feedbackData?.summary
+
+    console.log('Processed data:', {
+        feedbackData,
+        feedbackList,
+        paginationInfo,
+        summaryData,
+        currentPage // Thêm currentPage để debug
+    })
 
     const renderStars = (rating: number) => {
         return Array.from({ length: 5 }, (_, i) => (
-            <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-amber-400 text-amber-400" : "text-slate-300"}`} />
+            <Star
+                key={i}
+                className={`w-4 h-4 ${i < rating ? "fill-amber-400 text-amber-400" : "text-slate-300"}`}
+            />
         ))
+    }
+
+    // Xử lý image error
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        e.currentTarget.style.display = "none"
+        const fallback = e.currentTarget.nextElementSibling as HTMLElement
+        if (fallback) {
+            fallback.style.display = "flex"
+        }
     }
 
     if (role !== "car_owner") {
@@ -71,27 +167,30 @@ export default function FeedbackPage() {
         return <LoadingPage />
     }
 
-    if (
-        isError ||
-        !feedbackData ||
-        !feedbackData.details ||
-        !feedbackData.details.data ||
-        feedbackData.details.data.length === 0
-    ) {
+    // Kiểm tra đúng structure
+    if (isError || !feedbackData || !feedbackList || feedbackList.length === 0) {
+        console.log('Error state:', {
+            isError,
+            hasFeedbackData: !!feedbackData,
+            hasFeedbackList: !!feedbackList,
+            itemCount: feedbackList?.length || 0
+        })
         return <NoResult />
     }
 
-    const paginationMetadata = feedbackData.details.pagination
-    if (!paginationMetadata) {
-        console.error("Pagination metadata is undefined in feedbackData.details.pagination")
+    // Kiểm tra paginationInfo tồn tại
+    if (!paginationInfo || !summaryData) {
+        console.error('Missing required data:', {
+            hasPaginationInfo: !!paginationInfo,
+            hasSummaryData: !!summaryData
+        })
         return <NoResult />
     }
 
-    const { totalRecords, totalPages } = paginationMetadata
+    const { totalRecords, totalPages, hasPreviousPage, hasNextPage } = paginationInfo
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-
             {/* Breadcrumb */}
             <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-6 py-3">
                 <div className="max-w-7xl mx-auto text-sm text-slate-600">
@@ -103,7 +202,7 @@ export default function FeedbackPage() {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto p-6 space-y-8">
-                {/* Summary Card */}
+                {/* Summary Card - Sử dụng summaryData từ BE */}
                 <Card className="bg-gradient-to-br from-white to-blue-50/50 rounded-2xl shadow-xl border-0 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5"></div>
                     <CardContent className="relative p-8">
@@ -120,19 +219,18 @@ export default function FeedbackPage() {
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                             <div className="text-center">
                                 <div className="text-6xl font-bold bg-gradient-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                                    {feedbackData.summary.averageRating.toFixed(1)}
+                                    {summaryData.averageRating.toFixed(1)}
                                 </div>
                                 <div className="flex justify-center gap-1 mb-4">
-                                    {renderStars(Math.round(feedbackData.summary.averageRating))}
+                                    {renderStars(Math.round(summaryData.averageRating))}
                                 </div>
-                                <div className="text-slate-600 font-medium">Based on {feedbackData.summary.totalRatings} ratings</div>
+                                <div className="text-slate-600 font-medium">Based on {summaryData.totalRatings} ratings</div>
                             </div>
 
                             <div className="space-y-3">
                                 {[5, 4, 3, 2, 1].map((star) => {
-                                    const count = feedbackData.summary.ratingDistribution[star] || 0
-                                    const percentage =
-                                        feedbackData.summary.totalRatings > 0 ? (count / feedbackData.summary.totalRatings) * 100 : 0
+                                    const count = summaryData.ratingDistribution[star] || 0
+                                    const percentage = summaryData.totalRatings > 0 ? (count / summaryData.totalRatings) * 100 : 0
 
                                     return (
                                         <div key={star} className="flex items-center gap-3">
@@ -155,24 +253,27 @@ export default function FeedbackPage() {
 
                 {/* Feedback List */}
                 <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {feedbackData.details.data.map((feedback, index) => (
+                    {feedbackList.map((feedback, index) => (
                         <Card
                             key={`${feedback.createdAt}-${index}`}
                             className="group hover:shadow-2xl transition-all duration-500 border-0 bg-white rounded-2xl overflow-hidden hover:-translate-y-1"
                         >
                             <div className="aspect-video relative overflow-hidden">
                                 {feedback.carImageUrl ? (
-                                    <img
-                                        src={feedback.carImageUrl || "/placeholder.svg"}
-                                        alt={feedback.carName}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        onError={(e) => {
-                                            e.currentTarget.style.display = "none"
-                                            if (e.currentTarget.nextElementSibling) {
-                                                ;(e.currentTarget.nextElementSibling as HTMLElement).style.display = "flex"
-                                            }
-                                        }}
-                                    />
+                                    <>
+                                        <img
+                                            src={feedback.carImageUrl}
+                                            alt={feedback.carName}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            onError={handleImageError}
+                                        />
+                                        <div
+                                            className="w-full h-full bg-gradient-to-br from-slate-200 via-blue-100 to-indigo-200 flex items-center justify-center"
+                                            style={{ display: 'none' }}
+                                        >
+                                            <Car className="w-12 h-12 text-slate-400" />
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="w-full h-full bg-gradient-to-br from-slate-200 via-blue-100 to-indigo-200 flex items-center justify-center">
                                         <Car className="w-12 h-12 text-slate-400" />
@@ -189,17 +290,15 @@ export default function FeedbackPage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex gap-1">{renderStars(feedback.rating)}</div>
                                         <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                      {new Date(feedback.createdAt).toLocaleString("en-GB", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                      })}
-                    </span>
+                                            {new Date(feedback.createdAt).toLocaleDateString("en-GB")}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div className="bg-slate-50 rounded-xl p-4">
-                                    <p className="text-sm text-slate-700 italic">"{feedback.comment || "No comment provided"}"</p>
+                                    <p className="text-sm text-slate-700 italic">
+                                        &quot;{feedback.comment || "No comment provided"}&quot;
+                                    </p>
                                 </div>
 
                                 <div className="space-y-3 pt-2">
@@ -209,14 +308,8 @@ export default function FeedbackPage() {
                                             <span className="font-medium">From:</span>
                                         </div>
                                         <span className="text-slate-700">
-                      {new Date(feedback.pickUpTime).toLocaleString("en-GB", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                      })}
-                    </span>
+                                            {new Date(feedback.pickUpTime).toLocaleString("en-GB")}
+                                        </span>
                                     </div>
                                     <div className="flex items-center gap-3 text-sm text-slate-600">
                                         <div className="flex items-center gap-2">
@@ -224,14 +317,8 @@ export default function FeedbackPage() {
                                             <span className="font-medium">To:</span>
                                         </div>
                                         <span className="text-slate-700">
-                      {new Date(feedback.dropOffTime).toLocaleString("en-GB", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                      })}
-                    </span>
+                                            {new Date(feedback.dropOffTime).toLocaleString("en-GB")}
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -240,16 +327,17 @@ export default function FeedbackPage() {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
+                {totalPages > 1 && paginationInfo && (
                     <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-0">
                         <CardContent className="p-6">
-                            <Pagination
+                            <SimplePagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 totalItems={totalRecords}
-                                startIndex={(currentPage - 1) * itemsPerPage}
-                                endIndex={Math.min(currentPage * itemsPerPage, totalRecords)}
+                                itemsPerPage={itemsPerPage}
                                 onPageChange={setCurrentPage}
+                                hasPreviousPage={hasPreviousPage}
+                                hasNextPage={hasNextPage}
                             />
                         </CardContent>
                     </Card>

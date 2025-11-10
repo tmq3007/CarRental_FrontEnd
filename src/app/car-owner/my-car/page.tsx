@@ -1,6 +1,6 @@
 "use client"
 
-import CarListPage from "@/components/homepage/car-list-page"
+import CarListPage from "@/components/car-owner/car-list-page"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/store";
 import NoResult from "@/components/common/no-result";
