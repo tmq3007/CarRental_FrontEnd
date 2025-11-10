@@ -51,7 +51,14 @@ export const authApi = createApi({
                 url: '/auth/logout',
                 method: 'PUT',
             })
-        })
+        }),
+
+        loginWithGoogle: build.query<ApiResponse<LoginVO>, void>({
+            query: () => ({
+                url: '/Auth/login/google/?returnUrl=http://localhost:3000',
+                method: 'GET',
+            }),
+        }),
 
     }),
 })
@@ -60,6 +67,7 @@ export const {
     useLoginMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
-    useLogoutMutation
+    useLogoutMutation,
+    useLoginWithGoogleQuery
 } = authApi
 
