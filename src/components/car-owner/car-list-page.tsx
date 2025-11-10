@@ -1,6 +1,8 @@
 "use client"
-import { useState } from "react"
+
+import { useState, useMemo, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -14,16 +16,6 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import LoadingPage from "@/components/common/loading"
 
-// Define TypeScript interfaces for pagination
-interface Pagination {
-    pageNumber: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-    hasPreviousPage: boolean
-    hasNextPage: boolean
-}
-
 interface CarListPageProps {
     accountId: string
 }
@@ -31,13 +23,15 @@ interface CarListPageProps {
 export default function CarListPage({ accountId }: CarListPageProps) {
     const router = useRouter()
     const [currentPage, setCurrentPage] = useState(1)
-    const [pageSize, setPageSize] = useState(10)
+    const [goToPageInput, setGoToPageInput] = useState("")
     const [filters, setFilters] = useState<CarFilters>({
         sortBy: "id",
         sortDirection: "desc",
     })
     const [isTransitioning, setIsTransitioning] = useState(false)
-    const pageNumber = currentPage // Declare the variable before using it
+
+    const pageSize = 5
+    const maxVisiblePages = 5
 
     const { data, error, isLoading, isFetching } = useGetCarsQuery({
         accountId: useSelector((state: RootState) => state.user?.id || accountId),
@@ -46,15 +40,34 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         filters,
     })
 
-    const cars: CarVO_ViewACar[] = data?.data.data || []
-    const pagination: Pagination = data?.data.pagination || {
-        pageNumber: 1,
-        pageSize: 10,
-        totalRecords: 0,
-        totalPages: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-    }
+    const safePagination = useMemo(() => {
+        const raw = data?.data?.pagination
+        if (!raw) {
+            return {
+                pageNumber: 1,
+                pageSize: 5,
+                totalRecords: 0,
+                totalPages: 1,
+                hasPreviousPage: false,
+                hasNextPage: false,
+            }
+        }
+
+        const totalPages = Math.max(1, raw.totalPages || 1)
+        const validPageNumber = Math.min(Math.max(1, raw.pageNumber || 1), totalPages)
+
+        return {
+            ...raw,
+            pageNumber: validPageNumber,
+            pageSize: raw.pageSize || 5,
+            totalPages,
+            hasPreviousPage: validPageNumber > 1,
+            hasNextPage: validPageNumber < totalPages,
+        }
+    }, [data?.data?.pagination])
+
+    const cars: CarVO_ViewACar[] = data?.data?.data || []
+    const { pageNumber: safePageNumber, totalPages, totalRecords, hasPreviousPage, hasNextPage } = safePagination
 
     const handleViewDetails = (carId: string) => {
         router.push(`/car-owner/my-car/edit-car/${carId}`)
@@ -71,23 +84,44 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         setTimeout(() => setIsTransitioning(false), 300)
     }
 
-    const handlePageChange = (page: number) => {
-        if (page < 1 || page > pagination.totalPages || page === currentPage) return
-        setIsTransitioning(true)
-        setCurrentPage(page)
-        window.scrollTo({ top: 0, behavior: "smooth" })
-        setTimeout(() => setIsTransitioning(false), 300)
-    }
+    const handlePageChange = useCallback(
+        (page: number) => {
+            if (page < 1 || page > totalPages || page === safePageNumber) return
+            setIsTransitioning(true)
+            setCurrentPage(page)
+            setGoToPageInput("")
+            window.scrollTo({ top: 0, behavior: "smooth" })
+            setTimeout(() => setIsTransitioning(false), 300)
+        },
+        [safePageNumber, totalPages],
+    )
 
-    const handlePageSizeChange = (size: string) => {
-        const newSize = Number.parseInt(size)
-        if (isNaN(newSize) || newSize <= 0) return
-        setIsTransitioning(true)
-        setPageSize(newSize)
-        setCurrentPage(1)
-        window.scrollTo({ top: 0, behavior: "smooth" })
-        setTimeout(() => setIsTransitioning(false), 300)
-    }
+    const handleGoToPage = useCallback(() => {
+        const pageNum = Number.parseInt(goToPageInput, 10)
+        if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+            setGoToPageInput("")
+            return
+        }
+        handlePageChange(pageNum)
+    }, [goToPageInput, totalPages, handlePageChange])
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Only handle arrow keys when not typing in input
+            if (e.target instanceof HTMLInputElement) return
+
+            if (e.key === "ArrowLeft" && hasPreviousPage) {
+                e.preventDefault()
+                handlePageChange(safePageNumber - 1)
+            } else if (e.key === "ArrowRight" && hasNextPage) {
+                e.preventDefault()
+                handlePageChange(safePageNumber + 1)
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [safePageNumber, hasPreviousPage, hasNextPage, handlePageChange])
 
     const formatPrice = (price: number) => {
         return `${(price / 1000).toFixed(0)}k/day`
@@ -125,67 +159,25 @@ export default function CarListPage({ accountId }: CarListPageProps) {
         }
     }
 
-    const renderPagination = () => {
-        const { pageNumber, totalPages } = pagination
-        if (totalPages <= 1) return null
+    const renderPageButtons = () => {
+        const buttons = []
 
-        const maxVisiblePages = 5
-        let startPage = 1
-        let endPage = totalPages
+        let startPage = Math.max(1, safePageNumber - Math.floor(maxVisiblePages / 2))
+        const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
 
-        if (totalPages > maxVisiblePages) {
-            const halfVisible = Math.floor(maxVisiblePages / 2)
-
-            if (pageNumber <= halfVisible) {
-                endPage = maxVisiblePages
-            } else if (pageNumber + halfVisible >= totalPages) {
-                startPage = totalPages - maxVisiblePages + 1
-            } else {
-                startPage = pageNumber - halfVisible
-                endPage = pageNumber + halfVisible
-            }
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1)
         }
 
-        const pages = []
-
         // First page button
-        pages.push(
-            <Button
-                key="first"
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(1)}
-                disabled={pageNumber === 1 || isFetching}
-                className="h-10 px-3 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                title="First page"
-            >
-                <span className="text-xs font-medium">First</span>
-            </Button>,
-        )
-
-        // Previous button
-        pages.push(
-            <Button
-                key="prev"
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pageNumber - 1)}
-                disabled={!pagination.hasPreviousPage || isFetching}
-                className="h-10 w-10 p-0 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                title="Previous page"
-            >
-                <ChevronLeft className="h-4 w-4" />
-            </Button>,
-        )
-
-        // First page + ellipsis (if needed)
         if (startPage > 1) {
-            pages.push(
+            buttons.push(
                 <Button
                     key={1}
                     variant="outline"
                     size="sm"
                     onClick={() => handlePageChange(1)}
+                    disabled={isFetching}
                     className="h-10 w-10 p-0 border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
                 >
                     1
@@ -193,50 +185,52 @@ export default function CarListPage({ accountId }: CarListPageProps) {
             )
 
             if (startPage > 2) {
-                pages.push(
-                    <div key="ellipsis-start" className="flex items-center justify-center h-10 w-10">
-                        <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                buttons.push(
+                    <div key="ellipsis-start" className="h-10 flex items-center px-2 text-gray-400">
+                        <MoreHorizontal className="h-4 w-4" />
                     </div>,
                 )
             }
         }
 
-        // Page numbers
+        // Page numbers in range
         for (let i = startPage; i <= endPage; i++) {
-            pages.push(
+            buttons.push(
                 <Button
                     key={i}
-                    variant={i === pageNumber ? "default" : "outline"}
+                    variant={i === safePageNumber ? "default" : "outline"}
                     size="sm"
                     onClick={() => handlePageChange(i)}
                     disabled={isFetching}
                     className={`h-10 w-10 p-0 transition-all duration-200 ${
-                        i === pageNumber
+                        i === safePageNumber
                             ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600 shadow-sm"
                             : "border-gray-300 hover:bg-blue-50 hover:border-blue-300"
                     }`}
+                    aria-current={i === safePageNumber ? "page" : undefined}
                 >
                     {i}
                 </Button>,
             )
         }
 
-        // Last page + ellipsis (if needed)
+        // Last page button
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
-                pages.push(
-                    <div key="ellipsis-end" className="flex items-center justify-center h-10 w-10">
-                        <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                buttons.push(
+                    <div key="ellipsis-end" className="h-10 flex items-center px-2 text-gray-400">
+                        <MoreHorizontal className="h-4 w-4" />
                     </div>,
                 )
             }
 
-            pages.push(
+            buttons.push(
                 <Button
                     key={totalPages}
                     variant="outline"
                     size="sm"
                     onClick={() => handlePageChange(totalPages)}
+                    disabled={isFetching}
                     className="h-10 w-10 p-0 border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
                 >
                     {totalPages}
@@ -244,71 +238,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
             )
         }
 
-        // Next button
-        pages.push(
-            <Button
-                key="next"
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pageNumber + 1)}
-                disabled={!pagination.hasNextPage || isFetching}
-                className="h-10 w-10 p-0 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                title="Next page"
-            >
-                <ChevronRight className="h-4 w-4" />
-            </Button>,
-        )
-
-        // Last page button
-        pages.push(
-            <Button
-                key="last"
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={pageNumber === totalPages || isFetching}
-                className="h-10 px-3 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                title="Last page"
-            >
-                <span className="text-xs font-medium">Last</span>
-            </Button>,
-        )
-
-        return pages
-    }
-
-    const renderQuickJump = () => {
-        const { pageNumber, totalPages } = pagination
-        if (totalPages <= 5) return null
-
-        const jumpOptions = []
-        const jumpSize = Math.max(1, Math.floor(totalPages / 10))
-
-        // Add quick jump buttons for every 10% of total pages
-        for (let i = jumpSize; i < totalPages; i += jumpSize) {
-            if (Math.abs(i - pageNumber) > 2) {
-                jumpOptions.push(
-                    <Button
-                        key={`jump-${i}`}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handlePageChange(i)}
-                        className="h-8 px-2 text-xs text-blue-600 hover:bg-blue-50 transition-all duration-200"
-                    >
-                        {i}
-                    </Button>,
-                )
-            }
-        }
-
-        if (jumpOptions.length === 0) return null
-
-        return (
-            <div className="flex items-center gap-1">
-                <span className="text-sm text-gray-500 mr-2">Quick jump:</span>
-                {jumpOptions}
-            </div>
-        )
+        return buttons
     }
 
     if (isLoading) {
@@ -333,9 +263,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
 
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6 animate-in slide-in-from-top duration-500">
-                    <h1 className="text-2xl font-bold transition-all duration-300">
-                        List of Cars
-                    </h1>
+                    <h1 className="text-2xl font-bold transition-all duration-300">List of Cars</h1>
                     <div className="flex gap-4">
                         <Link href="/car-owner/add-car">
                             <Button className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
@@ -409,17 +337,15 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                             >
                                 <CardContent className="p-6">
                                     <div className="flex gap-6">
-                                        {/* Navigation Arrow Left */}
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
-                                            disabled={true} // Placeholder: Implement image navigation
+                                            disabled={true}
                                         >
                                             <ChevronLeft className="h-4 w-4" />
                                         </Button>
 
-                                        {/* Car Image */}
                                         <div className="relative w-64 h-40 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg overflow-hidden group">
                                             {car.carImageFront ? (
                                                 <img
@@ -438,7 +364,6 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                                     </div>
                                                 </div>
                                             )}
-                                            {/* Dots indicator (Placeholder: Implement image carousel) */}
                                             <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
                                                 <div className="w-2 h-2 bg-gray-800 rounded-full transition-all duration-200"></div>
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full transition-all duration-200 hover:bg-gray-600"></div>
@@ -446,17 +371,15 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                             </div>
                                         </div>
 
-                                        {/* Navigation Arrow Right */}
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             className="self-center transition-all duration-200 hover:bg-gray-100 hover:scale-110"
-                                            disabled={true} // Placeholder: Implement image navigation
+                                            disabled={true}
                                         >
                                             <ChevronRight className="h-4 w-4" />
                                         </Button>
 
-                                        {/* Car Details */}
                                         <div className="flex-1 space-y-3">
                                             <h3 className="text-xl font-semibold transition-colors duration-200 hover:text-blue-600">
                                                 {car.brand} {car.model} {car.productionYear}
@@ -501,7 +424,6 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                                             </div>
                                         </div>
 
-                                        {/* Action Buttons */}
                                         <div className="flex flex-col gap-2">
                                             <Button
                                                 onClick={() => handleViewDetails(String(car.id))}
@@ -519,78 +441,49 @@ export default function CarListPage({ accountId }: CarListPageProps) {
                     )}
                 </div>
 
-                {/* Improved Pagination */}
-                {pagination.totalPages > 0 && (
+                {totalPages > 0 && (
                     <div className="mt-8 space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
-                        {/* Pagination Bar */}
-                        <div className="flex justify-center">
-                            <div className="flex items-center gap-1 bg-white rounded-lg border border-gray-200 p-1 shadow-sm">
-                                {renderPagination()}
-                            </div>
-                        </div>
+                        {/* Main Pagination Controls */}
+                        <div className="flex flex-col gap-4">
+                            {/* Pagination Buttons */}
+                            <div className="flex justify-center">
+                                <div className="flex items-center gap-1 bg-white rounded-lg border border-gray-200 p-2 shadow-sm">
+                                    {/* Previous Button */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(safePageNumber - 1)}
+                                        disabled={!hasPreviousPage || isFetching}
+                                        className="h-10 px-3 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                        title="Previous page (← key)"
+                                        aria-label="Previous page"
+                                    >
+                                        <ChevronLeft className="h-4 w-4 mr-1" />
+                                        Previous
+                                    </Button>
 
-                        {/* Quick Jump */}
-                        <div className="flex justify-center">{renderQuickJump()}</div>
+                                    {/* Separator */}
+                                    <div className="h-6 w-px bg-gray-200 mx-1"></div>
 
-                        {/* Page Size and Info */}
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-600">Show</span>
-                                <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                                    <SelectTrigger className="w-20 h-8 text-sm border-gray-300 hover:border-blue-300 focus:border-blue-500 transition-all duration-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <SelectItem value="5" className="hover:bg-blue-50 transition-colors duration-150">
-                                            5
-                                        </SelectItem>
-                                        <SelectItem value="10" className="hover:bg-blue-50 transition-colors duration-150">
-                                            10
-                                        </SelectItem>
-                                        <SelectItem value="20" className="hover:bg-blue-50 transition-colors duration-150">
-                                            20
-                                        </SelectItem>
-                                        <SelectItem value="50" className="hover:bg-blue-50 transition-colors duration-150">
-                                            50
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <span className="text-sm text-gray-600">cars per page</span>
-                            </div>
+                                    {/* Page Numbers */}
+                                    <div className="flex items-center gap-1">{renderPageButtons()}</div>
 
-                            {/* Pagination Info with Page Input */}
-                            <div className="flex items-center gap-4">
-                                <div className="text-sm text-gray-600">
-                                    Showing{" "}
-                                    <span className="font-medium text-gray-900">
-                    {(pagination.pageNumber - 1) * pagination.pageSize + 1}
-                  </span>{" "}
-                                    to{" "}
-                                    <span className="font-medium text-gray-900">
-                    {Math.min(pagination.pageNumber * pagination.pageSize, pagination.totalRecords)}
-                  </span>{" "}
-                                    of <span className="font-medium text-gray-900">{pagination.totalRecords}</span> cars
-                                </div>
+                                    {/* Separator */}
+                                    <div className="h-6 w-px bg-gray-200 mx-1"></div>
 
-                                {/* Go to page input */}
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-600">Go to:</span>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max={pagination.totalPages}
-                                        placeholder={pageNumber.toString()}
-                                        className="w-16 h-8 px-2 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none transition-all duration-200"
-                                        onKeyPress={(e) => {
-                                            if (e.key === "Enter") {
-                                                const value = Number.parseInt((e.target as HTMLInputElement).value)
-                                                if (value >= 1 && value <= pagination.totalPages) {
-                                                    handlePageChange(value)
-                                                    ;(e.target as HTMLInputElement).value = ""
-                                                }
-                                            }
-                                        }}
-                                    />
+                                    {/* Next Button */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(safePageNumber + 1)}
+                                        disabled={!hasNextPage || isFetching}
+                                        className="h-10 px-3 border-gray-300 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                        title="Next page (→ key)"
+                                        aria-label="Next page"
+                                    >
+                                        Next
+                                        <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
                                 </div>
                             </div>
                         </div>
