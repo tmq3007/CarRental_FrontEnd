@@ -2,20 +2,40 @@ import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery"
 import type { ApiResponse } from "@/lib/store"
 
-export interface CarOwnerDashboardStats {
-	totalRevenue: number
-	activeBookings: number
-	totalCustomers: number
-	fleetUtilization: number
-	revenueChange: string
-	bookingsChange: string
-	customersChange: string
-	utilizationChange: string
-}
-
 export interface CarOwnerMonthlyRevenue {
 	month: string
 	total: number
+}
+
+export interface CarOwnerEarningsMetrics {
+	totalRevenue: number | null
+	revenueChange: string
+	netProfit: number | null
+	netProfitChange: string
+	pendingPayouts: number | null
+	averageBookingValue: number | null
+	averageBookingValueChange: string
+	completedBookingsThisMonth: number | null
+	monthlyRevenue: CarOwnerMonthlyRevenue[]
+	totalBookings?: number | null
+	bookingsChange?: string
+	totalCustomers?: number | null
+	customersChange?: string
+}
+
+export interface CarOwnerFleetMetrics {
+	fleetUtilization: number | null
+	utilizationChange: string
+	totalBookings: number | null
+	bookingsChange: string
+	averageBookingDurationDays: number | null
+	averageBookingDurationChange: string
+	upcomingBookings: number | null
+	cancellationRate: number | null
+	cancellationRateChange: string
+	activeFleet: number | null
+	inactiveFleet: number | null
+	fleetSize: number | null
 }
 
 export interface CarOwnerRatingDistributionItem {
@@ -44,16 +64,16 @@ export const carOwnerApi = createApi({
 	baseQuery: baseQueryWithAuthCheck,
 	tagTypes: ["CarOwnerDashboard"],
 	endpoints: (build) => ({
-		getDashboardStats: build.query<ApiResponse<CarOwnerDashboardStats>, void>({
+		getEarningsMetrics: build.query<ApiResponse<CarOwnerEarningsMetrics>, void>({
 			query: () => ({
-				url: "/car-owner/dashboard/stats",
+				url: "/car-owner/dashboard/earnings",
 				method: "GET",
 			}),
 			providesTags: ["CarOwnerDashboard"],
 		}),
-		getMonthlyRevenue: build.query<ApiResponse<CarOwnerMonthlyRevenue[]>, number | void>({
-			query: (year = new Date().getFullYear()) => ({
-				url: `/car-owner/dashboard/revenue/monthly?year=${year}`,
+		getFleetMetrics: build.query<ApiResponse<CarOwnerFleetMetrics>, void>({
+			query: () => ({
+				url: "/car-owner/dashboard/fleet",
 				method: "GET",
 			}),
 			providesTags: ["CarOwnerDashboard"],
@@ -79,8 +99,8 @@ export const carOwnerApi = createApi({
 })
 
 export const {
-	useGetDashboardStatsQuery,
-	useGetMonthlyRevenueQuery,
+	useGetEarningsMetricsQuery,
+	useGetFleetMetricsQuery,
 	useGetRatingSummaryQuery,
 	useGetRecentReviewsQuery,
 } = carOwnerApi

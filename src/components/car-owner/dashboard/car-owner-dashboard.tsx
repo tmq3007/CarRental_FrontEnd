@@ -3,6 +3,7 @@ import EarningsSummaryCards from "./earnings-summary-cards"
 import UpcomingBookingsList from "./upcoming-bookings-list"
 import RatingsReviewsSection from "./ratings-reviews-section"
 import AnalyticsInsights from "./analytics-insights"
+import FleetPerformanceMetrics from "./fleet-performance-metrics"
 
 interface CarOwnerDashboardProps {
   userId: string
@@ -23,7 +24,15 @@ export default function CarOwnerDashboard({ userId }: CarOwnerDashboardProps) {
         {/* Earnings Summary Cards */}
         <section className="mb-6 sm:mb-8">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Key Metrics</h2>
-          <EarningsSummaryCards />
+          <EarningsSummaryCards accountId={userId} />
+        </section>
+
+        {/* Fleet Performance */}
+        <section className="mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+            Fleet Performance
+          </h2>
+          <FleetPerformanceMetrics accountId={userId} />
         </section>
 
         {/* Business Activity Section */}

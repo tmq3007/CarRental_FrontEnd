@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MapPin, Clock } from "lucide-react"
-import { useGetBookingsByAccountIdQuery } from "@/lib/services/booking-api"
+import { useGetBookingsByAccountIdQuery, useGetCarOwnerUpcommingBookingsQuery } from "@/lib/services/booking-api"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
+import { BookingStatusBadge } from "../booking/status-badge"
 
 interface UpcomingBookingsListProps {
   accountId: string
@@ -23,21 +24,9 @@ function dayDiff(a?: string, b?: string) {
 }
 
 export default function UpcomingBookingsList({ accountId }: UpcomingBookingsListProps) {
-  const { data, isLoading, isError } = useGetBookingsByAccountIdQuery({ accountId })
+  const { data, isLoading, isError } = useGetCarOwnerUpcommingBookingsQuery({ accountId, limit: 3 })
   const bookings = data?.data ?? []
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Confirmed":
-        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-      case "Pending":
-        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
-      case "Completed":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
-      default:
-        return "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300"
-    }
-  }
 
   return (
     <Card className="border-0 shadow-sm h-full">
@@ -60,7 +49,7 @@ export default function UpcomingBookingsList({ accountId }: UpcomingBookingsList
                   <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{booking.carName}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400 truncate">#{booking.bookingNumber}</p>
                 </div>
-                <Badge className={`flex-shrink-0 text-xs ${getStatusColor(booking.status)}`}>{booking.status}</Badge>
+                <BookingStatusBadge status={booking.status} />
               </div>
 
               <div className="grid grid-cols-2 gap-2 mb-2">

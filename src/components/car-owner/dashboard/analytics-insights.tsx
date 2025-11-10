@@ -2,11 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
-import { useGetMonthlyRevenueQuery } from "@/lib/services/car-owner-api"
+import { useGetEarningsMetricsQuery } from "@/lib/services/car-owner-api"
 
 export default function AnalyticsInsights() {
-  const { data, isLoading, isError } = useGetMonthlyRevenueQuery()
-  const monthly = data?.data ?? []
+  const { data, isLoading, isError } = useGetEarningsMetricsQuery()
+  const monthly = data?.data?.monthlyRevenue ?? []
 
   // Fallback sample if no data yet
   const chartData = monthly.length

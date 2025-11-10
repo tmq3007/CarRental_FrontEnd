@@ -177,6 +177,16 @@ export const bookingApi = createApi({
     baseQuery: baseQueryWithAuthCheck,
     tagTypes: ["Booking"],
     endpoints: (build) => ({
+        getCarOwnerUpcommingBookings: build.query<
+            ApiResponse<CarOwnerBookingVO[]>,
+            { accountId: string; limit: number }
+        >({
+            query: ({ accountId, limit }) => ({
+                url: `/car-owner/dashboard/upcomming-bookings?accountId=${accountId}&limit=${limit}`,
+                method: "GET",
+            }),
+            providesTags: ["Booking"],
+        }),
         getCarOwnerBookings: build.query<
             ApiResponse<PaginationResponse<CarOwnerBookingVO[]>>,
             CarOwnerBookingQueryParams
@@ -223,6 +233,7 @@ export const bookingApi = createApi({
                 };
             },
             providesTags: ["Booking"],
+            keepUnusedDataFor: 0,
         }),
         getBookings: build.query<ApiResponse<PaginatedBookingResponse>, { page: number; pageSize: number }>({
             query: ({ page, pageSize }) => ({
@@ -239,8 +250,6 @@ export const bookingApi = createApi({
             }),
             providesTags: ["Booking"],
         }),
-
-        // API mới với search, filter, sort
         searchBookingsByAccountId: build.query<
             ApiResponse<BookingVO[]>,
             { accountId: string; queryParams: BookingQueryParams }
@@ -349,11 +358,11 @@ export const bookingApi = createApi({
 });
 
 export const {
+    useGetCarOwnerUpcommingBookingsQuery,
     useGetCarOwnerBookingsQuery,
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
-    useSearchBookingsByAccountIdQuery, // Thêm hook mới
-
+    useSearchBookingsByAccountIdQuery,
     useCancelBookingMutation,
     useConfirmPickupMutation,
     useConfirmDepositMutation,
