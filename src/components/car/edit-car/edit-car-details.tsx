@@ -15,7 +15,6 @@ import {
     useEditCarMutation,
     useGetCarDetailQuery,
     useGetBookingDetailsByCarIdQuery,
-    useConfirmDepositMutation,
     type CarVO_Detail,
 } from "@/lib/services/car-api"
 import { useDispatch } from "react-redux"
@@ -54,7 +53,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
 
     // Fetch booking details for the car
     const { data: bookingData, isLoading: isLoadingBooking } = useGetBookingDetailsByCarIdQuery(carId)
-    const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
 
     const [formData, setFormData] = useState({
         mileage: "",
@@ -183,23 +181,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
         setIsConfirmDepositDialogOpen(true)
     }
 
-    // Function to handle the "Yes" action in the custom confirmation dialog
-    const handleConfirmDepositAction = async () => {
-        if (!bookingData?.data?.bookingNumber) return
-        try {
-            const response = await confirmDeposit(bookingData.data.bookingNumber).unwrap()
-            if (response.data) {
-                alert("Deposit confirmed successfully")
-                router.refresh() // Reload the page to reflect updated data [^1]
-            }
-        } catch (error: any) {
-            console.error("Confirm deposit failed", error)
-            alert(error?.data?.message || "Failed to confirm deposit")
-        } finally {
-            setIsConfirmDepositDialogOpen(false)
-        }
-    }
-
     if (isLoading && !initialData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>
     if (isError) return <div className="min-h-screen flex items-center justify-center">Error loading car details</div>
     if (!carData) return <div className="min-h-screen flex items-center justify-center">No car data found</div>
@@ -289,15 +270,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
                                     {carData.brand} {carData.model}
                                 </h2>
-                                {bookingData?.data?.status === "pending_deposit" && (
-                                    <Button
-                                        onClick={handleConfirmDepositClick} // Trigger custom dialog
-                                        disabled={isConfirmingDeposit || isLoadingBooking}
-                                        className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 hover:scale-105 disabled:opacity-50"
-                                    >
-                                        {isConfirmingDeposit ? "Confirming..." : "Confirm deposit"}
-                                    </Button>
-                                )}
+                                
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -821,14 +794,6 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                     </Tabs>
                 </div>
             </div>
-            {/* Custom Confirmation Dialog */}
-            <ConfirmationDialog
-                isOpen={isConfirmDepositDialogOpen}
-                onClose={() => setIsConfirmDepositDialogOpen(false)}
-                onConfirm={handleConfirmDepositAction}
-                title="Confirm deposit"
-                description="Please confirm that you have received the deposit for this booking. This will allow the customer to pick-up the car at the agreed date and time."
-            />
         </div>
     )
 }

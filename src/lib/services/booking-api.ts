@@ -2,7 +2,7 @@
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuthCheck } from "@/lib/services/config/baseQuery";
-import { ApiResponse } from "@/lib/store";
+import { ApiResponse, PaginationResponse } from "@/lib/store";
 import { CarVO_Detail } from "./car-api";
 import { UserProfile } from "./user-api";
 import { Location } from "./local-api/address-api";
@@ -148,11 +148,82 @@ export interface BookingQueryParams {
     statuses?: string[];
 }
 
+export interface CarOwnerBookingQueryParams {
+    accountId: string;
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    carName?: string;
+    sortBy?: "pickupDate" | "returnDate" | "totalAmount" | "status";
+    sortDirection?: "asc" | "desc";
+    statuses?: string[];
+    fromDate?: string;
+    toDate?: string;
+}
+
+export interface CarOwnerBookingVO extends BookingVO {
+    bookingId?: string;
+    carId?: string;
+    renterFullName?: string;
+    renterEmail?: string;
+    renterPhoneNumber?: string;
+    paymentStatus?: string;
+    totalAmount?: number;
+    updatedAt?: string;
+}
+
 export const bookingApi = createApi({
     reducerPath: "bookingApi",
     baseQuery: baseQueryWithAuthCheck,
     tagTypes: ["Booking"],
     endpoints: (build) => ({
+        getCarOwnerBookings: build.query<
+            ApiResponse<PaginationResponse<CarOwnerBookingVO[]>>,
+            CarOwnerBookingQueryParams
+        >({
+            query: ({ accountId, statuses, ...params }) => {
+                const searchParams = new URLSearchParams();
+                searchParams.set("accountId", accountId);
+
+                if (typeof params.page === "number") {
+                    searchParams.set("page", String(params.page));
+                }
+                if (typeof params.pageSize === "number") {
+                    searchParams.set("pageSize", String(params.pageSize));
+                }
+                if (params.search) {
+                    searchParams.set("search", params.search);
+                }
+                if (params.carName) {
+                    searchParams.set("carName", params.carName);
+                }
+                if (params.sortBy) {
+                    searchParams.set("sortBy", params.sortBy);
+                }
+                if (params.sortDirection) {
+                    searchParams.set("sortDirection", params.sortDirection);
+                }
+                if (params.fromDate) {
+                    searchParams.set("fromDate", params.fromDate);
+                }
+                if (params.toDate) {
+                    searchParams.set("toDate", params.toDate);
+                }
+                statuses?.forEach((status) => {
+                    if (status) {
+                        searchParams.append("status", status);
+                    }
+                });
+
+                const queryString = searchParams.toString();
+
+                return {
+                    url: `/car-owner/bookings${queryString ? `?${queryString}` : ""}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Booking"],
+        }),
         getBookings: build.query<ApiResponse<PaginatedBookingResponse>, { page: number; pageSize: number }>({
             query: ({ page, pageSize }) => ({
                 url: `/booking?page=${page}&pageSize=${pageSize}`,
@@ -205,6 +276,13 @@ export const bookingApi = createApi({
         confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
             query: ({ bookingNumber }) => ({
                 url: `/booking/${bookingNumber}/confirm-pickup`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Booking"],
+        }),
+        confirmDeposit: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
+            query: ({ bookingNumber }) => ({
+                url: `/booking/${bookingNumber}/confirm-deposit`,
                 method: "PUT",
             }),
             invalidatesTags: ["Booking"],
@@ -271,12 +349,14 @@ export const bookingApi = createApi({
 });
 
 export const {
+    useGetCarOwnerBookingsQuery,
     useGetBookingsQuery,
     useGetBookingsByAccountIdQuery,
     useSearchBookingsByAccountIdQuery, // Thêm hook mới
 
     useCancelBookingMutation,
     useConfirmPickupMutation,
+    useConfirmDepositMutation,
     useReturnCarMutation,
     useGetBookingDetailQuery,
     useUpdateBookingMutation,
