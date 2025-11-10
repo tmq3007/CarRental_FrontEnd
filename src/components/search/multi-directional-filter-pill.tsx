@@ -29,6 +29,7 @@ interface MultiDirectionalFilterPillProps {
   }
   pickupTime: Date | undefined
   dropoffTime: Date | undefined
+  onApplyFilters: () => void // New prop
 }
 
 type ExpansionMode = "compact" | "horizontal" | "vertical" | "full"
@@ -45,6 +46,7 @@ export default function MultiDirectionalFilterPill({
   location,
   pickupTime,
   dropoffTime,
+  onApplyFilters,
 }: MultiDirectionalFilterPillProps) {
   const [expansionMode, setExpansionMode] = useState<ExpansionMode>("compact")
   const [isVerticalExpanded, setIsVerticalExpanded] = useState(false)
@@ -229,10 +231,28 @@ export default function MultiDirectionalFilterPill({
                 placeholder="Search cars..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onApplyFilters()
+                  }
+                }}
                 className="w-full pl-8 pr-3 py-1 text-sm border-0 bg-transparent focus:outline-none placeholder:text-muted-foreground"
                 onClick={(e) => e.stopPropagation()}
               />
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onApplyFilters()
+                }}
+                className="absolute left-1 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Apply search filters"
+              >
+                <Search size={14} />
+              </button>
             </div>
 
             {/* Tags Container - First Row */}
@@ -245,9 +265,8 @@ export default function MultiDirectionalFilterPill({
                     <Badge
                       key={tag.id}
                       variant={tag.isEmpty ? "outline" : "secondary"}
-                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${
-                        tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
-                      }`}
+                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
+                        }`}
                     >
                       {tag.icon}
                       <span className="truncate max-w-[100px]">{tag.label}</span>
@@ -280,9 +299,8 @@ export default function MultiDirectionalFilterPill({
                     <Badge
                       key={tag.id}
                       variant={tag.isEmpty ? "outline" : "secondary"}
-                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${
-                        tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
-                      }`}
+                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
+                        }`}
                     >
                       {["location", "pickupTime", "dropoffTime"].includes(tag.type) &&
                         (priorityTags.find((pt) => pt.type === tag.type)?.icon)}
@@ -310,9 +328,8 @@ export default function MultiDirectionalFilterPill({
                     <Badge
                       key={tag.id}
                       variant={tag.isEmpty ? "outline" : "secondary"}
-                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${
-                        tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
-                      }`}
+                      className={`px-2 py-1 text-xs whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${tag.isEmpty ? "text-muted-foreground" : "bg-muted/50 hover:bg-muted"
+                        }`}
                     >
                       {tag.icon}
                       <span className="truncate max-w-[120px]">{tag.label}</span>

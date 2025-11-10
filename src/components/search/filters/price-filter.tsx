@@ -47,9 +47,9 @@ export default function PriceFilter({ filters, handleFilterChange, rentalDays, c
           <DualRangeSlider
             value={filters.priceRange}
             onValueChange={(value) => handleFilterChange("priceRange", value)}
-            max={1000}
+            max={10000000}
             min={0}
-            step={10}
+            step={100000}
             className="w-full"
           />
         </div>

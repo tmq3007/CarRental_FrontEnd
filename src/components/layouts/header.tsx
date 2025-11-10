@@ -232,8 +232,8 @@ export default function Header() {
                                             <Link href="/car-owner/my-car" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
                                                 My Cars
                                             </Link>
-                                            <Link href="/car-owner/add-car" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
-                                                Add A Car
+                                            <Link href="/car-owner" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1F1F23] transition-colors">
+                                                Dashboard
                                             </Link>
                                         </>
                                     ) : (
