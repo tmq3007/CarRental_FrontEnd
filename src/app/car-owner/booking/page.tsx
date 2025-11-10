@@ -6,7 +6,7 @@ import { DateRange } from "react-day-picker"
 import { endOfDay, startOfDay } from "date-fns"
 import { toast } from "sonner"
 import { AlertTriangle, Loader2, WalletCards } from "lucide-react"
-import { formatCurrency } from "@/lib/hook/useFormatCurrency"
+import { formatCurrency } from "@/lib/utils/format"
 
 import {
   BookingFilters,

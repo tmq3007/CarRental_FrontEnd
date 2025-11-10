@@ -24,8 +24,7 @@ import {
   WalletCards,
   XCircle,
 } from 'lucide-react'
-import { format } from 'date-fns'
-import { formatCurrency } from '@/lib/hook/useFormatCurrency'
+import { formatCurrency, formatDateTime } from '@/lib/utils/format'
 import { useGetBookingDetailQuery } from '@/lib/services/booking-api'
 import type { BookingActionTarget } from '@/components/car-owner/booking/types'
 
@@ -36,17 +35,6 @@ interface BookingDetailModalProps {
   onConfirmDeposit?: (booking: BookingActionTarget) => void
   onCancelBooking?: (booking: BookingActionTarget) => void
   disableActions?: boolean
-}
-
-function safeFormatDate(value?: string, fmt = 'dd MMM yyyy, HH:mm') {
-  if (!value) return '—'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return value
-  try {
-    return format(parsed, fmt)
-  } catch (error) {
-    return value
-  }
 }
 
 function InfoRow({ label, value }: { label: string; value?: string | number | null }) {
@@ -145,7 +133,7 @@ export function BookingDetailModal({
                   <div className="flex items-center gap-3">
                     <BookingStatusBadge status={booking.status} />
                     <div className="text-sm text-slate-500">
-                      Pick-up {safeFormatDate(booking.pickUpTime)}
+                      Pick-up {formatDateTime(booking.pickUpTime, undefined, booking.pickUpTime ?? '—')}
                     </div>
                   </div>
                 </div>
@@ -177,8 +165,8 @@ export function BookingDetailModal({
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <InfoRow label="Car" value={booking.carName} />
                   <InfoRow label="License plate" value={booking.licensePlate} />
-                  <InfoRow label="Pickup" value={safeFormatDate(booking.pickUpTime)} />
-                  <InfoRow label="Return" value={safeFormatDate(booking.dropOffTime)} />
+                  <InfoRow label="Pickup" value={formatDateTime(booking.pickUpTime, undefined, booking.pickUpTime ?? '—')} />
+                  <InfoRow label="Return" value={formatDateTime(booking.dropOffTime, undefined, booking.dropOffTime ?? '—')} />
                 </div>
               </section>
 

@@ -31,7 +31,7 @@ interface FilterPanelProps {
   dropoffTime: Date | undefined
   onPickupTimeChange: (date: Date | undefined) => void
   onDropoffTimeChange: (date: Date | undefined) => void
-  onApplyFilters: () => void // New prop
+  onApplyFilters: () => void
 }
 
 export default function FilterPanel({

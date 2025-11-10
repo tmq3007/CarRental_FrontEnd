@@ -14,14 +14,13 @@ import {
   WalletCards,
   XCircle,
 } from 'lucide-react'
-import { format } from 'date-fns'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BookingStatusBadge } from '@/components/car-owner/booking/status-badge'
 import type { BookingActionTarget } from '@/components/car-owner/booking/types'
-import { formatCurrency } from '@/lib/hook/useFormatCurrency'
+import { formatCurrency, formatDate, formatDateTime, formatDurationInDays } from '@/lib/utils/format'
 import type { CarOwnerBookingQueryParams, CarOwnerBookingVO } from '@/lib/services/booking-api'
 import type { PaginationMetadata } from '@/lib/store'
 import {
@@ -32,12 +31,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-
-const fallbackFormatter = new Intl.DateTimeFormat(undefined, {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-})
 
 type BookingSortKey = NonNullable<CarOwnerBookingQueryParams['sortBy']>
 type BookingSortDirection = NonNullable<CarOwnerBookingQueryParams['sortDirection']>
@@ -55,47 +48,6 @@ interface BookingTableProps {
   pagination?: PaginationMetadata
   onPageChange: (page: number) => void
   disableActions?: boolean
-}
-
-function formatDate(value?: string) {
-  if (!value) return '—'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return value
-  }
-  try {
-    return format(parsed, 'dd MMM yyyy')
-  } catch (error) {
-    return fallbackFormatter.format(parsed)
-  }
-}
-
-function formatDateTime(value?: string) {
-  if (!value) return '—'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return value
-  }
-  try {
-    return format(parsed, 'dd MMM yyyy, HH:mm')
-  } catch (error) {
-    return `${fallbackFormatter.format(parsed)}, ${parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-  }
-}
-
-function calculateNights(pickup?: string, dropoff?: string) {
-  if (!pickup || !dropoff) return '—'
-  const start = new Date(pickup)
-  const end = new Date(dropoff)
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    return '—'
-  }
-  const diffMs = end.getTime() - start.getTime()
-  if (diffMs < 0) {
-    return '—'
-  }
-  const nights = Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)))
-  return `${nights} day${nights > 1 ? 's' : ''}`
 }
 
 const SkeletonRow = () => (
@@ -281,7 +233,7 @@ const BookingTableComponent = ({
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1 text-sm text-slate-700">
-                        <p>{calculateNights(booking.pickupDate, booking.returnDate)}</p>
+                        <p>{formatDurationInDays(booking.pickupDate, booking.returnDate)}</p>
                         <p className="text-xs text-slate-500">Created {formatDateTime(booking.createdAt)}</p>
                       </div>
                     </TableCell>
