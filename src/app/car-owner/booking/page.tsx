@@ -9,16 +9,16 @@ import { AlertTriangle, Loader2, WalletCards } from "lucide-react"
 import { formatCurrency } from "@/lib/utils/format"
 
 import {
-  BookingFilters,
-  type BookingSortOption,
-  type BookingSortDirection,
-  type BookingSortKey,
+	BookingFilters,
+	type BookingSortOption,
+	type BookingSortDirection,
+	type BookingSortKey,
 } from "@/components/car-owner/booking/booking-filters"
 import { BookingTable } from "@/components/car-owner/booking/booking-table"
 import { BookingDetailModal } from "@/components/car-owner/booking/booking-detail-modal"
 import {
-  CAR_OWNER_DEFAULT_STATUS_FILTER,
-  CAR_OWNER_STATUS_PRIORITY,
+	CAR_OWNER_DEFAULT_STATUS_FILTER,
+	CAR_OWNER_STATUS_PRIORITY,
 } from "@/components/car-owner/booking/status-badge"
 import type { BookingActionTarget } from "@/components/car-owner/booking/types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -27,19 +27,19 @@ import type { CheckedState } from "@radix-ui/react-checkbox"
 import type { RootState } from "@/lib/store"
 import useDebounce from "@/lib/hook/use-debounce"
 import {
-  type CarOwnerBookingQueryParams,
-  type CarOwnerBookingVO,
-  useCancelBookingMutation,
-  useConfirmDepositMutation,
-  useGetCarOwnerBookingsQuery,
+	type CarOwnerBookingQueryParams,
+	type CarOwnerBookingVO,
+	useCancelBookingMutation,
+	useConfirmDepositMutation,
+	useGetCarOwnerBookingsQuery,
 } from "@/lib/services/booking-api"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -79,13 +79,13 @@ const SORT_OPTIONS: BookingSortOption[] = [
 		sortBy: "status",
 		sortDirection: "asc",
 	},
-		{
-			id: "status_desc",
-			label: "Status (Z-A)",
-			description: "Reverse alphabetical status order",
-			sortBy: "status",
-			sortDirection: "desc",
-		},
+	{
+		id: "status_desc",
+		label: "Status (Z-A)",
+		description: "Reverse alphabetical status order",
+		sortBy: "status",
+		sortDirection: "desc",
+	},
 ]
 
 export default function CarOwnerBookingsPage() {
@@ -93,7 +93,7 @@ export default function CarOwnerBookingsPage() {
 
 	const [searchTerm, setSearchTerm] = useState("")
 	const [carName, setCarName] = useState("")
-		const [selectedStatuses, setSelectedStatuses] = useState<string[]>(() => [...CAR_OWNER_DEFAULT_STATUS_FILTER])
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>(() => [...CAR_OWNER_DEFAULT_STATUS_FILTER])
 	const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
 	const [sortBy, setSortBy] = useState<BookingSortKey>("pickupDate")
 	const [sortDirection, setSortDirection] = useState<BookingSortDirection>("desc")
@@ -101,10 +101,10 @@ export default function CarOwnerBookingsPage() {
 	const [pageSize, setPageSize] = useState(10)
 	const [detailOpen, setDetailOpen] = useState(false)
 	const [selectedBookingNumber, setSelectedBookingNumber] = useState<string | null>(null)
-		const [confirmDepositTarget, setConfirmDepositTarget] = useState<BookingActionTarget | null>(null)
-		const [cancelTarget, setCancelTarget] = useState<BookingActionTarget | null>(null)
-		const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
-		const [cancelAcknowledged, setCancelAcknowledged] = useState(false)
+	const [confirmDepositTarget, setConfirmDepositTarget] = useState<BookingActionTarget | null>(null)
+	const [cancelTarget, setCancelTarget] = useState<BookingActionTarget | null>(null)
+	const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+	const [cancelAcknowledged, setCancelAcknowledged] = useState(false)
 
 	const debouncedSearch = useDebounce(searchTerm.trim(), 400)
 	const debouncedCarName = useDebounce(carName.trim(), 400)
@@ -135,10 +135,10 @@ export default function CarOwnerBookingsPage() {
 		skip: !queryArgs,
 	})
 
-		const [cancelBooking, { isLoading: isCancelling }] = useCancelBookingMutation()
-		const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
+	const [cancelBooking, { isLoading: isCancelling }] = useCancelBookingMutation()
+	const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
 
-		const bookings: CarOwnerBookingVO[] = data?.data?.data ?? []
+	const bookings: CarOwnerBookingVO[] = data?.data?.data ?? []
 	const pagination = data?.data?.PaginationMetadata
 
 	const bookingsWithPriority = useMemo(() => {
@@ -147,7 +147,7 @@ export default function CarOwnerBookingsPage() {
 		const priority: CarOwnerBookingVO[] = []
 		const others: CarOwnerBookingVO[] = []
 
-			bookings.forEach((booking: CarOwnerBookingVO) => {
+		bookings.forEach((booking: CarOwnerBookingVO) => {
 			const normalizedStatus = booking.status?.toLowerCase?.() ?? ""
 			if (prioritySet.has(normalizedStatus)) {
 				priority.push(booking)
@@ -159,7 +159,7 @@ export default function CarOwnerBookingsPage() {
 		return [...priority, ...others]
 	}, [bookings])
 
-			const isProcessingAction = isCancelling || isConfirmingDeposit
+	const isProcessingAction = isCancelling || isConfirmingDeposit
 
 	const activeSortId = `${sortBy}_${sortDirection}`
 
@@ -276,7 +276,7 @@ export default function CarOwnerBookingsPage() {
 	}
 
 	return (
-		<main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+		<main className="mx-auto flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
 			<BookingFilters
 				searchValue={searchTerm}
 				onSearchChange={(value: string) => {
@@ -434,11 +434,11 @@ export default function CarOwnerBookingsPage() {
 						</div>
 					)}
 					<div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
-										<Checkbox
-											id="cancel-confirmation"
-											checked={cancelAcknowledged}
-											onCheckedChange={(checked: CheckedState) => setCancelAcknowledged(Boolean(checked))}
-										/>
+						<Checkbox
+							id="cancel-confirmation"
+							checked={cancelAcknowledged}
+							onCheckedChange={(checked: CheckedState) => setCancelAcknowledged(Boolean(checked))}
+						/>
 						<label htmlFor="cancel-confirmation" className="select-none">
 							I understand this booking will be permanently cancelled and the renter will be notified immediately.
 						</label>
