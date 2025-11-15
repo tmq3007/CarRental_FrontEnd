@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
                 console.log("Token JTI:", decoded.jti);
                 console.log("Token Email:", decoded.email);
 
-                // 👉 Send token to backend for Redis validation
+                //Send token to next-backend for Redis validation
                 const res = await fetch('/api/validate-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
