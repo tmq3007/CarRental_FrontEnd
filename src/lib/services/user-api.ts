@@ -69,7 +69,7 @@ export const userApi = createApi({
                 if (dto.cityProvince) formData.append("cityProvince", dto.cityProvince)
                 if (dto.email) formData.append("email", dto.email)
                 if (dto.drivingLicenseUri instanceof File) {
-                        formData.append("DrivingLicenseUri", dto.drivingLicenseUri)
+                        formData.append("drivingLicenseUri", dto.drivingLicenseUri)
                     }
                 return {
                         url: `User/profile/${id}`,
