@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CAR_OWNER_STATUS_OPTIONS } from '@/components/car-owner/booking/status-badge'
+import { STATUS_OPTIONS } from '@/components/car-owner/booking/status-badge'
 import type { CarOwnerBookingQueryParams } from '@/lib/services/booking-api'
 
 export type BookingSortKey = NonNullable<CarOwnerBookingQueryParams['sortBy']>
@@ -102,10 +102,10 @@ export function BookingFilters({
   const activeSort = sortOptions.find((option) => option.id === activeSortId) ?? sortOptions[0]
   const appliedStatusesLabel = (() => {
     if (selectedStatuses.length === 0) return 'None'
-    if (selectedStatuses.length === CAR_OWNER_STATUS_OPTIONS.length) return 'All'
+    if (selectedStatuses.length === STATUS_OPTIONS.length) return 'All'
     if (selectedStatuses.length <= 2) {
       return selectedStatuses
-        .map((status) => CAR_OWNER_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status)
+        .map((status) => STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status)
         .join(', ')
     }
     return `${selectedStatuses.length} selected`
@@ -184,7 +184,7 @@ export function BookingFilters({
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Booking status</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {CAR_OWNER_STATUS_OPTIONS.map((option) => (
+            {STATUS_OPTIONS.map((option) => (
               <DropdownMenuCheckboxItem
                 key={option.value}
                 checked={selectedStatuses.includes(option.value)}
@@ -194,7 +194,7 @@ export function BookingFilters({
               </DropdownMenuCheckboxItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onStatusesChange(CAR_OWNER_STATUS_OPTIONS.map((option) => option.value))}>
+            <DropdownMenuItem onClick={() => onStatusesChange(STATUS_OPTIONS.map((option) => option.value))}>
               Select all
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onStatusesChange([])}>Clear</DropdownMenuItem>

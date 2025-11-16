@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, User, Phone, Mail, Hash, CreditCard, DollarSign, MapPin } from "lucide-react"
-import { BookingDetailVO } from "@/lib/services/booking-api"
+import type { BookingDetailVO, BookingStatus } from "@/lib/services/booking-api"
+import { BOOKING_STATUS_LABEL } from "@/lib/constants/booking-status"
 
 interface BookingInformationProps {
   bookingDetail: BookingDetailVO
@@ -37,19 +38,32 @@ export default function BookingInformation({ bookingDetail }: BookingInformation
     return "N/A"
   }
 
+  const statusPalette: Record<BookingStatus, string> = {
+    waiting_confirmed: "border-amber-200 bg-amber-100 text-amber-800",
+    pending_deposit: "border-yellow-200 bg-yellow-100 text-yellow-800",
+    pending_payment: "border-yellow-200 bg-yellow-100 text-yellow-800",
+    confirmed: "border-blue-200 bg-blue-100 text-blue-800",
+    in_progress: "border-indigo-200 bg-indigo-100 text-indigo-800",
+    waiting_confirm_return: "border-purple-200 bg-purple-100 text-purple-800",
+    rejected_return: "border-red-200 bg-red-100 text-red-700",
+    completed: "border-slate-200 bg-slate-100 text-slate-700",
+    cancelled: "border-rose-200 bg-rose-100 text-rose-700",
+  }
+
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      confirmed: { label: "Confirmed", className: "bg-green-100 text-green-800 border-green-200" },
-      in_progress: { label: "In Progress", className: "bg-blue-100 text-blue-800 border-blue-200" },
-      pending_payment: { label: "Pending Payment", className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-      pending_deposit: { label: "Pending Deposit", className: "bg-orange-100 text-orange-800 border-orange-200" },
-      completed: { label: "Completed", className: "bg-gray-100 text-gray-800 border-gray-200" },
-      cancelled: { label: "Cancelled", className: "bg-red-100 text-red-800 border-red-200" },
+    if (!status) {
+      return (
+        <Badge variant="outline" className="border-slate-200 bg-slate-100 text-slate-600 font-medium">
+          Unknown
+        </Badge>
+      )
     }
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.confirmed
+    const normalized = status.toLowerCase() as BookingStatus
+    const label = BOOKING_STATUS_LABEL[normalized] ?? status.replace(/_/g, " ")
+    const className = statusPalette[normalized] ?? "border-slate-200 bg-slate-100 text-slate-600"
     return (
-      <Badge variant="outline" className={`${config.className} font-medium`}>
-        {config.label}
+      <Badge variant="outline" className={`${className} font-medium`}>
+        {label}
       </Badge>
     )
   }

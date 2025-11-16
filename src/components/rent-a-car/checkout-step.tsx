@@ -49,7 +49,7 @@ export interface CheckoutStepHandle {
 export const CheckoutStep = forwardRef<CheckoutStepHandle, CheckoutStepProps>(
   ({ car, bookingState, onUpdatePaymentDetails, paymentDetails, onNextStep }, ref) => {
     const [paymentType, setPaymentType] = useState(paymentDetails.paymentType || "")
-    const [deposit, setDeposit] = useState((0.3 * (bookingState.rentalDays || 0) * (car?.basePrice || 0)).toString())
+    const [deposit, setDeposit] = useState(Math.ceil(0.3 * (bookingState.rentalDays || 0) * (car?.basePrice || 0)).toString())
     const [termsAccepted, setTermsAccepted] = useState(false)
     const [licenseConfirmed, setLicenseConfirmed] = useState(false)
     const [marketingOptIn, setMarketingOptIn] = useState(false)
@@ -60,8 +60,8 @@ export const CheckoutStep = forwardRef<CheckoutStepHandle, CheckoutStepProps>(
       submit?: string
     }>({})
 
-    const [maxDeposite] = useState((bookingState.rentalDays || 0) * (car?.basePrice || 0))
-    const [minDeposite] = useState(0.3 * (bookingState.rentalDays || 0) * (car?.basePrice || 0))
+    const [maxDeposite] = useState(Math.ceil((bookingState.rentalDays || 0) * (car?.basePrice || 0)))
+    const [minDeposite] = useState(Math.ceil(0.3 * (bookingState.rentalDays || 0) * (car?.basePrice || 0)))
     const [isRefreshing, setIsRefreshing] = useState(false)
 
     const userId = useSelector((state: RootState) => state.user.id);
@@ -261,40 +261,70 @@ export const CheckoutStep = forwardRef<CheckoutStepHandle, CheckoutStepProps>(
                 </Label>
                 <div className="relative">
                   <Input
-                    id="deposit"
-                    type="number"
-                    step={100000}
-                    placeholder="Enter deposit amount"
-                    value={deposit}
-                    min={minDeposite}
-                    max={maxDeposite}
-                    onChange={(e) => {
-                      const value = Number(e.target.value)
-                      if (value >= minDeposite && value <= maxDeposite) {
-                        setDeposit(e.target.value)
-                        setErrors((prev) => ({ ...prev, deposit: undefined }))
-                        onUpdatePaymentDetails({ paymentType, deposit: value })
-                      } else {
-                        if (value < minDeposite) {
-                          setDeposit(minDeposite.toString())
-                          setErrors((prev) => ({
-                            ...prev,
-                            deposit: `Minimum deposit is ${formatCurrency(minDeposite)}`,
-                          }))
-                        }
-                        if (value > maxDeposite) {
-                          setDeposit(maxDeposite.toString())
-                          setErrors((prev) => ({
-                            ...prev,
-                            deposit: `Maximum deposit is ${formatCurrency(maxDeposite)}`,
-                          }))
-                        }
+                  id="deposit"
+                  type="number"
+                  step={100000}
+                  placeholder="Enter deposit amount"
+                  value={deposit}
+                  min={minDeposite}
+                  max={maxDeposite}
+                  onChange={(e) => {
+                    // Update UI immediately
+                    const input = e.target as HTMLInputElement
+                    const raw = input.value
+                    setDeposit(raw)
+                    setErrors((prev) => ({ ...prev, deposit: undefined }))
+
+                    // Debounce using DOM element dataset so we don't need extra hooks
+                    const existing = input.dataset.debounceTimer
+                    if (existing) {
+                    clearTimeout(Number(existing))
+                    }
+
+                    input.dataset.debounceTimer = String(
+                    window.setTimeout(() => {
+                      const value = Number(input.value)
+
+                      if (!value || isNaN(value) || value <= 0) {
+                      setErrors((prev) => ({ ...prev, deposit: "Please enter a valid deposit amount." }))
+                      return
                       }
-                    }}
-                    className="text-lg font-semibold pr-16"
+
+                      if (value < minDeposite) {
+                      const normalized = minDeposite.toString()
+                      setDeposit(normalized)
+                      setErrors((prev) => ({
+                        ...prev,
+                        deposit: `Minimum deposit is ${formatCurrency(minDeposite)}`,
+                      }))
+                      onUpdatePaymentDetails({ paymentType, deposit: minDeposite })
+                      delete input.dataset.debounceTimer
+                      return
+                      }
+
+                      if (value > maxDeposite) {
+                      const normalized = maxDeposite.toString()
+                      setDeposit(normalized)
+                      setErrors((prev) => ({
+                        ...prev,
+                        deposit: `Maximum deposit is ${formatCurrency(maxDeposite)}`,
+                      }))
+                      onUpdatePaymentDetails({ paymentType, deposit: maxDeposite })
+                      delete input.dataset.debounceTimer
+                      return
+                      }
+
+                      // Valid value within range
+                      setErrors((prev) => ({ ...prev, deposit: undefined }))
+                      onUpdatePaymentDetails({ paymentType, deposit: value })
+                      delete input.dataset.debounceTimer
+                    }, 500),
+                    )
+                  }}
+                  className="text-lg font-semibold pr-16"
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
-                    VND
+                  VND
                   </span>
                 </div>
                 {errors.deposit && (
