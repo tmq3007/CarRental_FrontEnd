@@ -74,7 +74,7 @@ export interface CarVO_Full {
     productionYear: number;
     mileage?: number;
     fuelConsumption?: number;
-    isGasoline?: boolean;
+    fuelType: string;
     isAutomatic?: boolean;
     termOfUse?: string;
     additionalFunction?: string;

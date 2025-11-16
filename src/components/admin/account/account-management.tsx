@@ -162,11 +162,11 @@ export default function AccountManagement() {
     const getRoleName = (roleId: number): string => {
         switch (roleId) {
             case 1:
-                return "admin"
-            case 2:
-                return "customer"
-            case 3:
                 return "car_owner"
+            case 2:
+                return "admin"
+            case 3:
+                return "customer"
             case 4:
                 return "operator"
             default:
@@ -382,9 +382,9 @@ export default function AccountManagement() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Roles</SelectItem>
-                                <SelectItem value="1">Admin (1)</SelectItem>
-                                <SelectItem value="2">Customer (2)</SelectItem>
-                                <SelectItem value="3">Car Owner (3)</SelectItem>
+                                <SelectItem value="1">Car Owner (1)</SelectItem>
+                                <SelectItem value="2">Admin (2)</SelectItem>
+                                <SelectItem value="3">Customer(3)</SelectItem>
                                 <SelectItem value="4">Operator (4)</SelectItem>
                             </SelectContent>
                         </Select>
@@ -475,7 +475,7 @@ export default function AccountManagement() {
                                                         <span className="sm:hidden">View</span>
                                                     </Button>
 
-                                                    {Account.roleId === 3 ? (
+                                                    {Account.roleId === 1 ? (
                                                         <Link href={`/admin/cars?accountId=${Account.id}`}>
                                                             <Button
                                                                 variant="outline"
