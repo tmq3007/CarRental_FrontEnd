@@ -17,9 +17,17 @@ import {
     useGetBookingDetailsByCarIdQuery,
     type CarVO_Detail,
 } from "@/lib/services/car-api"
+
+import {
+    useGetProvincesQuery,
+    useGetDistrictsQuery,
+    useGetWardsQuery
+} from "@/lib/services/local-api/address-api"
+
 import { useDispatch } from "react-redux"
 import { setCarId, resetCarId } from "@/lib/slice/carSlice"
-import ConfirmationDialog from "@/components/ui/confirmation-dialog" // Import the custom dialog
+import ConfirmationDialog from "@/components/ui/confirmation-dialog"
+import AddressInput from "@/components/common/address-input"; // Import the custom dialog
 
 interface Document {
     id: number
@@ -34,6 +42,7 @@ interface Image {
     src: string
 }
 
+
 export default function EditCarDetails({ carId, initialData }: { carId: string; initialData: CarVO_Detail }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [status, setStatus] = useState("")
@@ -41,6 +50,21 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
     const [carData, setCarData] = useState<CarVO_Detail>(initialData)
     const [isConfirmDepositDialogOpen, setIsConfirmDepositDialogOpen] = useState(false) // State for custom dialog
     const dispatch = useDispatch()
+    const [selectedProvinceCode, setSelectedProvinceCode] = useState<number | null>(null)
+    const [selectedDistrictCode, setSelectedDistrictCode] = useState<number | null>(null)
+
+    // Fetch provinces
+    const { data: provinces = [], isLoading: provincesLoading } = useGetProvincesQuery()
+
+// Fetch districts based on selected province
+    const { data: districts = [], isLoading: districtsLoading } = useGetDistrictsQuery(selectedProvinceCode!, {
+        skip: !selectedProvinceCode,
+    })
+
+// Fetch wards based on selected district
+    const { data: wards = [], isLoading: wardsLoading } = useGetWardsQuery(selectedDistrictCode!, {
+        skip: !selectedDistrictCode,
+    })
 
     // Fetch car details if not provided
     const {
@@ -541,44 +565,15 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 <Search className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <Select
-                                                value={formData.cityProvince}
-                                                onValueChange={(value) => handleSelectChange("cityProvince", value)}
-                                            >
-                                                <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
-                                                    <SelectValue placeholder="City/Province" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="hanoi">Hanoi</SelectItem>
-                                                    <SelectItem value="hcm">Ho Chi Minh City</SelectItem>
-                                                    <SelectItem value="danang">Da Nang</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Select
-                                                value={formData.district}
-                                                onValueChange={(value) => handleSelectChange("district", value)}
-                                            >
-                                                <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
-                                                    <SelectValue placeholder="District" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="cau-giay">Cau Giay</SelectItem>
-                                                    <SelectItem value="dong-da">Dong Da</SelectItem>
-                                                    <SelectItem value="ba-dinh">Ba Dinh</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Select value={formData.ward} onValueChange={(value) => handleSelectChange("ward", value)}>
-                                                <SelectTrigger className="transition-all duration-200 hover:border-blue-400">
-                                                    <SelectValue placeholder="Ward" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="ward1">Ward 1</SelectItem>
-                                                    <SelectItem value="ward2">Ward 2</SelectItem>
-                                                    <SelectItem value="ward3">Ward 3</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                        <AddressInput
+                                            onLocationChange={(field, value) => handleSelectChange(field, value)}
+                                            location={{
+                                                province: formData.cityProvince,
+                                                district: formData.district,
+                                                ward: formData.ward
+                                            }}
+                                            orientation="vertical"
+                                        />
                                         <Input
                                             name="houseNumberStreet"
                                             value={formData.houseNumberStreet}
