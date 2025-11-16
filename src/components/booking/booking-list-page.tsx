@@ -37,7 +37,7 @@ import { formatCurrency } from "@/lib/hook/useFormatCurrency"
 import * as Dialog from "@radix-ui/react-dialog"
 import { useRouter } from "next/navigation"
 import type { LucideIcon } from "lucide-react"
-import { BookingActionPanel, type ActionKey } from "@/components/booking/booking-action-panel"
+import { BookingActionPanel, type ActionKey, type BookingActionCompletedPayload } from "@/components/booking/booking-action-panel"
 import { CustomerBookingDetailModal } from "@/components/booking/customer-booking-detail-modal"
 import { BookingStatusBadge } from "../car-owner/booking/status-badge"
 import { BookingSummaryDialog } from "@/components/booking/booking-summary-dialog"
@@ -268,7 +268,8 @@ export default function BookingListPage() {
   }, [])
 
   const handleActionCompleted = useCallback(
-    async (actionKey: ActionKey) => {
+    async (actionKey: ActionKey, payload: BookingActionCompletedPayload) => {
+      void payload
       const updatedBookings = await refreshBookings()
       if (actionKey === "customer_request_return" || actionKey === "customer_return_again") {
         let targetBooking: BookingVO | null = selectedBooking
@@ -703,7 +704,7 @@ interface CustomerActionRunnerProps {
     actionKey: ActionKey
   }
   onClose: () => void
-  onActionCompleted: (actionKey: ActionKey) => Promise<void> | void
+  onActionCompleted: (actionKey: ActionKey, payload: BookingActionCompletedPayload) => Promise<void> | void
 }
 
 function CustomerActionRunner({ context, onClose, onActionCompleted }: CustomerActionRunnerProps) {
@@ -728,8 +729,8 @@ function CustomerActionRunner({ context, onClose, onActionCompleted }: CustomerA
           role="customer"
           isRefreshing={isFetching}
           initialActionKey={actionKey}
-          onActionCompleted={async (completedKey) => {
-            await onActionCompleted(completedKey)
+          onActionCompleted={async (completedKey, payload) => {
+            await onActionCompleted(completedKey, payload)
             onClose()
           }}
         />

@@ -1,9 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { DateRange } from "react-day-picker"
 import { endOfDay, startOfDay } from "date-fns"
+import Confetti from "react-confetti"
 
 import {
 	BookingFilters,
@@ -27,7 +28,8 @@ import {
 	useGetCarOwnerBookingsQuery,
 	useGetBookingDetailQuery,
 } from "@/lib/services/booking-api"
-import { BookingActionPanel, type ActionKey } from "@/components/booking/booking-action-panel"
+import { BookingActionPanel, type ActionKey, type BookingActionCompletedPayload } from "@/components/booking/booking-action-panel"
+import { BookingSummaryDialog } from "@/components/booking/booking-summary-dialog"
 import { toast } from "sonner"
 
 const SORT_OPTIONS: BookingSortOption[] = [
@@ -94,6 +96,32 @@ export default function CarOwnerBookingsPage() {
 		actionKey: ActionKey
 		requestId: number
 	} | null>(null)
+	const [summaryBookingNumber, setSummaryBookingNumber] = useState<string | null>(null)
+	const [summaryModalOpen, setSummaryModalOpen] = useState(false)
+	const [showConfetti, setShowConfetti] = useState(false)
+	const [confettiSize, setConfettiSize] = useState({ width: 0, height: 0 })
+	const confettiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	useEffect(() => {
+		if (typeof window === "undefined") {
+			return
+		}
+		const updateSize = () => {
+			setConfettiSize({ width: window.innerWidth, height: window.innerHeight })
+		}
+		updateSize()
+		window.addEventListener("resize", updateSize)
+		return () => {
+			window.removeEventListener("resize", updateSize)
+		}
+	}, [])
+
+	useEffect(() => () => {
+		if (confettiTimeoutRef.current) {
+			clearTimeout(confettiTimeoutRef.current)
+			confettiTimeoutRef.current = null
+		}
+	}, [])
 
 	const debouncedSearch = useDebounce(searchTerm.trim(), 400)
 	const debouncedCarName = useDebounce(carName.trim(), 400)
@@ -215,8 +243,20 @@ export default function CarOwnerBookingsPage() {
 	)
 
 	const handleActionCompleted = useCallback(
-		async (_actionKey: ActionKey) => {
+		async (actionKey: ActionKey, payload: BookingActionCompletedPayload) => {
 			await refetch()
+			if (actionKey === "owner_accept_return") {
+				setSummaryBookingNumber(payload.booking.bookingNumber)
+				setSummaryModalOpen(true)
+				setShowConfetti(true)
+				if (confettiTimeoutRef.current) {
+					clearTimeout(confettiTimeoutRef.current)
+				}
+				confettiTimeoutRef.current = setTimeout(() => {
+					setShowConfetti(false)
+					confettiTimeoutRef.current = null
+				}, 5000)
+			}
 		},
 		[refetch]
 	)
@@ -235,7 +275,18 @@ export default function CarOwnerBookingsPage() {
 	}
 
 	return (
-		<main className="mx-auto flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+		<>
+			{showConfetti && (
+				<Confetti
+					width={Math.max(confettiSize.width, 1)}
+					height={Math.max(confettiSize.height, 1)}
+					recycle={false}
+					numberOfPieces={450}
+					gravity={0.4}
+					style={{ pointerEvents: "none", zIndex: 50 }}
+				/>
+			)}
+			<main className="mx-auto flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
 			<BookingFilters
 				searchValue={searchTerm}
 				onSearchChange={(value: string) => {
@@ -311,8 +362,25 @@ export default function CarOwnerBookingsPage() {
 				disableActions={false}
 				initialActionKey={pendingActionKey}
 				onInitialActionHandled={() => setPendingActionKey(null)}
+				onActionCompleted={handleActionCompleted}
 			/>
 		</main>
+		<BookingSummaryDialog
+			bookingNumber={summaryBookingNumber}
+			open={summaryModalOpen}
+			onOpenChange={(open) => {
+				setSummaryModalOpen(open)
+				if (!open) {
+					if (confettiTimeoutRef.current) {
+						clearTimeout(confettiTimeoutRef.current)
+						confettiTimeoutRef.current = null
+					}
+					setSummaryBookingNumber(null)
+					setShowConfetti(false)
+				}
+			}}
+		/>
+		</>
 	)
 }
 
@@ -322,7 +390,7 @@ interface OwnerActionRunnerProps {
 		actionKey: ActionKey
 	}
 	onClose: () => void
-	onActionCompleted: (actionKey: ActionKey) => Promise<void> | void
+	onActionCompleted: (actionKey: ActionKey, payload: BookingActionCompletedPayload) => Promise<void> | void
 }
 
 function OwnerActionRunner({ context, onClose, onActionCompleted }: OwnerActionRunnerProps) {
@@ -347,8 +415,8 @@ function OwnerActionRunner({ context, onClose, onActionCompleted }: OwnerActionR
 					role="car_owner"
 					isRefreshing={isFetching}
 					initialActionKey={actionKey}
-					onActionCompleted={async (completedKey) => {
-						await onActionCompleted(completedKey)
+					onActionCompleted={async (completedKey, payload) => {
+						await onActionCompleted(completedKey, payload)
 						onClose()
 					}}
 				/>

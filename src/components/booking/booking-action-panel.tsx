@@ -17,10 +17,14 @@ import {
 import { BookingActionDialog, type BookingActionFormValues } from "@/components/booking/booking-action-dialog"
 import { BOOKING_STATUS_LABEL } from "@/lib/constants/booking-status"
 
+export interface BookingActionCompletedPayload {
+  booking: BookingDetailVO
+}
+
 interface BookingActionPanelProps {
   booking: BookingDetailVO
   role?: string | null
-  onActionCompleted: (actionKey: ActionKey) => Promise<void> | void
+  onActionCompleted: (actionKey: ActionKey, payload: BookingActionCompletedPayload) => Promise<void> | void
   isRefreshing?: boolean
   disabled?: boolean
   initialActionKey?: ActionKey | null
@@ -76,7 +80,8 @@ const ACTION_MATRIX: Record<BookingStatus, Partial<Record<ActionRole, ActionKey[
     owner: ["owner_confirm_deposit", "owner_cancel_booking"],
   },
   confirmed: {
-    customer: ["customer_confirm_pickup"],
+    customer: ["customer_confirm_pickup", "customer_cancel"],
+    owner: ["owner_cancel_booking"],
   },
   in_progress: {
     customer: ["customer_request_return"],
@@ -347,7 +352,7 @@ export function BookingActionPanel({
           break
       }
 
-      await onActionCompleted(actionKey)
+      await onActionCompleted(actionKey, { booking })
       setDialogOpen(false)
       setCurrentAction(null)
     } catch (error: any) {

@@ -14,7 +14,7 @@ import { useGetBookingDetailQuery } from "@/lib/services/booking-api"
 import type { BookingStatusHistoryEntry } from "@/lib/services/booking-api"
 import { BookingStatusTimeline } from "@/components/booking/booking-status-timeline"
 import { BookingStatusProgress } from "@/components/booking/booking-status-progress"
-import { BookingActionPanel } from "@/components/booking/booking-action-panel"
+import { BookingActionPanel, type BookingActionCompletedPayload } from "@/components/booking/booking-action-panel"
 import type { RootState } from "@/lib/store"
 
 interface BookingDetailsProps {
@@ -92,7 +92,7 @@ export default function BookingDetails({ bookingId }: BookingDetailsProps) {
             <BookingActionPanel
                 booking={bookingDetail}
                 role={role}
-                onActionCompleted={async (_actionKey) => {
+                onActionCompleted={async (_actionKey, _payload: BookingActionCompletedPayload) => {
                     await refetch()
                 }}
                 isRefreshing={isFetching}
