@@ -45,6 +45,7 @@
     "postprocessing": "^6.37.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
+    "react-confetti": "^6.4.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",

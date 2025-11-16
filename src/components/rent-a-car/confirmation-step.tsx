@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import { CheckCircle, Phone, Mail, MessageCircle, Calendar, Users, Settings, Lug
 import SpotlightCard from "@/blocks/Components/SpotlightCard/SpotlightCard";
 import { BookingVO } from "@/lib/services/booking-api";
 import { formatCurrency } from "@/lib/hook/useFormatCurrency";
+import { BookingStatusBadge } from "../car-owner/booking/status-badge";
+import Confetti from "react-confetti";
 
 interface ConfirmationStepProps {
   bookingData: BookingVO;
@@ -16,6 +19,25 @@ interface ConfirmationStepProps {
 
 export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
   const router = useRouter();
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+
+    const timer = window.setTimeout(() => setShowConfetti(false), 5000);
+
+    return () => {
+      window.removeEventListener("resize", updateSize);
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   const calculateTotal = () => {
     // Assuming basePrice is per day and rentalDays is derived from pickupDate and returnDate
     const pickup = new Date(bookingData.pickupDate);
@@ -27,7 +49,18 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
   };
 
   return (
-    <div className="mx-auto px-4 sm:px-6 max-w-7xl">
+    <>
+      {showConfetti && windowSize.width > 0 && windowSize.height > 0 && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          numberOfPieces={350}
+          recycle={false}
+          style={{ pointerEvents: "none", position: "fixed", top: 0, left: 0 }}
+        />
+      )}
+
+      <div className="mx-auto px-4 sm:px-6 max-w-7xl">
       <div className="space-y-4 lg:space-y-6">
         {/* Success Message */}
         <Card>
@@ -48,9 +81,7 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Booking Details</CardTitle>
-            <Badge variant="secondary" className="bg-green-100 text-green-700">
-              {bookingData.status}
-            </Badge>
+            <BookingStatusBadge status={bookingData.status} />
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
@@ -264,6 +295,7 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

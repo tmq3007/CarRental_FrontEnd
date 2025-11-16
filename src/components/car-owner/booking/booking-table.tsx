@@ -1,6 +1,7 @@
 'use client'
 
-import { memo, useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
+import type { MouseEvent as ReactMouseEvent } from 'react'
 import {
   ArrowDown,
   ArrowUp,
@@ -13,13 +14,15 @@ import {
   User,
   WalletCards,
   XCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Ban,
 } from 'lucide-react'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BookingStatusBadge } from '@/components/car-owner/booking/status-badge'
-import type { BookingActionTarget } from '@/components/car-owner/booking/types'
 import { formatCurrency, formatDate, formatDateTime, formatDurationInDays } from '@/lib/utils/format'
 import type { CarOwnerBookingQueryParams, CarOwnerBookingVO } from '@/lib/services/booking-api'
 import type { PaginationMetadata } from '@/lib/store'
@@ -31,6 +34,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import type { ActionKey } from '@/components/booking/booking-action-panel'
+import type { LucideIcon } from 'lucide-react'
 
 type BookingSortKey = NonNullable<CarOwnerBookingQueryParams['sortBy']>
 type BookingSortDirection = NonNullable<CarOwnerBookingQueryParams['sortDirection']>
@@ -43,8 +48,7 @@ interface BookingTableProps {
   sortDirection: BookingSortDirection
   onSortChange: (sortKey: BookingSortKey) => void
   onSelectBooking: (booking: CarOwnerBookingVO) => void
-  onConfirmDeposit: (booking: BookingActionTarget) => void
-  onCancelBooking: (booking: BookingActionTarget) => void
+  onRequestAction: (booking: CarOwnerBookingVO, action: ActionKey) => void
   pagination?: PaginationMetadata
   onPageChange: (page: number) => void
   disableActions?: boolean
@@ -73,6 +77,59 @@ function renderSortIndicator(active: boolean, direction: BookingSortDirection) {
   )
 }
 
+type OwnerActionConfig = {
+  key: ActionKey
+  label: string
+  variant: 'default' | 'secondary' | 'destructive' | 'outline'
+  icon: LucideIcon
+}
+
+const OWNER_ACTION_CONFIG: Partial<Record<ActionKey, OwnerActionConfig>> = {
+  owner_confirm_booking: {
+    key: 'owner_confirm_booking',
+    label: 'Confirm',
+    variant: 'default',
+    icon: CheckCircle2,
+  },
+  owner_cancel_booking: {
+    key: 'owner_cancel_booking',
+    label: 'Cancel',
+    variant: 'destructive',
+    icon: XCircle,
+  },
+  owner_confirm_deposit: {
+    key: 'owner_confirm_deposit',
+    label: 'Confirm deposit',
+    variant: 'outline',
+    icon: WalletCards,
+  },
+  owner_accept_return: {
+    key: 'owner_accept_return',
+    label: 'Accept return',
+    variant: 'default',
+    icon: ShieldCheck,
+  },
+  owner_reject_return: {
+    key: 'owner_reject_return',
+    label: 'Reject return',
+    variant: 'destructive',
+    icon: Ban,
+  },
+}
+
+function getOwnerActionsForStatus(status?: string): ActionKey[] {
+  switch ((status ?? '').toLowerCase()) {
+    case 'waiting_confirmed':
+      return ['owner_confirm_booking', 'owner_cancel_booking']
+    case 'pending_deposit':
+      return ['owner_confirm_deposit', 'owner_cancel_booking']
+    case 'waiting_confirm_return':
+      return ['owner_accept_return', 'owner_reject_return']
+    default:
+      return []
+  }
+}
+
 const BookingTableComponent = ({
   bookings,
   isLoading,
@@ -81,8 +138,7 @@ const BookingTableComponent = ({
   sortDirection,
   onSortChange,
   onSelectBooking,
-  onConfirmDeposit,
-  onCancelBooking,
+  onRequestAction,
   pagination,
   onPageChange,
   disableActions,
@@ -116,6 +172,20 @@ const BookingTableComponent = ({
 
     return pages
   }, [pagination])
+
+  const handleRowClick = useCallback(
+    (event: ReactMouseEvent<HTMLTableRowElement>, booking: CarOwnerBookingVO) => {
+      if (event.defaultPrevented) {
+        return
+      }
+      const target = event.target as HTMLElement | null
+      if (target?.closest('[data-row-action="true"]')) {
+        return
+      }
+      onSelectBooking(booking)
+    },
+    [onSelectBooking],
+  )
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -166,26 +236,13 @@ const BookingTableComponent = ({
                 const status = booking.status?.toLowerCase?.() ?? ''
                 const totalAmount = booking.totalAmount ?? booking.basePrice ?? 0
                 const bookingId = booking.bookingId ?? booking.bookingNumber
-                const allowCancel = ['confirmed', 'pending_payment', 'pending_deposit'].includes(status)
-                const allowDeposit = ['pending_payment', 'pending_deposit'].includes(status)
-                const actionTarget: BookingActionTarget = {
-                  bookingNumber: booking.bookingNumber ?? bookingId ?? '',
-                  bookingId,
-                  carName: booking.carName,
-                  status: booking.status ?? status,
-                  deposit: booking.deposit,
-                  basePrice: booking.basePrice,
-                  totalAmount,
-                  pickupDate: booking.pickupDate,
-                  returnDate: booking.returnDate,
-                  paymentType: booking.paymentType,
-                }
+                const ownerActions = getOwnerActionsForStatus(status)
 
                 return (
                   <TableRow
                     key={booking.bookingNumber}
                     className="cursor-pointer transition-colors hover:bg-emerald-50/40"
-                    onClick={() => onSelectBooking(booking)}
+                    onClick={(event) => handleRowClick(event, booking)}
                   >
                     <TableCell>
                       <div className="space-y-1">
@@ -248,33 +305,35 @@ const BookingTableComponent = ({
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex flex-wrap items-center justify-end gap-2">
-                        {allowDeposit && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onConfirmDeposit(actionTarget)
-                            }}
-                            disabled={disableActions}
-                          >
-                            <WalletCards className="mr-1 h-3.5 w-3.5" /> Deposit
-                          </Button>
-                        )}
-                        {allowCancel && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onCancelBooking(actionTarget)
-                            }}
-                            disabled={disableActions}
-                          >
-                            <XCircle className="mr-1 h-3.5 w-3.5" /> Cancel
-                          </Button>
-                        )}
+                        {ownerActions.map((actionKey) => {
+                          const config = OWNER_ACTION_CONFIG[actionKey]
+                          if (!config?.label) {
+                            return null
+                          }
+                          const Icon = config.icon
+                          return (
+                            <Button
+                              key={`${booking.bookingNumber}-${actionKey}`}
+                              variant={config.variant}
+                              size="sm"
+                              className={
+                                config.variant === 'outline'
+                                  ? 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                                  : undefined
+                              }
+                              data-row-action="true"
+                              onClick={(event) => {
+                                event.preventDefault()
+                                event.stopPropagation()
+                                onRequestAction(booking, actionKey)
+                              }}
+                              disabled={disableActions}
+                            >
+                              <Icon className="mr-1 h-3.5 w-3.5" />
+                              {config.label}
+                            </Button>
+                          )
+                        })}
                       </div>
                     </TableCell>
                   </TableRow>

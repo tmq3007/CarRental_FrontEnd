@@ -1,12 +1,9 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useSelector } from "react-redux"
 import { DateRange } from "react-day-picker"
 import { endOfDay, startOfDay } from "date-fns"
-import { toast } from "sonner"
-import { AlertTriangle, Loader2, WalletCards } from "lucide-react"
-import { formatCurrency } from "@/lib/utils/format"
 
 import {
 	BookingFilters,
@@ -20,28 +17,18 @@ import {
 	CAR_OWNER_DEFAULT_STATUS_FILTER,
 	CAR_OWNER_STATUS_PRIORITY,
 } from "@/components/car-owner/booking/status-badge"
-import type { BookingActionTarget } from "@/components/car-owner/booking/types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import type { CheckedState } from "@radix-ui/react-checkbox"
 import type { RootState } from "@/lib/store"
 import useDebounce from "@/lib/hook/use-debounce"
 import {
 	type CarOwnerBookingQueryParams,
 	type CarOwnerBookingVO,
-	useCancelBookingMutation,
-	useConfirmDepositMutation,
 	useGetCarOwnerBookingsQuery,
+	useGetBookingDetailQuery,
 } from "@/lib/services/booking-api"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
+import { BookingActionPanel, type ActionKey } from "@/components/booking/booking-action-panel"
+import { toast } from "sonner"
 
 const SORT_OPTIONS: BookingSortOption[] = [
 	{
@@ -101,10 +88,12 @@ export default function CarOwnerBookingsPage() {
 	const [pageSize, setPageSize] = useState(10)
 	const [detailOpen, setDetailOpen] = useState(false)
 	const [selectedBookingNumber, setSelectedBookingNumber] = useState<string | null>(null)
-	const [confirmDepositTarget, setConfirmDepositTarget] = useState<BookingActionTarget | null>(null)
-	const [cancelTarget, setCancelTarget] = useState<BookingActionTarget | null>(null)
-	const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
-	const [cancelAcknowledged, setCancelAcknowledged] = useState(false)
+	const [pendingActionKey, setPendingActionKey] = useState<ActionKey | null>(null)
+	const [actionRunnerContext, setActionRunnerContext] = useState<{
+		bookingNumber: string
+		actionKey: ActionKey
+		requestId: number
+	} | null>(null)
 
 	const debouncedSearch = useDebounce(searchTerm.trim(), 400)
 	const debouncedCarName = useDebounce(carName.trim(), 400)
@@ -135,9 +124,6 @@ export default function CarOwnerBookingsPage() {
 		skip: !queryArgs,
 	})
 
-	const [cancelBooking, { isLoading: isCancelling }] = useCancelBookingMutation()
-	const [confirmDeposit, { isLoading: isConfirmingDeposit }] = useConfirmDepositMutation()
-
 	const bookings: CarOwnerBookingVO[] = data?.data?.data ?? []
 	const pagination = data?.data?.PaginationMetadata
 
@@ -158,8 +144,6 @@ export default function CarOwnerBookingsPage() {
 
 		return [...priority, ...others]
 	}, [bookings])
-
-	const isProcessingAction = isCancelling || isConfirmingDeposit
 
 	const activeSortId = `${sortBy}_${sortDirection}`
 
@@ -218,49 +202,24 @@ export default function CarOwnerBookingsPage() {
 		setPageSize(10)
 	}, [])
 
-	const handleConfirmDepositRequest = useCallback((booking: BookingActionTarget) => {
-		setConfirmDepositTarget(booking)
-	}, [])
+	const handleRequestAction = useCallback(
+		(booking: CarOwnerBookingVO, action: ActionKey) => {
+			setSelectedBookingNumber(booking.bookingNumber)
+			setActionRunnerContext({
+				bookingNumber: booking.bookingNumber,
+				actionKey: action,
+				requestId: Date.now(),
+			})
+		},
+		[]
+	)
 
-	const executeConfirmDeposit = useCallback(() => {
-		if (!confirmDepositTarget) return
-		const { bookingNumber, carName } = confirmDepositTarget
-		const action = confirmDeposit({ bookingNumber }).unwrap()
-		toast.promise(action, {
-			loading: "Confirming deposit...",
-			success: () => {
-				setConfirmDepositTarget(null)
-				return `Deposit confirmed for ${carName ?? bookingNumber}`
-			},
-			error: "Unable to confirm deposit. Please try again.",
-		})
-	}, [confirmDeposit, confirmDepositTarget])
-
-	const handleCancelBookingRequest = useCallback((booking: BookingActionTarget) => {
-		setCancelTarget(booking)
-		setCancelAcknowledged(false)
-		setCancelDialogOpen(true)
-	}, [])
-
-	const executeCancelBooking = useCallback(() => {
-		if (!cancelTarget) return
-		const current = cancelTarget
-		const identifier = current.bookingId ?? current.bookingNumber
-		if (!identifier) {
-			toast.error("Missing booking identifier. Please contact support.")
-			return
-		}
-		const action = cancelBooking({ bookingId: identifier }).unwrap()
-		toast.promise(action, {
-			loading: "Cancelling booking...",
-			success: () => {
-				setCancelDialogOpen(false)
-				setCancelTarget(null)
-				return `Booking ${current.bookingNumber} cancelled`
-			},
-			error: "Unable to cancel booking.",
-		})
-	}, [cancelBooking, cancelTarget])
+	const handleActionCompleted = useCallback(
+		async (_actionKey: ActionKey) => {
+			await refetch()
+		},
+		[refetch]
+	)
 
 	if (!accountId) {
 		return (
@@ -324,12 +283,20 @@ export default function CarOwnerBookingsPage() {
 				sortDirection={sortDirection}
 				onSortChange={handleTableSortChange}
 				onSelectBooking={handleSelectBooking}
-				onConfirmDeposit={handleConfirmDepositRequest}
-				onCancelBooking={handleCancelBookingRequest}
+				onRequestAction={handleRequestAction}
 				pagination={pagination}
 				onPageChange={handlePageChange}
-				disableActions={isProcessingAction}
+				disableActions={false}
 			/>
+
+			{actionRunnerContext && (
+				<OwnerActionRunner
+					key={actionRunnerContext.requestId}
+					context={actionRunnerContext}
+					onClose={() => setActionRunnerContext(null)}
+					onActionCompleted={handleActionCompleted}
+				/>
+			)}
 
 			<BookingDetailModal
 				bookingNumber={selectedBookingNumber}
@@ -338,127 +305,54 @@ export default function CarOwnerBookingsPage() {
 					setDetailOpen(open)
 					if (!open) {
 						setSelectedBookingNumber(null)
+						setPendingActionKey(null)
 					}
 				}}
-				onConfirmDeposit={handleConfirmDepositRequest}
-				onCancelBooking={handleCancelBookingRequest}
-				disableActions={isProcessingAction}
+				disableActions={false}
+				initialActionKey={pendingActionKey}
+				onInitialActionHandled={() => setPendingActionKey(null)}
 			/>
-
-			<Dialog
-				open={Boolean(confirmDepositTarget)}
-				onOpenChange={(open: boolean) => {
-					if (!open) {
-						setConfirmDepositTarget(null)
-					}
-				}}
-			>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle className="flex items-center gap-2 text-lg">
-							<WalletCards className="h-5 w-5 text-emerald-500" />
-							Confirm deposit
-						</DialogTitle>
-						<DialogDescription>
-							Verify the renter&rsquo;s deposit has been received before confirming this action.
-						</DialogDescription>
-					</DialogHeader>
-					{confirmDepositTarget && (
-						<div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-700">
-							<div className="flex flex-col">
-								<span className="text-xs font-medium uppercase tracking-wide text-slate-500">Booking</span>
-								<span className="font-semibold text-slate-900">#{confirmDepositTarget.bookingNumber}</span>
-							</div>
-							<div className="flex justify-between gap-3">
-								<span>Vehicle</span>
-								<span className="font-medium">{confirmDepositTarget.carName ?? "N/A"}</span>
-							</div>
-							<div className="flex justify-between gap-3">
-								<span>Deposit amount</span>
-								<span className="font-semibold text-emerald-600">
-									{typeof confirmDepositTarget.deposit === "number"
-										? formatCurrency(confirmDepositTarget.deposit)
-										: "—"}
-								</span>
-							</div>
-							<div className="flex justify-between gap-3">
-								<span>Payment type</span>
-								<span className="font-medium capitalize">
-									{confirmDepositTarget.paymentType ?? "Not specified"}
-								</span>
-							</div>
-						</div>
-					)}
-					<DialogFooter className="gap-2">
-						<Button variant="outline" onClick={() => setConfirmDepositTarget(null)} disabled={isConfirmingDeposit}>
-							Cancel
-						</Button>
-						<Button onClick={executeConfirmDeposit} disabled={isConfirmingDeposit} className="gap-2">
-							{isConfirmingDeposit && <Loader2 className="h-4 w-4 animate-spin" />}
-							Confirm deposit
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-
-			<Dialog
-				open={cancelDialogOpen}
-				onOpenChange={(open: boolean) => {
-					setCancelDialogOpen(open)
-					if (!open) {
-						setCancelTarget(null)
-						setCancelAcknowledged(false)
-					}
-				}}
-			>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle className="flex items-center gap-2 text-lg text-red-600">
-							<AlertTriangle className="h-5 w-5" />
-							Cancel booking
-						</DialogTitle>
-						<DialogDescription>
-							Cancelling will notify the renter and release any reserved dates. This action cannot be undone.
-						</DialogDescription>
-					</DialogHeader>
-					{cancelTarget && (
-						<div className="space-y-3 rounded-lg border border-red-100 bg-red-50/60 p-4 text-sm text-red-700">
-							<div className="flex flex-col">
-								<span className="text-xs font-medium uppercase tracking-wide text-red-500/80">Booking</span>
-								<span className="font-semibold text-red-700">#{cancelTarget.bookingNumber}</span>
-							</div>
-							<div className="flex justify-between gap-3">
-								<span>Vehicle</span>
-								<span className="font-medium text-red-700">{cancelTarget.carName ?? "N/A"}</span>
-							</div>
-						</div>
-					)}
-					<div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
-						<Checkbox
-							id="cancel-confirmation"
-							checked={cancelAcknowledged}
-							onCheckedChange={(checked: CheckedState) => setCancelAcknowledged(Boolean(checked))}
-						/>
-						<label htmlFor="cancel-confirmation" className="select-none">
-							I understand this booking will be permanently cancelled and the renter will be notified immediately.
-						</label>
-					</div>
-					<DialogFooter className="gap-2">
-						<Button variant="outline" onClick={() => setCancelDialogOpen(false)} disabled={isCancelling}>
-							Keep booking
-						</Button>
-						<Button
-							onClick={executeCancelBooking}
-							disabled={!cancelAcknowledged || isCancelling}
-							variant="destructive"
-							className="gap-2"
-						>
-							{isCancelling && <Loader2 className="h-4 w-4 animate-spin" />}
-							Cancel booking
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</main>
+	)
+}
+
+interface OwnerActionRunnerProps {
+	context: {
+		bookingNumber: string
+		actionKey: ActionKey
+	}
+	onClose: () => void
+	onActionCompleted: (actionKey: ActionKey) => Promise<void> | void
+}
+
+function OwnerActionRunner({ context, onClose, onActionCompleted }: OwnerActionRunnerProps) {
+	const { bookingNumber, actionKey } = context
+	const { data, isFetching, isError } = useGetBookingDetailQuery(bookingNumber, {
+		skip: !bookingNumber,
+	})
+	const bookingDetail = data?.data
+
+	useEffect(() => {
+		if (isError) {
+			toast.error("Unable to load booking details for this action")
+			onClose()
+		}
+	}, [isError, onClose])
+
+	return (
+		<div className="hidden" aria-hidden="true">
+			{bookingDetail ? (
+				<BookingActionPanel
+					booking={bookingDetail}
+					role="car_owner"
+					isRefreshing={isFetching}
+					initialActionKey={actionKey}
+					onActionCompleted={async (completedKey) => {
+						await onActionCompleted(completedKey)
+						onClose()
+					}}
+				/>
+			) : null}
+		</div>
 	)
 }
