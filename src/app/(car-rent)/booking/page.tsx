@@ -43,6 +43,7 @@ export interface BookingState {
   driverDrivingLicenseUri?: string;
   driverHouseNumberStreet?: string;
   driverLocation: Location;
+  isDifferentDriver?: boolean;
 }
 export default function CarRentalBooking() {
   const searchParams = useSearchParams();
@@ -109,6 +110,7 @@ export default function CarRentalBooking() {
       district: user?.district ?? "",
       ward: user?.ward ?? "",
     },
+    isDifferentDriver: false,
   });
 
   useEffect(() => {
@@ -131,6 +133,7 @@ export default function CarRentalBooking() {
           ward: prev.driverLocation.ward || user.ward || "",
         },
       }));
+      handlePickupLocationChange("province", car.cityProvince || "");
     }
   }, [car, user, carId, userId]);
 
@@ -158,6 +161,7 @@ export default function CarRentalBooking() {
   };
 
   const handlePickupLocationChange = (field: string, value: string) => {
+    console.log("Pickup location change:", field, value);
     setBookingState((prev) => {
       const newPickupLocation = { ...prev.pickupLocation, [field]: value };
       const newDropoffLocation = {

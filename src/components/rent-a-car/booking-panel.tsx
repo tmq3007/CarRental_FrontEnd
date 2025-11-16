@@ -67,7 +67,7 @@ export function BookingPanel({
   const calculateTotal = () => {
     let total = 0;
     if (pickupDate && returnDate) {
-      const days = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
+      const days = calculateRentalDays();
       total = days * (car?.basePrice ?? 99999999999999);
     }
     return total;
@@ -75,7 +75,8 @@ export function BookingPanel({
 
   const calculateRentalDays = () => {
     if (pickupDate && returnDate) {
-      return Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
+      const diffTime = returnDate.getTime() - pickupDate.getTime();
+      return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     }
     return 0;
   };
@@ -144,10 +145,6 @@ export function BookingPanel({
     if (!validateForm()) {
       return;
     }
-
-    const formattedPickupLocation = `${pickupLocation.ward || ""}, ${pickupLocation.district || ""}, ${pickupLocation.province || ""}`.trim();
-    const formattedDropoffLocation = `${dropoffLocation.ward || ""}, ${pickupLocation.district || ""}, ${pickupLocation.province || ""}`.trim();
-
     onNextStep();
   };
 
@@ -195,6 +192,7 @@ export function BookingPanel({
             onLocationChange={onUpdatePickupLocation}
             orientation="horizontal"
             spacing="md"
+            disabledFields={["province"]}
           />
           {errors.pickupLocation && <p className="text-red-500 text-sm">{errors.pickupLocation}</p>}
         </div>

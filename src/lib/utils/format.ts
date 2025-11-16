@@ -105,3 +105,28 @@ export function formatDurationInDays(
 export function isValidDate(value: DateInput) {
   return toDate(value) !== null
 }
+
+export const formatVnd = (cents: number): string => {
+  const safeValue = Number.isFinite(cents) ? cents : 0
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(safeValue)
+}
+
+export const formatDateTimeVi = (value?: DateInput): string | null => {
+  const date = toDate(value)
+  if (!date) {
+    return null
+  }
+
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date)
+}

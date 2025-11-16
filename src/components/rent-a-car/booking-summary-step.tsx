@@ -35,7 +35,7 @@ interface DriverSpecificData {
 }
 
 export function BookingSummaryStep({ bookingState, setBookingState, car, user }: BookingSummaryStepProps) {
-  const [isDifferentDriver, setIsDifferentDriver] = useState(false)
+  const [isDifferentDriver, setIsDifferentDriver] = useState<boolean>(bookingState.isDifferentDriver ?? false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   const [preservedDriverData, setPreservedDriverData] = useState<DriverSpecificData>({
@@ -54,6 +54,29 @@ export function BookingSummaryStep({ bookingState, setBookingState, car, user }:
   })
 
   useEffect(() => {
+    setIsDifferentDriver(bookingState.isDifferentDriver ?? false)
+  }, [bookingState.isDifferentDriver])
+
+  useEffect(() => {
+    if (bookingState.isDifferentDriver) {
+      setPreservedDriverData({
+        fullName: bookingState.driverFullName || "",
+        dob: bookingState.driverDob,
+        phoneNumber: bookingState.driverPhoneNumber || "",
+        email: bookingState.driverEmail || "",
+        nationalId: bookingState.driverNationalId || "",
+        drivingLicenseUri: bookingState.driverDrivingLicenseUri || "",
+        location: {
+          province: bookingState.driverLocation?.province || "",
+          district: bookingState.driverLocation?.district || "",
+          ward: bookingState.driverLocation?.ward || "",
+        },
+        houseNumberStreet: bookingState.driverHouseNumberStreet || "",
+      })
+    }
+  }, [bookingState])
+
+  useEffect(() => {
     if (!isDifferentDriver) {
       setBookingState((prev) => ({
         ...prev,
@@ -69,6 +92,7 @@ export function BookingSummaryStep({ bookingState, setBookingState, car, user }:
           ward: user.ward || "",
         },
         driverHouseNumberStreet: user.houseNumberStreet || "",
+        isDifferentDriver: false,
       }))
     }
   }, [user, setBookingState, isDifferentDriver])
@@ -131,12 +155,14 @@ export function BookingSummaryStep({ bookingState, setBookingState, car, user }:
     }
   }
 
-  const handleDifferentDriverChange = (checked: boolean) => {
-    setIsDifferentDriver(checked)
+  const handleDifferentDriverChange = (checked: boolean | "indeterminate") => {
+    const nextIsDifferentDriver = checked === true
+    setIsDifferentDriver(nextIsDifferentDriver)
 
-    if (!checked) {
+    if (!nextIsDifferentDriver) {
       setBookingState((prev) => ({
         ...prev,
+        isDifferentDriver: false,
         driverFullName: user.fullName || "",
         driverDob: user.dob ? new Date(user.dob) : undefined,
         driverPhoneNumber: user.phoneNumber || "",
@@ -154,13 +180,18 @@ export function BookingSummaryStep({ bookingState, setBookingState, car, user }:
     } else {
       setBookingState((prev) => ({
         ...prev,
+        isDifferentDriver: true,
         driverFullName: preservedDriverData.fullName,
         driverDob: preservedDriverData.dob,
         driverPhoneNumber: preservedDriverData.phoneNumber,
         driverEmail: preservedDriverData.email,
         driverNationalId: preservedDriverData.nationalId,
         driverDrivingLicenseUri: preservedDriverData.drivingLicenseUri,
-        driverLocation: preservedDriverData.location,
+        driverLocation: {
+          province: preservedDriverData.location.province,
+          district: preservedDriverData.location.district,
+          ward: preservedDriverData.location.ward,
+        },
         driverHouseNumberStreet: preservedDriverData.houseNumberStreet,
       }))
       if (preservedDriverData.drivingLicenseUri && preservedDriverData.drivingLicenseUri.startsWith("http")) {

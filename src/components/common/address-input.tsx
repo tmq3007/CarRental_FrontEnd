@@ -108,6 +108,20 @@ const AddressInput = ({
   const [selectedDistrictCode, setSelectedDistrictCode] = useState<number | null>(null)
   const [selectedWardCode, setSelectedWardCode] = useState<number | null>(null)
 
+  const normalizeAdministrativeName = (value?: string) => {
+    if (!value) return ""
+    const noDiacritics = value.normalize("NFD").replace(/\p{Diacritic}/gu, "")
+    const lower = noDiacritics.toLowerCase().trim()
+    const withoutPrefix = lower.replace(/^(tinh|thanh pho|tp\.?)(\s+)/, "")
+    return withoutPrefix
+      .replace(/^(quan|huyen|thi xa|thanh pho|xa|phuong)(\s+)/, "")
+      .trim()
+  }
+
+  const compareAdministrativeName = (a?: string, b?: string) => {
+    return normalizeAdministrativeName(a) === normalizeAdministrativeName(b)
+  }
+
   // Fetch provinces
   const { data: provinces = [], isLoading: provincesLoading } = useGetProvincesQuery()
 
@@ -124,7 +138,7 @@ const AddressInput = ({
   // Sync local state with location prop
   useEffect(() => {
     if (location.province) {
-      const province = provinces.find((p) => p.name === location.province)
+      const province = provinces.find((p) => compareAdministrativeName(p.name, location.province))
       setSelectedProvinceCode(province?.code || null)
     } else {
       setSelectedProvinceCode(null)
@@ -133,7 +147,7 @@ const AddressInput = ({
 
   useEffect(() => {
     if (location.district && selectedProvinceCode) {
-      const district = districts.find((d) => d.name === location.district)
+      const district = districts.find((d) => compareAdministrativeName(d.name, location.district))
       setSelectedDistrictCode(district?.code || null)
     } else {
       setSelectedDistrictCode(null)
@@ -142,7 +156,7 @@ const AddressInput = ({
 
   useEffect(() => {
     if (location.ward && selectedDistrictCode) {
-      const ward = wards.find((w) => w.name === location.ward)
+      const ward = wards.find((w) => compareAdministrativeName(w.name, location.ward))
       setSelectedWardCode(ward?.code || null)
     } else {
       setSelectedWardCode(null)

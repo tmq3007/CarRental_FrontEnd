@@ -1,54 +1,20 @@
 import { Badge } from "@/components/ui/badge"
+import { BOOKING_STATUS_OPTIONS, resolveBookingStatusBadge } from "@/lib/constants/booking-status"
 import { cn } from "@/lib/utils"
 
 export const CAR_OWNER_STATUS_PRIORITY = [
+  "waiting_confirmed",
+  "waiting_confirm_return",
   "confirmed",
   "in_progress",
   "pending_payment",
   "pending_deposit",
+  "rejected_return",
 ]
 
 export const CAR_OWNER_DEFAULT_STATUS_FILTER = [...CAR_OWNER_STATUS_PRIORITY]
 
-export const CAR_OWNER_STATUS_OPTIONS: { value: string; label: string }[] = [
-  { value: "confirmed", label: "Confirmed" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "pending_payment", label: "Pending Payment" },
-  { value: "pending_deposit", label: "Pending Deposit" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-]
-
-const STATUS_STYLES: Record<string, { label: string; className: string }> = {
-  confirmed: {
-    label: "Confirmed",
-    className: "border-green-200 bg-green-50 text-green-700",
-  },
-  in_progress: {
-    label: "In Progress",
-    className: "border-blue-200 bg-blue-50 text-blue-700",
-  },
-  pending_payment: {
-    label: "Pending Payment",
-    className: "border-amber-200 bg-amber-50 text-amber-700",
-  },
-  pending_deposit: {
-    label: "Pending Deposit",
-    className: "border-orange-200 bg-orange-50 text-orange-700",
-  },
-  completed: {
-    label: "Completed",
-    className: "border-slate-200 bg-slate-50 text-slate-700",
-  },
-  cancelled: {
-    label: "Cancelled",
-    className: "border-red-200 bg-red-50 text-red-700",
-  },
-  default: {
-    label: "Unknown",
-    className: "border-slate-200 bg-slate-50 text-slate-700",
-  },
-}
+export const STATUS_OPTIONS: { value: string; label: string }[] = [...BOOKING_STATUS_OPTIONS]
 
 interface BookingStatusBadgeProps {
   status: string
@@ -56,8 +22,7 @@ interface BookingStatusBadgeProps {
 }
 
 export function BookingStatusBadge({ status, className }: BookingStatusBadgeProps) {
-  const normalized = status?.toLowerCase?.() ?? ""
-  const config = STATUS_STYLES[normalized] ?? STATUS_STYLES.default
+  const config = resolveBookingStatusBadge(status)
 
   return (
     <Badge

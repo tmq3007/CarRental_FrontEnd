@@ -46,6 +46,7 @@ export function OrderSummary({ car, currentStep, bookingState, onNextStep, valid
               ? bookingState.driverDob.toISOString()
               : bookingState.driverDob
             : null,
+          isDifferentDriver: bookingState.isDifferentDriver ?? false,
         };
         const response = await createBooking(bookingData).unwrap();
         onNextStep(response.data); // Pass the BookingVO response to the next step

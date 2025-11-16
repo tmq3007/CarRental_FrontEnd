@@ -26,11 +26,62 @@ export interface BookingVO {
     carImageRight?: string;
 }
 
+export type BookingStatus =
+    | "waiting_confirmed"
+    | "pending_deposit"
+    | "pending_payment"
+    | "confirmed"
+    | "in_progress"
+    | "waiting_confirm_return"
+    | "rejected_return"
+    | "completed"
+    | "cancelled";
+
+export interface BookingStatusHistoryEntry {
+    id?: string;
+    oldStatus: BookingStatus | string;
+    newStatus: BookingStatus | string;
+    note?: string | null;
+    pictureUrl?: string | null;
+    changedAt: string;
+}
+
+export interface BookingSummaryTimelineEntry {
+    oldStatus: BookingStatus | string;
+    newStatus: BookingStatus | string;
+    note?: string | null;
+    pictureUrl?: string | null;
+    changedAt: string;
+}
+
+export interface BookingSummaryVO {
+    bookingNumber: string;
+    status: BookingStatus | string;
+    pickUpTime?: string | null;
+    dropOffTime?: string | null;
+    actualReturnTime?: string | null;
+    basePricePerDayCents?: number | null;
+    totalDays?: number | null;
+    basePriceCents?: number | null;
+    depositSnapshotCents?: number | null;
+    extraKmFeeCents?: number | null;
+    discountCents?: number | null;
+    extraChargesCents?: number | null;
+    totalCalculatedCents?: number | null;
+    remainingChargedCents?: number | null;
+    refundToRenterCents?: number | null;
+    ownerShareFromDepositCents?: number | null;
+    adminShareFromDepositCents?: number | null;
+    ownerShareFromRemainingCents?: number | null;
+    adminShareFromRemainingCents?: number | null;
+    timeline?: BookingSummaryTimelineEntry[] | null;
+}
+
 export interface BookingDetailVO {
     bookingNumber: string;
     carName: string;
     carId: string;
-    status: string;
+    status: BookingStatus | string;
     pickUpTime?: string;
     dropOffTime?: string;
     accountEmail?: string;
@@ -96,6 +147,10 @@ export interface BookingDetailVO {
     basePrice?: number;
     deposit?: number;
     paymentType?: string;
+    depositPaid?: boolean;
+    depositStatus?: string;
+    statusHistory?: BookingStatusHistoryEntry[];
+    historyEntries?: BookingStatusHistoryEntry[];
 }
 export interface BookingCarAndUserResponse {
     car: CarVO_Detail;
@@ -130,7 +185,7 @@ export interface CreateBookingDTO {
     driverNationalId?: string | null;
     driverHouseNumberStreet?: string | null;
     driverLocation?: Location;
-    isRenterSameAsDriver?: boolean;
+    isDifferentDriver?: boolean;
 }
 
 export interface PaginatedBookingResponse {
@@ -282,19 +337,27 @@ export const bookingApi = createApi({
             }),
             invalidatesTags: ["Booking"],
         }),
-        confirmPickup: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
-            query: ({ bookingNumber }) => ({
+        confirmPickup: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string; pictureUrl?: string | null }
+        >({
+            query: ({ bookingNumber, note, pictureUrl }) => ({
                 url: `/booking/${bookingNumber}/confirm-pickup`,
-                method: "PUT",
+                method: "POST",
+                body: { note, pictureUrl: pictureUrl ?? null },
             }),
-            invalidatesTags: ["Booking"],
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
         }),
-        confirmDeposit: build.mutation<ApiResponse<string>, { bookingNumber: string }>({
-            query: ({ bookingNumber }) => ({
+        confirmDeposit: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string | null }
+        >({
+            query: ({ bookingNumber, note }) => ({
                 url: `/booking/${bookingNumber}/confirm-deposit`,
-                method: "PUT",
+                method: "POST",
+                body: note ? { note } : undefined,
             }),
-            invalidatesTags: ["Booking"],
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
         }),
         returnCar: build.mutation<ApiResponse<string>, { bookingId: string }>({
             query: ({ bookingId }) => ({
@@ -302,6 +365,85 @@ export const bookingApi = createApi({
                 method: "PUT",
             }),
             invalidatesTags: ["Booking"],
+        }),
+
+        customerCancelBooking: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; reason?: string; pictureUrl?: string | null }
+        >({
+            query: ({ bookingNumber, reason, pictureUrl }) => ({
+                url: `/booking/${bookingNumber}/customer-cancel`,
+                method: "POST",
+                body: { reason, pictureUrl: pictureUrl ?? null },
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+        ownerCancelBooking: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string; pictureUrl?: string | null }
+        >({
+            query: ({ bookingNumber, note, pictureUrl }) => ({
+                url: `/booking/${bookingNumber}/owner-cancel`,
+                method: "POST",
+                body: { note, pictureUrl: pictureUrl ?? null },
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+        confirmBooking: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string | null }
+        >({
+            query: ({ bookingNumber, note }) => ({
+                url: `/booking/${bookingNumber}/confirm`,
+                method: "POST",
+                body: note ? { note } : undefined,
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+        requestReturn: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string; pictureUrl?: string | null }
+        >({
+            query: ({ bookingNumber, note, pictureUrl }) => ({
+                url: `/booking/${bookingNumber}/request-return`,
+                method: "POST",
+                body: { note, pictureUrl: pictureUrl ?? null },
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+        acceptReturn: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string; pictureUrl?: string | null; chargesCents?: number }
+        >({
+            query: ({ bookingNumber, note, pictureUrl, chargesCents }) => ({
+                url: `/booking/${bookingNumber}/accept-return`,
+                method: "POST",
+                body: {
+                    note,
+                    pictureUrl: pictureUrl ?? null,
+                    chargesCents: chargesCents ?? 0,
+                },
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+        rejectReturn: build.mutation<
+            ApiResponse<string>,
+            { bookingNumber: string; note?: string; pictureUrl?: string | null }
+        >({
+            query: ({ bookingNumber, note, pictureUrl }) => ({
+                url: `/booking/${bookingNumber}/reject-return`,
+                method: "POST",
+                body: { note, pictureUrl: pictureUrl ?? null },
+            }),
+            invalidatesTags: (result, error, { bookingNumber }) => [{ type: "Booking", id: bookingNumber }, "Booking"],
+        }),
+
+        getBookingSummary: build.query<ApiResponse<BookingSummaryVO>, string>({
+            query: (bookingNumber) => ({
+                url: `/Booking/summary/${bookingNumber}`,
+                method: "GET",
+            }),
+            providesTags: (result, error, bookingNumber) => [{ type: "Booking", id: bookingNumber }],
         }),
 
         getBookingDetail: build.query<ApiResponse<BookingDetailVO>, string>({
@@ -367,7 +509,14 @@ export const {
     useConfirmPickupMutation,
     useConfirmDepositMutation,
     useReturnCarMutation,
+    useCustomerCancelBookingMutation,
+    useOwnerCancelBookingMutation,
+    useConfirmBookingMutation,
+    useRequestReturnMutation,
+    useAcceptReturnMutation,
+    useRejectReturnMutation,
     useGetBookingDetailQuery,
+    useGetBookingSummaryQuery,
     useUpdateBookingMutation,
     useRateCarMutation,
     useGetBookingCarAndUserQuery,
