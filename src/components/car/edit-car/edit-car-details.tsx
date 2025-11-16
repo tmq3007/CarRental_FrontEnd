@@ -555,7 +555,7 @@ export default function EditCarDetails({ carId, initialData }: { carId: string; 
                                                 placeholder="Search for an address"
                                                 value={formData.houseNumberStreet}
                                                 className="pr-10 transition-all duration-200 focus:scale-105"
-                                                disabled
+
                                             />
                                             <Button
                                                 variant="ghost"
