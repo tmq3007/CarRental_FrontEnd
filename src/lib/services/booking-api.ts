@@ -24,6 +24,7 @@ export interface BookingVO {
     carImageBack?: string;
     carImageLeft?: string;
     carImageRight?: string;
+    isReviewed?: boolean;
 }
 
 export type BookingStatus =

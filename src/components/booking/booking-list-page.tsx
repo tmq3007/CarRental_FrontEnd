@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import {
-  useGetBookingsByAccountIdQuery,
   useSearchBookingsByAccountIdQuery,
   useGetBookingDetailQuery,
   useRateCarMutation,
@@ -17,7 +16,6 @@ import { useSelector } from "react-redux"
 import type { RootState } from "@/lib/store"
 import { toast } from "sonner"
 import LoadingPage from "@/components/common/loading"
-import NoResult from "@/components/common/no-result"
 import { Pagination } from "@/components/wallet/pagination"
 import {
   Search,
@@ -31,6 +29,7 @@ import {
   Ban,
   Undo2,
   RefreshCw,
+  Loader2,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu"
 import { formatCurrency } from "@/lib/hook/useFormatCurrency"
@@ -81,6 +80,8 @@ function normalizeStatus(status?: string | null) {
   return (status ?? "").toLowerCase()
 }
 
+type NormalizedStatus = ReturnType<typeof normalizeStatus>
+
 function getCustomerActionsForStatus(status?: string | null): ActionKey[] {
   switch (normalizeStatus(status)) {
     case "waiting_confirmed":
@@ -107,14 +108,15 @@ export default function BookingListPage() {
   const router = useRouter()
   const [rateCar] = useRateCarMutation()
 
-  // State cho search mới
-  const [searchParams, setSearchParams] = useState<BookingQueryParams>({
+  const defaultSearchParams: BookingQueryParams = {
     searchTerm: "",
     sortOrder: "newest",
-    statuses: ["confirmed", "in_progress", "pending_payment", "pending_deposit", "rejected_return", "waiting_confirm_return", "waiting_confirmed", "completed", "cancelled"],
-  })
+    statuses: ["confirmed", "in_progress", "pending_payment", "pending_deposit", "rejected_return", "waiting_confirm_return", "waiting_confirmed"],
+  }
 
-  const [isSearching, setIsSearching] = useState(false)
+  // State cho search mới
+  const [searchParams, setSearchParams] = useState<BookingQueryParams>(defaultSearchParams)
+
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6
   const [detailModalOpen, setDetailModalOpen] = useState(false)
@@ -127,27 +129,20 @@ export default function BookingListPage() {
   } | null>(null)
   const [summaryModalOpen, setSummaryModalOpen] = useState(false)
   const [summaryBookingNumber, setSummaryBookingNumber] = useState<string | null>(null)
+  const [pendingRatingBookingNumber, setPendingRatingBookingNumber] = useState<string | null>(null)
+  const pendingRatingBookingRef = useRef<BookingVO | null>(null)
 
-  const statusRegistryRef = useRef<Map<string, string>>(new Map())
+  const statusRegistryRef = useRef<Map<string, NormalizedStatus>>(new Map())
   const hasInitializedStatusesRef = useRef(false)
   const completionQueueRef = useRef<string[]>([])
   const shownCompletionsRef = useRef<Set<string>>(new Set())
 
   // API calls
   const {
-    data: allBookingsData,
-    isLoading: isLoadingAll,
-    isError: isErrorAll,
-    refetch: refetchAllBookings,
-  } = useGetBookingsByAccountIdQuery(
-    { accountId: userId || "" },
-    { skip: !userId }
-  )
-
-  const {
     data: searchedBookingsData,
-    isLoading: isLoadingSearch,
-    isError: isErrorSearch,
+    isLoading: isLoading,
+    isFetching: isFetching,
+    isError: isError,
     refetch: refetchSearchedBookings,
   } = useSearchBookingsByAccountIdQuery(
     {
@@ -155,52 +150,28 @@ export default function BookingListPage() {
       queryParams: searchParams,
     },
     {
-      skip: !userId || !isSearching,
+      skip: !userId,
     }
   )
 
-  // Quyết định dùng data nào
-  const bookingsData = isSearching ? searchedBookingsData : allBookingsData
-  const bookings = bookingsData?.data || []
-  const isLoading = isLoadingAll || (isSearching && isLoadingSearch)
-  const isError = isErrorAll || (isSearching && isErrorSearch)
+  const bookings = searchedBookingsData?.data || []
 
   const refreshBookings = useCallback(async (): Promise<BookingVO[]> => {
-    if (isSearching) {
-      const result = await refetchSearchedBookings()
-      if ('data' in result && result.data?.data) {
-        return result.data.data
-      }
-    } else {
-      const result = await refetchAllBookings()
-      if ('data' in result && result.data?.data) {
-        return result.data.data
-      }
+    const result = await refetchSearchedBookings()
+    if ('data' in result && result.data?.data) {
+      return result.data.data
     }
     return bookings
-  }, [isSearching, refetchAllBookings, refetchSearchedBookings, bookings])
+  }, [refetchSearchedBookings, bookings])
 
   // Handle search
   const handleSearch = () => {
-    if (!searchParams.searchTerm &&
-      searchParams.statuses?.length === statusOptions.length &&
-      searchParams.sortOrder === "newest") {
-      // Nếu không có filter nào được áp dụng, tắt search mode
-      setIsSearching(false)
-    } else {
-      setIsSearching(true)
-    }
     setCurrentPage(1) // Reset về trang đầu tiên
   }
 
   // Handle reset
   const handleReset = () => {
-    setSearchParams({
-      searchTerm: "",
-      sortOrder: "newest",
-      statuses: ["confirmed", "in_progress", "pending_payment", "pending_deposit"],
-    })
-    setIsSearching(false)
+    setSearchParams(defaultSearchParams)
     setCurrentPage(1)
   }
 
@@ -211,6 +182,7 @@ export default function BookingListPage() {
   const totalPages = Math.ceil(bookings.length / itemsPerPage)
   const paginatedBookings = bookings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
+  const isFiltered = JSON.stringify(searchParams) !== JSON.stringify(defaultSearchParams)
 
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState<BookingVO | null>(null)
@@ -241,22 +213,26 @@ export default function BookingListPage() {
   )
 
   const showNextCompletion = useCallback(() => {
-      if (summaryModalOpen) {
-        return
-      }
+    if (summaryModalOpen) {
+      return
+    }
 
-      const nextBookingNumber = completionQueueRef.current.shift()
-      if (!nextBookingNumber) {
-        return
-      }
+    const nextBookingNumber = completionQueueRef.current.shift()
+    if (!nextBookingNumber) {
+      return
+    }
 
-      shownCompletionsRef.current.add(nextBookingNumber)
-      setSummaryBookingNumber(nextBookingNumber)
-      setSummaryModalOpen(true)
-      toast.success("Congratulations! Your trip is complete.", {
-        description: `Booking #${nextBookingNumber} has been completed. Review the summary for full details.`,
-      })
-    }, [summaryModalOpen])
+    shownCompletionsRef.current.add(nextBookingNumber)
+    const nextBooking = bookings.find((item) => item.bookingNumber === nextBookingNumber) ?? null
+    const shouldPromptReview = Boolean(nextBooking && !nextBooking.isReviewed)
+    pendingRatingBookingRef.current = shouldPromptReview ? nextBooking : null
+    setSummaryBookingNumber(nextBookingNumber)
+    setSummaryModalOpen(true)
+    setPendingRatingBookingNumber(shouldPromptReview ? nextBookingNumber : null)
+    toast.success("Congratulations! Your trip is complete.", {
+      description: `Booking #${nextBookingNumber} has been completed. Review the summary for full details.`,
+    })
+  }, [bookings, summaryModalOpen])
 
   const handleDetailModalOpenChange = useCallback((open: boolean) => {
     setDetailModalOpen(open)
@@ -268,24 +244,10 @@ export default function BookingListPage() {
   }, [])
 
   const handleActionCompleted = useCallback(
-    async (actionKey: ActionKey, payload: BookingActionCompletedPayload) => {
-      void payload
-      const updatedBookings = await refreshBookings()
-      if (actionKey === "customer_request_return" || actionKey === "customer_return_again") {
-        let targetBooking: BookingVO | null = selectedBooking
-        if (selectedBookingNumber) {
-          const latest = updatedBookings.find((item) => item.bookingNumber === selectedBookingNumber)
-          if (latest) {
-            targetBooking = latest
-          }
-        }
-        if (targetBooking) {
-          setSelectedBooking(targetBooking)
-          setRatingDialogOpen(true)
-        }
-      }
+    async (_actionKey: ActionKey, _payload: BookingActionCompletedPayload) => {
+      await refreshBookings()
     },
-    [refreshBookings, selectedBookingNumber, selectedBooking]
+    [refreshBookings]
   )
 
   useEffect(() => {
@@ -293,6 +255,8 @@ export default function BookingListPage() {
       statusRegistryRef.current.clear()
       completionQueueRef.current = []
       hasInitializedStatusesRef.current = false
+      pendingRatingBookingRef.current = null
+      setPendingRatingBookingNumber(null)
       return
     }
 
@@ -323,10 +287,10 @@ export default function BookingListPage() {
   }, [bookings, showNextCompletion])
 
   useEffect(() => {
-    if (!summaryModalOpen) {
+    if (!summaryModalOpen && !ratingDialogOpen) {
       showNextCompletion()
     }
-  }, [summaryModalOpen, showNextCompletion])
+  }, [summaryModalOpen, ratingDialogOpen, showNextCompletion])
 
   const handleSubmitRating = async () => {
     if (!selectedBooking || rating === 0) {
@@ -442,7 +406,6 @@ export default function BookingListPage() {
               <Button
                 onClick={handleSearch}
                 className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={isLoadingSearch}
               >
                 <Search className="w-4 h-4 mr-2" />
                 Search
@@ -456,12 +419,26 @@ export default function BookingListPage() {
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Reset
               </Button>
+
+              <Button
+                onClick={() => refreshBookings()}
+                variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                disabled={isFetching}
+              >
+                {isFetching ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                )}
+                Refresh
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Search Status Indicator */}
-        {isSearching && (
+        {isFiltered && (
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center text-blue-700 text-sm">
@@ -488,6 +465,7 @@ export default function BookingListPage() {
           const returnDate = new Date(booking.returnDate ?? "")
           const numberOfDays = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
           const normalizedStatus = normalizeStatus(booking.status)
+          const isReviewed = Boolean(booking.isReviewed)
           const customerActions = getCustomerActionsForStatus(normalizedStatus)
 
           return (
@@ -582,6 +560,7 @@ export default function BookingListPage() {
                   {normalizedStatus === "completed" && (
                     <Button
                       onClick={() => {
+                        if (isReviewed) return
                         setSelectedBooking(booking)
                         setSelectedBookingNumber(booking.bookingNumber)
                         setRatingDialogOpen(true)
@@ -589,9 +568,10 @@ export default function BookingListPage() {
                       variant="secondary"
                       size="sm"
                       className="w-full justify-center gap-2"
+                      disabled={isReviewed}
                     >
                       <Star className="h-4 w-4 text-emerald-500" />
-                      Leave a review
+                      {isReviewed ? "Reviewed" : "Leave a review"}
                     </Button>
                   )}
                 </div>
@@ -640,7 +620,17 @@ export default function BookingListPage() {
         onOpenChange={(open) => {
           setSummaryModalOpen(open)
           if (!open) {
+            const closedBookingNumber = summaryBookingNumber
             setSummaryBookingNumber(null)
+            if (closedBookingNumber && pendingRatingBookingNumber === closedBookingNumber) {
+              const targetBooking = pendingRatingBookingRef.current
+              if (targetBooking && targetBooking.bookingNumber === closedBookingNumber && !targetBooking.isReviewed) {
+                setSelectedBooking(targetBooking)
+                setRatingDialogOpen(true)
+              }
+              setPendingRatingBookingNumber(null)
+              pendingRatingBookingRef.current = null
+            }
           }
         }}
       />
@@ -653,6 +643,12 @@ export default function BookingListPage() {
           if (!open) {
             setRating(0)
             setReview("")
+            setPendingRatingBookingNumber(null)
+            pendingRatingBookingRef.current = null
+            if (!detailModalOpen) {
+              setSelectedBooking(null)
+              setSelectedBookingNumber(null)
+            }
           }
         }}
       >
@@ -737,4 +733,4 @@ function CustomerActionRunner({ context, onClose, onActionCompleted }: CustomerA
       ) : null}
     </div>
   )
-}
+}            
