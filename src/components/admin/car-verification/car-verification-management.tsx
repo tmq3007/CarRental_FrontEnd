@@ -395,7 +395,7 @@ export default function CarVerification() {
                                                         <div className="text-center md:text-left">
                                                             <span className="text-gray-500">Fuel:</span>
                                                             <span className="ml-1 md:ml-2 font-medium block md:inline">
-                                {car.isGasoline === true ? "Gasoline" : car.isGasoline === false ? "Diesel" : "N/A"}
+                                {car.fuelType || "N/A"}
                               </span>
                                                         </div>
                                                     </div>
@@ -607,11 +607,7 @@ export default function CarVerification() {
                                             <div className="grid grid-cols-2 gap-2">
                                                 <span className="text-gray-500">Fuel Type:</span>
                                                 <span className="font-medium">
-                          {selectedCar.isGasoline === true
-                              ? "Gasoline"
-                              : selectedCar.isGasoline === false
-                                  ? "Diesel"
-                                  : "Not specified"}
+                          {selectedCar.fuelType || "Not specified"}
                         </span>
                                             </div>
                                         </div>
