@@ -67,6 +67,7 @@ export default function CarListPage({ accountId }: CarListPageProps) {
     }, [data?.data?.pagination])
 
     const cars: CarVO_ViewACar[] = data?.data?.data || []
+    console.log('Cars data from API:', cars);
     const { pageNumber: safePageNumber, totalPages, totalRecords, hasPreviousPage, hasNextPage } = safePagination
 
     const handleViewDetails = (carId: string) => {

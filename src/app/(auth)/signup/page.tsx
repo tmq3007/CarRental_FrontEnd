@@ -70,7 +70,7 @@ export default function SignInPage() {
             confirmPassword: formData.get("confirmPassword") as string,
             fullName,
             phoneNumber,
-            roleId: userType === "renter" ? 2 : 4
+            roleId: userType === "renter" ? 3 : 1
         }
 
         try {

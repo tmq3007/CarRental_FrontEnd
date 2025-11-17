@@ -25,6 +25,7 @@ export default function ProfilePage() {
 
     const { data: user, isLoading: userLoading, error: userError, refetch: refetchUser } = useGetUserByIdQuery(userId)
 
+    console.log(user)
     const [updateProfile] = useUpdateUserProfileMutation()
     const [changePassword] = useChangePasswordMutation()
     const [personalInfo, setPersonalInfo] = useState<UserProfile | null>(null)
