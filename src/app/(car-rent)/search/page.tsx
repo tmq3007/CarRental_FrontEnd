@@ -65,8 +65,8 @@ export default function SearchPage() {
     pickupTime: reduxSearchData.pickupTime
       ? new Date(reduxSearchData.pickupTime)
       : parseDateParam(searchParams.get('pickupTime')),
-    dropoffTime: reduxSearchData.dropoffTime
-      ? new Date(reduxSearchData.dropoffTime)
+    dropoffTime: reduxSearchData.dropOffTime
+      ? new Date(reduxSearchData.dropOffTime)
       : parseDateParam(searchParams.get('dropoffTime')),
     order: (searchParams.get('order') as 'asc' | 'desc') || 'asc',
     sortBy: searchParams.get('sortBy') || 'newest',
@@ -85,7 +85,7 @@ export default function SearchPage() {
       const queryString = toQueryParams({
         ...filters,
         pickupTime: filters.pickupTime ? filters.pickupTime.toISOString() : null,
-        dropOffTime: filters.dropoffTime ? filters.dropoffTime.toISOString() : null,
+        dropOffTime: filters.dropOffTime ? filters.dropOffTime.toISOString() : null,
         page,
         pageSize: size,
       });
@@ -98,7 +98,7 @@ export default function SearchPage() {
   const queryCriteria: QueryCriteria = useMemo(() => ({
     ...currentFilters,
     pickupTime: currentFilters.pickupTime ? currentFilters.pickupTime.toISOString() : null,
-    dropoffTime: currentFilters.dropoffTime ? currentFilters.dropoffTime.toISOString() : null,
+    dropOffTime: currentFilters.dropOffTime ? currentFilters.dropOffTime.toISOString() : null,
     page: currentPage,
     pageSize,
   }), [currentFilters, currentPage, pageSize]);
@@ -116,11 +116,11 @@ export default function SearchPage() {
   };
 
   const rentalDays =
-    currentFilters.pickupTime && currentFilters.dropoffTime
+    currentFilters.pickupTime && currentFilters.dropOffTime
       ? Math.max(
         1,
         Math.ceil(
-          (currentFilters.dropoffTime.getTime() - currentFilters.pickupTime.getTime()) /
+          (currentFilters.dropOffTime.getTime() - currentFilters.pickupTime.getTime()) /
           (1000 * 60 * 60 * 24)
         )
       )
@@ -140,7 +140,7 @@ export default function SearchPage() {
             ward: filters.location?.ward ?? '',
           },
           pickupTime: filters.pickupTime ? filters.pickupTime.toISOString() : null,
-          dropoffTime: filters.dropoffTime ? filters.dropoffTime.toISOString() : null,
+          dropOffTime: filters.dropOffTime ? filters.dropOffTime.toISOString() : null,
         })
       );
       updateUrl(filters, 1);
@@ -170,7 +170,7 @@ export default function SearchPage() {
       searchQuery: '',
       location: undefined,
       pickupTime: null,
-      dropoffTime: null,
+      dropOffTime: null,
       order: 'asc',
       sortBy: 'newest',
     };
@@ -181,7 +181,7 @@ export default function SearchPage() {
       setSearchData({
         location: { province: '', district: '', ward: '' },
         pickupTime: null,
-        dropoffTime: null,
+        dropOffTime: null,
       })
     );
     updateUrl(resetFilters, 1);

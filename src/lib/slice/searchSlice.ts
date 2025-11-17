@@ -10,7 +10,7 @@ interface Location {
 interface SearchState {
   location: Location;
   pickupTime: string | null;
-  dropoffTime: string | null;
+  dropOffTime: string | null;
 }
 
 const initialState: SearchState = {
@@ -20,7 +20,7 @@ const initialState: SearchState = {
     ward: '',
   },
   pickupTime: new Date().toISOString(),
-  dropoffTime: new Date().toISOString(),
+  dropOffTime: new Date().toISOString(),
 };
 
 const searchSlice = createSlice({
@@ -32,12 +32,12 @@ const searchSlice = createSlice({
       action: PayloadAction<{
         location: Location;
         pickupTime: string | null;
-        dropoffTime: string | null;
+        dropOffTime: string | null;
       }>
     ) => {
       state.location = action.payload.location;
       state.pickupTime = action.payload.pickupTime;
-      state.dropoffTime = action.payload.dropoffTime;
+      state.dropOffTime = action.payload.dropOffTime;
     },
   },
 });

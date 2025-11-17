@@ -28,7 +28,7 @@ export default function FilterPillComponent({
   const [immediateFilters, setImmediateFilters] = useState(initialFilters)
   const [location, setLocation] = useState(initialFilters.location || { province: "", district: "", ward: "" })
   const [pickupTime, setPickupTime] = useState(initialFilters.pickupTime)
-  const [dropoffTime, setDropoffTime] = useState(initialFilters.dropoffTime)
+  const [dropOffTime, setDropOffTime] = useState(initialFilters.dropOffTime)
   const [searchQuery, setSearchQuery] = useState(initialFilters.searchQuery || "")
   const applyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const applyFiltersRef = useRef<() => void>(() => {})
@@ -38,7 +38,7 @@ export default function FilterPillComponent({
     setImmediateFilters(initialFilters)
     setLocation(initialFilters.location || { province: "", district: "", ward: "" })
     setPickupTime(initialFilters.pickupTime)
-    setDropoffTime(initialFilters.dropoffTime)
+    setDropOffTime(initialFilters.dropOffTime)
     setSearchQuery(initialFilters.searchQuery || "")
   }, [initialFilters])
 
@@ -63,12 +63,12 @@ export default function FilterPillComponent({
       })
     }
 
-    if (dropoffTime) {
+    if (dropOffTime) {
       tags.push({
-        id: "dropoffTime",
-        label: `Dropoff: ${dropoffTime.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`,
-        type: "dropoffTime",
-        value: dropoffTime,
+        id: "dropOffTime",
+        label: `Dropoff: ${dropOffTime.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`,
+        type: "dropOffTime",
+        value: dropOffTime,
       })
     }
 
@@ -95,12 +95,11 @@ export default function FilterPillComponent({
       searchQuery,
       location: location.province ? location : undefined,
       pickupTime,
-      dropoffTime,
+      dropOffTime,
     }
     onFilterChange(updatedFilters)
     setIsExpanded(false)
-  }, [dropoffTime, immediateFilters, location, onFilterChange, pickupTime, searchQuery])
-
+  }, [dropOffTime, immediateFilters, location, onFilterChange, pickupTime, searchQuery])
   useEffect(() => {
     applyFiltersRef.current = applyFilters
   }, [applyFilters])
@@ -128,7 +127,7 @@ export default function FilterPillComponent({
       case "search": setSearchQuery(""); break
       case "location": setLocation({ province: "", district: "", ward: "" }); break
       case "pickupTime": setPickupTime(undefined); break
-      case "dropoffTime": setDropoffTime(undefined); break
+      case "dropOffTime": setDropOffTime(undefined); break
       case "carTypes":
       case "fuelTypes":
       case "transmissionTypes":
@@ -206,7 +205,7 @@ export default function FilterPillComponent({
         location={location}
         onApplyFilters={applyFilters}
         pickupTime={pickupTime ?? undefined}
-        dropoffTime={dropoffTime ?? undefined}
+        dropOffTime={dropOffTime ?? undefined}
       />
 
       <FilterPanel
@@ -225,9 +224,9 @@ export default function FilterPillComponent({
         location={location}
         onLocationChange={handleLocationChange}
         pickupTime={pickupTime ?? undefined}
-        dropoffTime={dropoffTime ?? undefined}
+        dropOffTime={dropOffTime ?? undefined}
         onPickupTimeChange={setPickupTime}
-        onDropoffTimeChange={setDropoffTime}
+        onDropOffTimeChange={setDropOffTime}
         onApplyFilters={applyFilters}
       />
     </>

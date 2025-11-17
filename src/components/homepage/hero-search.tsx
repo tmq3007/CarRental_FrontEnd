@@ -36,7 +36,7 @@ export default function HeroSearchSection() {
       ward: reduxSearchData.location.ward || '',
     },
     pickupDateTime: reduxSearchData.pickupTime ? new Date(reduxSearchData.pickupTime) : undefined,
-    dropoffDateTime: reduxSearchData.dropoffTime ? new Date(reduxSearchData.dropoffTime) : undefined,
+    dropoffDateTime: reduxSearchData.dropOffTime ? new Date(reduxSearchData.dropOffTime) : undefined,
   }));
 
   // Sync local state with Redux state if it changes (e.g., due to rehydration)
@@ -48,7 +48,7 @@ export default function HeroSearchSection() {
         ward: reduxSearchData.location.ward || '',
       },
       pickupDateTime: reduxSearchData.pickupTime ? new Date(reduxSearchData.pickupTime) : undefined,
-      dropoffDateTime: reduxSearchData.dropoffTime ? new Date(reduxSearchData.dropoffTime) : undefined,
+      dropoffDateTime: reduxSearchData.dropOffTime ? new Date(reduxSearchData.dropOffTime) : undefined,
     });
   }, [reduxSearchData]);
 
@@ -60,7 +60,7 @@ export default function HeroSearchSection() {
       setSearchData({
         location: { province, district, ward },
         pickupTime: searchData.pickupDateTime ? searchData.pickupDateTime.toISOString() : null,
-        dropoffTime: searchData.dropoffDateTime ? searchData.dropoffDateTime.toISOString() : null,
+        dropOffTime: searchData.dropoffDateTime ? searchData.dropoffDateTime.toISOString() : null,
       })
     );
   
