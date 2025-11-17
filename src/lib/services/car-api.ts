@@ -34,7 +34,7 @@ export interface CarVO_ViewACar {
   brand: string;
   model: string;
   color: string;
-  basePrice: number;
+  basePrice : number;
   numberOfSeats: number;
   productionYear: number;
   carImageFront?: string;
@@ -278,7 +278,6 @@ export const carApi = createApi({
         body: payload,
       }),
     }),
-
 
     getBookingDetailsByCarId: build.query<ApiResponse<BookingDetailVO>, string>({
       query: (carId) => ({
