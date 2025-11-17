@@ -191,7 +191,7 @@ export interface FilterCriteria {
     ward?: string;
   };
   pickupTime?: Date | null;
-  dropoffTime?: Date | null;
+  dropOffTime?: Date | null;
   sortBy: string;
   order: "asc" | "desc";
 }

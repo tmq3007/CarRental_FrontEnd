@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 import Redis from 'ioredis'
 
 const redis = new Redis(process.env.REDIS_URL!)
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
 
     try {
         const { jti, email } = await req.json()
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ message: 'Used' }, { status: 404 });
         }
 
-        console.log("Been here")
+        console.log('Been here')
 
         return NextResponse.json({ message: 'Okay' }, { status: 200 });
 

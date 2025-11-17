@@ -82,9 +82,9 @@ export default function CarRentalBooking() {
     pickupDate: reduxSearchData.pickupTime
       ? new Date(reduxSearchData.pickupTime)
       : parseQueryDate(searchParams.get("pickupTime")),
-    returnDate: reduxSearchData.dropoffTime
-      ? new Date(reduxSearchData.dropoffTime)
-      : parseQueryDate(searchParams.get("dropoffTime")),
+    returnDate: reduxSearchData.dropOffTime
+      ? new Date(reduxSearchData.dropOffTime)
+      : parseQueryDate(searchParams.get("dropOffTime")),
     pickupLocation: {
       province: reduxSearchData.location.province || searchParams.get("locationProvince") || "",
       district: reduxSearchData.location.district || "",

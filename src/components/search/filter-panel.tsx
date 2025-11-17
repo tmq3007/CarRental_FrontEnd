@@ -28,9 +28,9 @@ interface FilterPanelProps {
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined
-  dropoffTime: Date | undefined
+  dropOffTime: Date | undefined
   onPickupTimeChange: (date: Date | undefined) => void
-  onDropoffTimeChange: (date: Date | undefined) => void
+  onDropOffTimeChange: (date: Date | undefined) => void
   onApplyFilters: () => void
 }
 
@@ -50,9 +50,9 @@ export default function FilterPanel({
   location,
   onLocationChange,
   pickupTime,
-  dropoffTime,
+  dropOffTime,
   onPickupTimeChange,
-  onDropoffTimeChange,
+  onDropOffTimeChange,
   onApplyFilters,
 }: FilterPanelProps) {
   if (!isExpanded) return null
@@ -100,9 +100,9 @@ export default function FilterPanel({
             location={location}
             onLocationChange={onLocationChange}
             pickupTime={pickupTime}
-            dropoffTime={dropoffTime}
+            dropOffTime={dropOffTime}
             onPickupTimeChange={onPickupTimeChange}
-            onDropoffTimeChange={onDropoffTimeChange}
+            onDropOffTimeChange={onDropOffTimeChange}
           />
         ) : (
           <CompactViewContent
@@ -115,9 +115,9 @@ export default function FilterPanel({
             location={location}
             onLocationChange={onLocationChange}
             pickupTime={pickupTime}
-            dropoffTime={dropoffTime}
+            dropOffTime={dropOffTime}
             onPickupTimeChange={onPickupTimeChange}
-            onDropoffTimeChange={onDropoffTimeChange}
+            onDropOffTimeChange={onDropOffTimeChange}
           />
         )}
 
@@ -146,9 +146,9 @@ function CompactViewContent({
   location,
   onLocationChange,
   pickupTime,
-  dropoffTime,
+  dropOffTime,
   onPickupTimeChange,
-  onDropoffTimeChange,
+  onDropOffTimeChange,
 }: {
   activeTab: string
   onTabChange: (tab: string) => void
@@ -163,9 +163,9 @@ function CompactViewContent({
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined
-  dropoffTime: Date | undefined
+  dropOffTime: Date | undefined
   onPickupTimeChange: (date: Date | undefined) => void
-  onDropoffTimeChange: (date: Date | undefined) => void
+  onDropOffTimeChange: (date: Date | undefined) => void
 }) {
   return (
     <>
@@ -177,9 +177,9 @@ function CompactViewContent({
         {activeTab === "location-time" && (
           <LocationAndTimeFilter
             pickupTime={pickupTime}
-            dropoffTime={dropoffTime}
+            dropOffTime={dropOffTime}
             onPickupTimeChange={onPickupTimeChange}
-            onDropoffTimeChange={onDropoffTimeChange}
+            onDropOffTimeChange={onDropOffTimeChange}
             location={location}
             onLocationChange={onLocationChange}
           />
@@ -207,9 +207,9 @@ function FullViewContent({
   location,
   onLocationChange,
   pickupTime,
-  dropoffTime,
+  dropOffTime,
   onPickupTimeChange,
-  onDropoffTimeChange,
+  onDropOffTimeChange,
 }: {
   filters: any
   handleFilterChange: (filterType: string, value: any) => void
@@ -222,9 +222,9 @@ function FullViewContent({
   }
   onLocationChange: (field: string, value: string) => void
   pickupTime: Date | undefined
-  dropoffTime: Date | undefined
+  dropOffTime: Date | undefined
   onPickupTimeChange: (date: Date | undefined) => void
-  onDropoffTimeChange: (date: Date | undefined) => void
+  onDropOffTimeChange: (date: Date | undefined) => void
 }) {
   return (
     <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(75vh - 140px)" }}>
@@ -233,9 +233,9 @@ function FullViewContent({
         <div className="col-span-2">
           <LocationAndTimeFilter
             pickupTime={pickupTime}
-            dropoffTime={dropoffTime}
+            dropOffTime={dropOffTime}
             onPickupTimeChange={onPickupTimeChange}
-            onDropoffTimeChange={onDropoffTimeChange}
+            onDropOffTimeChange={onDropOffTimeChange}
             location={location}
             onLocationChange={onLocationChange}
           />

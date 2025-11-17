@@ -28,7 +28,7 @@ interface MultiDirectionalFilterPillProps {
     ward?: string
   }
   pickupTime: Date | undefined
-  dropoffTime: Date | undefined
+  dropOffTime: Date | undefined
   onApplyFilters: () => void // New prop
 }
 
@@ -45,7 +45,7 @@ export default function MultiDirectionalFilterPill({
   activeFiltersCount,
   location,
   pickupTime,
-  dropoffTime,
+  dropOffTime,
   onApplyFilters,
 }: MultiDirectionalFilterPillProps) {
   const [expansionMode, setExpansionMode] = useState<ExpansionMode>("compact")
@@ -91,17 +91,17 @@ export default function MultiDirectionalFilterPill({
     },
     {
       id: "dropoff-time",
-      label: formatDate(dropoffTime),
-      type: "dropoffTime",
-      value: dropoffTime,
+      label: formatDate(dropOffTime),
+      type: "dropOffTime",
+      value: dropOffTime,
       priority: 1,
       icon: <Clock size={12} className="mr-1" />,
-      isEmpty: !dropoffTime,
+      isEmpty: !dropOffTime,
     },
   ]
 
   // Additional filter tags
-  const additionalTags = filterTags.filter((tag) => !["location", "pickupTime", "dropoffTime"].includes(tag.type))
+  const additionalTags = filterTags.filter((tag) => !["location", "pickupTime", "dropOffTime"].includes(tag.type))
 
   // All tags combined
   const allTags = [...priorityTags, ...additionalTags]

@@ -30,7 +30,7 @@ export function ConfirmationStep({ bookingData }: ConfirmationStepProps) {
     updateSize();
     window.addEventListener("resize", updateSize);
 
-    const timer = window.setTimeout(() => setShowConfetti(false), 5000);
+    const timer = window.setTimeout(() => setShowConfetti(false), 20000);
 
     return () => {
       window.removeEventListener("resize", updateSize);

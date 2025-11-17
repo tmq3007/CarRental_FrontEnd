@@ -5,9 +5,9 @@ import AddressInput from "@/components/common/address-input";
 
 interface LocationAndTimeFilterProps {
   pickupTime: Date | undefined;
-  dropoffTime: Date | undefined;
+  dropOffTime: Date | undefined;
   onPickupTimeChange: (date: Date | undefined) => void; 
-  onDropoffTimeChange: (date: Date | undefined) => void; 
+  onDropOffTimeChange: (date: Date | undefined) => void; 
   location: {
     province?: string;
     district?: string;
@@ -19,9 +19,9 @@ interface LocationAndTimeFilterProps {
 
 export default function LocationAndTimeFilter({
   pickupTime,
-  dropoffTime,
+  dropOffTime,
   onPickupTimeChange,
-  onDropoffTimeChange,
+  onDropOffTimeChange,
   onLocationChange,
   location,
   compact = false,
@@ -85,8 +85,8 @@ export default function LocationAndTimeFilter({
                 </div>
               </div>
               <DateTimePicker
-                value={dropoffTime}
-                onChange={onDropoffTimeChange}
+                value={dropOffTime}
+                onChange={onDropOffTimeChange}
                 label=""
                 placeholder="Select return date & time"
               />

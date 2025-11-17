@@ -18,7 +18,7 @@ import { useGetBookingDetailQuery } from '@/lib/services/booking-api'
 import type { BookingDetailVO, BookingStatusHistoryEntry } from '@/lib/services/booking-api'
 import { BookingStatusTimeline } from '@/components/booking/booking-status-timeline'
 import { BookingStatusProgress } from '@/components/booking/booking-status-progress'
-import { BookingActionPanel, type ActionKey } from '@/components/booking/booking-action-panel'
+import { BookingActionPanel, type ActionKey, type BookingActionCompletedPayload } from '@/components/booking/booking-action-panel'
 
 interface BookingDetailModalProps {
   bookingNumber?: string | null
@@ -33,6 +33,7 @@ interface BookingDetailModalProps {
   disableActions?: boolean
   initialActionKey?: ActionKey | null
   onInitialActionHandled?: () => void
+  onActionCompleted?: (actionKey: ActionKey, payload: BookingActionCompletedPayload) => Promise<void> | void
 }
 
 function InfoRow({ label, value }: { label: string; value?: string | number | null }) {
@@ -73,6 +74,7 @@ export function BookingDetailModal({
   disableActions,
   initialActionKey,
   onInitialActionHandled,
+  onActionCompleted,
 }: BookingDetailModalProps) {
   const shouldFetch = Boolean(open && bookingNumber)
   const { data, isLoading, isError, refetch, isFetching } = useGetBookingDetailQuery(bookingNumber ?? '', {
@@ -155,8 +157,11 @@ export function BookingDetailModal({
                   <BookingActionPanel
                     booking={booking}
                     role="car_owner"
-                    onActionCompleted={async (_actionKey) => {
+                    onActionCompleted={async (actionKey, payload) => {
                       await refetch()
+                      if (onActionCompleted) {
+                        await onActionCompleted(actionKey, payload)
+                      }
                     }}
                     isRefreshing={isFetching}
                     disabled={disableActions}
